@@ -11,6 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MateMatch">
+
+        <activity android:name=".main.TestActivity" />
+
         <activity
             android:name=".main.MainActivity"
             android:exported="true">
