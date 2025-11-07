@@ -6,7 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_light"
-    tools:context=".ProfileSetupActivity">
+    tools:context=".profile.ui.ProfileSetupActivity">
+
+
 
     <!-- 카드형 컨테이너 -->
     <com.google.android.material.card.MaterialCardView
@@ -62,7 +64,8 @@
                     android:layout_height="120dp"
                     android:src="@drawable/ic_person"
                     android:scaleType="centerCrop"
-                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Material3.Corner.None"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.None"
+
                     app:strokeColor="#CCCCCC"
                     app:strokeWidth="1dp"
                     android:layout_marginBottom="12dp" />
@@ -74,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:text="Upload Photo"
                     android:icon="@drawable/ic_upload"
-                    android:iconPadding="8dp"
+                    app:iconPadding="8dp"
                     android:iconTint="@android:color/white"
                     android:textColor="@android:color/white"
                     android:backgroundTint="#5C3A00" />

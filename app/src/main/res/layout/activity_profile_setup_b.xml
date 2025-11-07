@@ -88,14 +88,16 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
+                    <!-- City Spinner -->
                     <Spinner
                         android:id="@+id/spinnerCity"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:entries="@array/cities"
-                        android:prompt="Select city" />
+                        android:prompt="@string/select_city" />
 
+                    <!-- District Spinner -->
                     <Spinner
                         android:id="@+id/spinnerDistrict"
                         android:layout_width="0dp"
@@ -103,8 +105,9 @@
                         android:layout_weight="1"
                         android:layout_marginStart="12dp"
                         android:entries="@array/districts"
-                        android:prompt="Select district"/>
+                        android:prompt="@string/select_district" />
                 </LinearLayout>
+
 
                 <!-- 건물 유형 -->
                 <TextView

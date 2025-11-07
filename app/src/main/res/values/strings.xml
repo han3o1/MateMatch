@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">MateMatch</string>
+    <string name="select_age">Select age</string>
+    <string name="select_gender">Select gender</string>
+    <string name="select_occupation">Select occupation</string>
+    <string name="select_city">Select city</string>
+    <string name="select_district">Select district</string>
 </resources>
+
+
+
