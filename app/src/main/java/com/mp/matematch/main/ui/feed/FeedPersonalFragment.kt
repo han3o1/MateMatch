@@ -13,7 +13,6 @@ class FeedPersonalFragment : Fragment() {
 
     private var _binding: FragmentFeedPersonBinding? = null
     private val binding get() = _binding!!
-
     private lateinit var personAdapter: PersonAdapter
 
     override fun onCreateView(
@@ -41,6 +40,7 @@ class FeedPersonalFragment : Fragment() {
         )
 
         personAdapter = PersonAdapter(dummyData)
+
         binding.recyclerView.apply {
             adapter = personAdapter
             layoutManager = LinearLayoutManager(context)

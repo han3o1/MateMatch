@@ -18,8 +18,8 @@
             android:layout_width="match_parent"
             android:layout_height="240dp"
             android:scaleType="centerCrop"
-            android:contentDescription="Profile image" />
-
+            android:contentDescription="Profile image"
+            android:src="@drawable/ic_profile_placeholder"/>
         <!-- 매칭률 뱃지 -->
 
         <!-- 이름, 나이 -->
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="2dp"
-            android:text='"Chill roommate wanted! Respectful ,clean"'
+            android:text="'Chill roommate wanted! Respectful ,clean'"
             android:textSize="14sp"
             android:textColor="#717182" />
 

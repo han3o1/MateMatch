@@ -3,7 +3,8 @@ package com.mp.matematch.main // ← 네 패키지 경로에 맞게 수정!
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.mp.matematch.R
-import com.mp.matematch.main.ui.feed.FeedPersonalFragment
+import com.mp.matematch.main.ui.feed.FeedHouseFragment
+
 
 
 class TestActivity : AppCompatActivity() {
@@ -12,7 +13,7 @@ class TestActivity : AppCompatActivity() {
         setContentView(R.layout.activity_test)
 
         supportFragmentManager.beginTransaction()
-            .replace(R.id.testFragmentContainer, FeedPersonalFragment())
+            .replace(R.id.testFragmentContainer, FeedHouseFragment())
             .commit()
     }
 }
