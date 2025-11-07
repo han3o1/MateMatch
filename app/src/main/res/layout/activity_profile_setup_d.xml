@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/roommate_ma"
     android:padding="20dp"
-    tools:context=".profile.ui.ProfileSetupCActivity">
+    tools:context=".profile.ui.ProfileSetupDActivity">
 
     <!-- 상단 바 -->
     <LinearLayout
@@ -38,7 +38,7 @@
             android:id="@+id/textStep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Step 3 of 5"
+            android:text="Step 4 of 5"
             android:textColor="#7D7D7D"
             android:textSize="14sp"
             android:layout_gravity="end"
@@ -46,7 +46,7 @@
             android:gravity="end"/>
     </LinearLayout>
 
-    <!-- 카드 -->
+    <!-- 카드 영역 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
@@ -76,115 +76,129 @@
                     android:id="@+id/textTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Roommate Preferences"
+                    android:text="Lifestyle and Matching Preferences"
                     android:textStyle="bold"
                     android:textSize="18sp"
                     android:layout_marginBottom="16dp" />
 
-                <!-- 수면 패턴 -->
+                <!-- 기상 / 취침 시간 -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Sleeping Schedule">
+                    android:hint="Wake-up Time">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputSleep"
+                        android:id="@+id/inputWakeup"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="e.g., Night owl or Early riser" />
+                        android:hint="e.g., 7:00 AM" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 청소 빈도 -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:hint="Cleaning Frequency">
+                    android:hint="Bedtime">
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputClean"
+                        android:id="@+id/inputBedtime"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="e.g., Daily, Weekly, Occasionally" />
+                        android:hint="e.g., 12:00 AM" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 흡연 여부 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Do you smoke?"
-                        android:textSize="16sp" />
-
-                    <Switch
-                        android:id="@+id/switchSmoking"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <!-- 반려동물 -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Do you have pets?"
-                        android:textSize="16sp" />
-
-                    <Switch
-                        android:id="@+id/switchPets"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-                </LinearLayout>
-
-                <!-- 룸메이트 성별 선호 -->
+                <!-- 소음 수용도 -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Preferred Roommate Gender"
+                    android:text="Noise Tolerance Level"
                     android:textStyle="bold"
                     android:layout_marginTop="24dp" />
 
                 <RadioGroup
-                    android:id="@+id/radioGenderPreference"
+                    android:id="@+id/radioNoiseLevel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center">
 
                     <RadioButton
-                        android:id="@+id/radioMale"
+                        android:id="@+id/radioQuiet"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Male"
+                        android:text="Quiet"
                         android:layout_marginEnd="16dp" />
 
                     <RadioButton
-                        android:id="@+id/radioFemale"
+                        android:id="@+id/radioModerate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Female"
+                        android:text="Moderate"
                         android:layout_marginEnd="16dp" />
 
                     <RadioButton
-                        android:id="@+id/radioAny"
+                        android:id="@+id/radioNoisy"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Any" />
+                        android:text="Noisy" />
                 </RadioGroup>
 
-                <!-- 다음 버튼 -->
+                <!-- 방문객 허용 여부 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginTop="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Allow guests?"
+                        android:textSize="16sp" />
+
+                    <Switch
+                        android:id="@+id/switchGuests"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- 요리 선호도 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Cooking Frequency"
+                    android:textStyle="bold"
+                    android:layout_marginTop="24dp" />
+
+                <RadioGroup
+                    android:id="@+id/radioCooking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <RadioButton
+                        android:id="@+id/radioCookOften"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Often"
+                        android:layout_marginEnd="16dp" />
+
+                    <RadioButton
+                        android:id="@+id/radioCookSometimes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sometimes"
+                        android:layout_marginEnd="16dp" />
+
+                    <RadioButton
+                        android:id="@+id/radioNeverCook"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rarely" />
+                </RadioGroup>
+
+                <!-- 버튼 영역 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -211,7 +225,6 @@
                         android:backgroundTint="#5C3A00"
                         android:textColor="@android:color/white"/>
                 </LinearLayout>
-
             </LinearLayout>
         </ScrollView>
     </com.google.android.material.card.MaterialCardView>

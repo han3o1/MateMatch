@@ -1,0 +1,15 @@
+<resources>
+    <string-array name="cities">
+        <item>Seoul</item>
+        <item>Busan</item>
+        <item>Incheon</item>
+        <item>Daegu</item>
+    </string-array>
+
+    <string-array name="districts">
+        <item>Gangnam</item>
+        <item>Mapo</item>
+        <item>Songpa</item>
+        <item>Seocho</item>
+    </string-array>
+</resources>
