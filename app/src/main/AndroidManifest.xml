@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".MateMatchApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -10,19 +11,25 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.MateMatch">
+        android:theme="@style/Theme.MateMatch"
+        tools:targetApi="31">
+      
+      <activity android:name=".main.TestActivity" />
 
-        <activity android:name=".main.TestActivity" />
 
         <activity
-            android:name=".main.MainActivity"
+            android:name=".auth.ui.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".auth.ui.SignUpActivity" />
+        <activity android:name=".purpose.ui.PurposeSelectionActivity" />
+        <activity android:name=".main.MainActivity" />
+
     </application>
 
 </manifest>
