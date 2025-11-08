@@ -1,12 +1,15 @@
 package com.mp.matematch.main.ui.feed
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mp.matematch.R
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.mp.matematch.databinding.FragmentFeedPersonBinding
 
 class FeedPersonalFragment : Fragment() {
@@ -14,6 +17,7 @@ class FeedPersonalFragment : Fragment() {
     private var _binding: FragmentFeedPersonBinding? = null
     private val binding get() = _binding!!
     private lateinit var personAdapter: PersonAdapter
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,25 +30,73 @@ class FeedPersonalFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val dummyData = listOf(
-            Person(
-                name = "Sarah Chen",
-                age = 25,
-                job = "Designer",
-                location = "Downtown Seattle",
-                rentRange = "$1200 ~ $1600",
-                description = "Looking for a clean and quiet place! 🧹",
-                tags = listOf("Night Owl", "Clean", "Private"),
-                profileImageResId = R.drawable.ic_profile_placeholder
-            )
-        )
-
-        personAdapter = PersonAdapter(dummyData)
-
+        personAdapter = PersonAdapter(mutableListOf())
         binding.recyclerView.apply {
             adapter = personAdapter
             layoutManager = LinearLayoutManager(context)
         }
+
+        // ✅ 기본 피드 로드
+        loadDefaultPersonFeed()
+
+        // ✅ 검색창 클릭 시 필터 다이얼로그 열기
+        binding.searchBox.setOnClickListener {
+            FilterDialog(requireContext()) { filters ->
+                applyFilters(filters)
+            }.showStep1()
+        }
+    }
+
+    private fun loadDefaultPersonFeed() {
+        val currentUserType = getCurrentUserType()
+        var query: Query = firestore.collection("users")
+
+        when (currentUserType) {
+            "roommate-provider" -> query = query.whereEqualTo("userType", "houseSeeker")
+            "roommate-seeker" -> query = query.whereEqualTo("userType", "roommate-seeker")
+        }
+
+        query.get().addOnSuccessListener { result ->
+            val persons = result.documents.mapNotNull { it.toObject(Person::class.java) }
+            personAdapter.updateData(persons)
+            Log.d("FeedPersonal", "기본 피드 로드 완료: ${persons.size}개")
+        }
+    }
+
+    private fun applyFilters(filters: Map<String, Any?>) {
+        val currentUserType = getCurrentUserType()
+        var query: Query = firestore.collection("users")
+
+        when (currentUserType) {
+            "roommate-provider" -> query = query.whereEqualTo("userType", "houseSeeker")
+            "roommate-seeker" -> query = query.whereEqualTo("userType", "roommate-seeker")
+        }
+
+        val locations = filters["locations"] as? List<*> ?: emptyList<String>()
+        if (locations.isNotEmpty()) {
+            query = query.whereIn("location", locations)
+        }
+
+        query.get().addOnSuccessListener { result ->
+            val filtered = result.documents.mapNotNull { it.toObject(Person::class.java) }
+            personAdapter.updateData(filtered)
+            Log.d("FeedPersonal", "필터 적용 결과: ${filtered.size}개")
+        }
+    }
+
+    private fun getCurrentUserType(): String {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return ""
+        var type = ""
+
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                type = doc.getString("userType") ?: ""
+            }
+
+        return type
     }
 
     override fun onDestroyView() {
