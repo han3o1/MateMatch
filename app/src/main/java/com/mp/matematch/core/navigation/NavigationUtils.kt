@@ -2,7 +2,7 @@ package com.mp.matematch.core.navigation
 
 import android.content.Context
 import android.content.Intent
-import com.mp.matematch.main.ui.MainActivity
+import com.mp.matematch.main.MainActivity
 
 object NavigationUtils {
 
