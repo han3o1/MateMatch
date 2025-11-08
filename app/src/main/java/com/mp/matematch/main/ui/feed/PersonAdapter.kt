@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mp.matematch.databinding.ItemFeedPersonBinding
 import com.mp.matematch.R
 
-class PersonAdapter(private val personList: List<Person>) :
+class PersonAdapter(private val personList: MutableList<Person> = mutableListOf()) :
     RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
 
     class PersonViewHolder(val binding: ItemFeedPersonBinding) : RecyclerView.ViewHolder(binding.root)
@@ -24,15 +24,9 @@ class PersonAdapter(private val personList: List<Person>) :
         val person = personList[position]
         with(holder.binding) {
             imageProfile.setImageResource(person.profileImageResId)
-
-            // 이름, 나이, 직업 - textNameAge, textJob
             textNameAge.text = "${person.name}, ${person.age}"
             textJob.text = person.job
-
-            // 소개 문구
             textQuote.text = person.description
-
-            // 위치 + 렌트 범위
             textLocation.text = person.location
             textTime.text = person.rentRange
 
@@ -55,9 +49,14 @@ class PersonAdapter(private val personList: List<Person>) :
                 tagContainer.addView(tagView)
             }
         }
-
-
     }
 
     override fun getItemCount() = personList.size
+
+    // ✅ 리스트 갱신용 함수
+    fun updateData(newList: List<Person>) {
+        personList.clear()
+        personList.addAll(newList)
+        notifyDataSetChanged()
+    }
 }

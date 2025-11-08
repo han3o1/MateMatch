@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">MateMatch</string>
+    <string name="filter_step1_title">Search Filters - Step 1</string>
+    <string name="filter_step1_subtitle">Select locations and building types</string>
+    <string name="filter_location">Location</string>
+    <string name="filter_building_type">Building Type</string>
+    <string name="next">Next</string>
+
 </resources>

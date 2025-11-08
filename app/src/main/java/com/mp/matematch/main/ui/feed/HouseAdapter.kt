@@ -10,7 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ItemFeedHouseBinding
 
-class HouseAdapter(private val houseList: List<House>) :
+class HouseAdapter(private val houseList: MutableList<House> = mutableListOf()) :
+
     RecyclerView.Adapter<HouseAdapter.HouseViewHolder>() {
 
     class HouseViewHolder(val binding: ItemFeedHouseBinding) : RecyclerView.ViewHolder(binding.root)
@@ -51,4 +52,10 @@ class HouseAdapter(private val houseList: List<House>) :
     }
 
     override fun getItemCount(): Int = houseList.size
+
+    fun updateData(newList: List<House>) {
+        houseList.clear()
+        houseList.addAll(newList)
+        notifyDataSetChanged()
+    }
 }
