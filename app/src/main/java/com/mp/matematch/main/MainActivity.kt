@@ -1,4 +1,4 @@
-package com.mp.matematch.main.ui
+package com.mp.matematch.main
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
