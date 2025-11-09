@@ -5,11 +5,13 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupABinding
 import com.mp.matematch.profile.model.User
 import java.util.UUID
@@ -34,6 +36,9 @@ class ProfileSetupActivity : AppCompatActivity() {
 
         userType = intent.getStringExtra("USER_TYPE")
 
+        /** ✅ 드롭다운 초기화 **/
+        setupDropdowns()
+
         /** ✅ Move-in 날짜 선택기 **/
         binding.inputMoveInDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
@@ -48,9 +53,7 @@ class ProfileSetupActivity : AppCompatActivity() {
 
         /** ✅ 이미지 업로드 버튼 **/
         binding.btnUploadPhoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
-            }
+            val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" }
             startActivityForResult(
                 Intent.createChooser(intent, "Select Profile Image"),
                 PICK_IMAGE_REQUEST
@@ -66,6 +69,51 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.btnBack?.setOnClickListener { finish() }
     }
 
+    /** ✅ AutoCompleteTextView 드롭다운 초기화 **/
+    private fun setupDropdowns() {
+        // ▫️ 나이
+        val ageAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.ages,
+            android.R.layout.simple_dropdown_item_1line
+        )
+
+        // ▫️ 성별
+        val genderAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.genders,
+            android.R.layout.simple_dropdown_item_1line
+        )
+
+        // ▫️ 직업
+        val occupationAdapter = ArrayAdapter.createFromResource(
+            this,
+            R.array.occupations,
+            android.R.layout.simple_dropdown_item_1line
+        )
+
+        // ✅ 어댑터 연결
+        binding.spinnerAge.setAdapter(ageAdapter)
+        binding.spinnerGender.setAdapter(genderAdapter)
+        binding.spinnerOccupation.setAdapter(occupationAdapter)
+
+        // ✅ 클릭 시 자동 드롭다운 표시
+        binding.spinnerAge.setOnClickListener { binding.spinnerAge.showDropDown() }
+        binding.spinnerGender.setOnClickListener { binding.spinnerGender.showDropDown() }
+        binding.spinnerOccupation.setOnClickListener { binding.spinnerOccupation.showDropDown() }
+
+        // ✅ 디버깅용 로그
+        binding.spinnerAge.setOnItemClickListener { parent, _, position, _ ->
+            Log.d("ProfileSetup", "선택된 나이: ${parent.getItemAtPosition(position)}")
+        }
+        binding.spinnerGender.setOnItemClickListener { parent, _, position, _ ->
+            Log.d("ProfileSetup", "선택된 성별: ${parent.getItemAtPosition(position)}")
+        }
+        binding.spinnerOccupation.setOnItemClickListener { parent, _, position, _ ->
+            Log.d("ProfileSetup", "선택된 직업: ${parent.getItemAtPosition(position)}")
+        }
+    }
+
     /** ✅ onActivityResult: 이미지 선택 결과 처리 **/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -77,28 +125,42 @@ class ProfileSetupActivity : AppCompatActivity() {
 
     /** ✅ Firestore + Storage 저장 함수 **/
     private fun saveUserProfile() {
-        val uid = auth.currentUser?.uid ?: return
-        val name = binding.inputName.text.toString()
-        val ageText = binding.spinnerAge.selectedItem?.toString() ?: ""
-        val occupation = binding.spinnerOccupation.selectedItem?.toString() ?: ""
-        val age = ageText.toIntOrNull() ?: 0
-        val moveInDate = binding.inputMoveInDate.text.toString()
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            Log.e("ProfileSetup", "❌ FirebaseAuth user not found")
+            return
+        }
 
-        // Firebase Storage에 이미지 업로드
+        // ✅ 입력값 추출
+        val name = binding.inputName.text.toString().trim()
+        val ageText = binding.spinnerAge.text.toString().trim()
+        val occupation = binding.spinnerOccupation.text.toString().trim()
+        val gender = binding.spinnerGender.text.toString().trim()
+        val mbti = binding.inputMbti.text.toString().trim()
+        val moveInDate = binding.inputMoveInDate.text.toString().trim()
+
+        val age = ageText.filter { it.isDigit() }.toIntOrNull() ?: 0 // “23–26” 방지
+
+        if (name.isEmpty()) {
+            Log.e("ProfileSetup", "❌ 이름이 비어 있습니다.")
+            return
+        }
+
+        // ✅ Firebase Storage 업로드 로직
         if (selectedImageUri != null) {
             val storageRef = storage.reference.child("profile_images/${UUID.randomUUID()}.jpg")
             val uploadTask = storageRef.putFile(selectedImageUri!!)
 
             uploadTask.addOnSuccessListener {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    saveUserToFirestore(uid, name, age, occupation, moveInDate, uri.toString())
+                    saveUserToFirestore(uid, name, age, gender, occupation, mbti, moveInDate, uri.toString())
                 }
             }.addOnFailureListener { e ->
                 Log.e("ProfileSetup", "❌ Image upload failed: ${e.message}")
-                saveUserToFirestore(uid, name, age, occupation, moveInDate, "")
+                saveUserToFirestore(uid, name, age, gender, occupation, mbti, moveInDate, "")
             }
         } else {
-            saveUserToFirestore(uid, name, age, occupation, moveInDate, "")
+            saveUserToFirestore(uid, name, age, gender, occupation, mbti, moveInDate, "")
         }
     }
 
@@ -107,7 +169,9 @@ class ProfileSetupActivity : AppCompatActivity() {
         uid: String,
         name: String,
         age: Int,
+        gender: String,
         occupation: String,
+        mbti: String,
         moveInDate: String,
         imageUrl: String
     ) {
@@ -116,13 +180,13 @@ class ProfileSetupActivity : AppCompatActivity() {
             userType = userType ?: "",
             name = name,
             age = age,
+            gender = gender,
             occupation = occupation,
+            mbti = mbti,
             moveInDate = moveInDate,
             profileImageUrl = imageUrl,
 
-            // 기본값 초기화 (다음 단계에서 채워짐)
-            gender = binding.spinnerGender.selectedItem?.toString() ?: "",
-            mbti = binding.inputMbti.text.toString(),
+            // 이후 단계에서 채워질 필드
             city = "",
             district = "",
             addressDetail = "",
@@ -173,7 +237,3 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
     }
 }
-
-
-
-

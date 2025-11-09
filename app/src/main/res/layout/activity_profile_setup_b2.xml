@@ -76,10 +76,10 @@
                     android:id="@+id/textTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Your Property"
-                    android:textStyle="bold"
+                    android:layout_marginBottom="16dp"
+                    android:text="Your Location"
                     android:textSize="18sp"
-                    android:layout_marginBottom="16dp" />
+                    android:textStyle="bold" />
 
                 <!-- City & District -->
                 <LinearLayout
