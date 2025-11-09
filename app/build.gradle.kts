@@ -5,6 +5,8 @@ plugins {
     id("com.google.gms.google-services")
 }
 
+
+
 android {
     namespace = "com.mp.matematch"
     compileSdk = 36
@@ -18,6 +20,8 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
+
 
     buildTypes {
         release {
@@ -54,6 +58,8 @@ dependencies {
 
     //implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
+    implementation("com.google.android.material:material:1.12.0")
+
 
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-auth-ktx")
