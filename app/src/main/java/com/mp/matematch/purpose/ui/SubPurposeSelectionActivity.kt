@@ -15,20 +15,18 @@ class SubPurposeSelectionActivity : AppCompatActivity() {
         binding = ActivitySubPurposeSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. "Yes, I have a place" 버튼 클릭 시
+        // [1] 집이 있는 사람 (Provider)
         binding.btnYesHavePlace.setOnClickListener {
-            // 룸메찾기-집있 프로필 작성으로 이동
             val intent = Intent(this, ProfileSetupActivity::class.java).apply {
-                putExtra("USER_TYPE", "Provider")
+                putExtra("USER_TYPE", "Provider") // A→B→C→D→E
             }
             startActivity(intent)
         }
 
-        // 2. "No, I don't have a place yet" 버튼 클릭 시
+        // [2] 집이 없는 사람 (Seeker)
         binding.btnNoHavePlace.setOnClickListener {
-            // 룸메찾기-집없 프로필 작성으로 이동
             val intent = Intent(this, ProfileSetupActivity::class.java).apply {
-                putExtra("USER_TYPE", "Seeker")
+                putExtra("USER_TYPE", "Seeker") // A→B2->C→D→E
             }
             startActivity(intent)
         }

@@ -15,17 +15,17 @@ class PurposeSelectionActivity : AppCompatActivity() {
         binding = ActivityPurposeSelectionBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. "Find a Roommate" 버튼 클릭 시
+        // [1] “Find a Roommate” 선택 → 세부 선택 화면으로 이동
         binding.btnFindRoommate.setOnClickListener {
-            // SubPurposeSelectionActivity로 이동
             val intent = Intent(this, SubPurposeSelectionActivity::class.java)
             startActivity(intent)
         }
 
-        // 2. "Find a House" 버튼 클릭 시
+        // [2] “Find a House” 선택 → 집 찾기 시나리오 바로 시작 (A → B → F)
         binding.btnFindHouse.setOnClickListener {
-            // 집찾기 프로필 작성으로 이동
-            val intent = Intent(this, ProfileSetupActivity::class.java)
+            val intent = Intent(this, ProfileSetupActivity::class.java).apply {
+                putExtra("USER_TYPE", "Finder")
+            }
             startActivity(intent)
         }
     }

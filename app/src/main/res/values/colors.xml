@@ -6,4 +6,6 @@
     <color name="brown">#694004</color>
     <color name="brown_active">#694004</color>
     <color name="gray_inactive">#9E9E9E</color>
+    <color name="background_light">#2ECEC2B4</color>
+
 </resources>

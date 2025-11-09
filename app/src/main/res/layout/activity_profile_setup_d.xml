@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/roommate_ma"
     android:padding="20dp"
-    tools:context=".profile.ui.ProfileSetupCActivity">
+    tools:context=".profile.ui.ProfileSetupDActivity">
 
     <!-- 상단 바 -->
     <LinearLayout
@@ -38,7 +38,7 @@
             android:id="@+id/textStep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Step 3 of 5"
+            android:text="Step 3 of 4"
             android:textColor="#7D7D7D"
             android:textSize="14sp"
             android:layout_gravity="end"
@@ -46,7 +46,7 @@
             android:gravity="end"/>
     </LinearLayout>
 
-    <!-- Lifestyle 카드 -->
+    <!-- 카드 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
@@ -72,7 +72,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Your Lifestyle"
+                android:text="Ideal Roommate"
                 android:textStyle="bold"
                 android:textSize="18sp"
                 android:textColor="#000000"
@@ -82,7 +82,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tell us about your daily habits and preferences"
+                android:text="What are you looking for in a roommate?"
                 android:textSize="14sp"
                 android:textColor="#7D7D7D"
                 android:layout_marginBottom="24dp"
@@ -101,6 +101,46 @@
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginVertical="8dp">
 
+                <!-- Preferred Age Range -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
+                    <TextView
+                        android:text="Preferred Age Range"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerAgeRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_age_range"/>
+                </LinearLayout>
+
+                <!-- Gender Preference -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:text="Gender Preference"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerGenderPref"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_gender_pref"/>
+                </LinearLayout>
+
                 <!-- Sleep Schedule -->
                 <LinearLayout
                     android:orientation="vertical"
@@ -108,21 +148,17 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_marginEnd="8dp">
-
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Sleep Schedule"
-                        android:textColor="#000000"
+                        android:textColor="#000"
                         android:textSize="14sp"
-                        android:ellipsize="end"
-                        android:maxLines="1" />
-
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
                     <Spinner
-                        android:id="@+id/spinnerSleep"
+                        android:id="@+id/spinnerSleepPref"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:prompt="@string/select_sleep" />
+                        android:prompt="@string/select_sleep_pref"/>
                 </LinearLayout>
 
                 <!-- Smoking -->
@@ -132,21 +168,17 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="8dp">
-
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Smoking"
-                        android:textColor="#000000"
+                        android:textColor="#000"
                         android:textSize="14sp"
-                        android:ellipsize="end"
-                        android:maxLines="1" />
-
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
                     <Spinner
-                        android:id="@+id/spinnerSmoking"
+                        android:id="@+id/spinnerSmokingPref"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:prompt="@string/select_smoking" />
+                        android:prompt="@string/select_smoking_pref"/>
                 </LinearLayout>
 
                 <!-- Pets -->
@@ -156,19 +188,17 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_marginEnd="8dp">
-
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Pets"
-                        android:textColor="#000000"
-                        android:textSize="14sp" />
-
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
                     <Spinner
-                        android:id="@+id/spinnerPets"
+                        android:id="@+id/spinnerPetsPref"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:prompt="@string/select_pets" />
+                        android:prompt="@string/select_pets_pref"/>
                 </LinearLayout>
 
                 <!-- Cleanliness -->
@@ -178,81 +208,20 @@
                     android:layout_height="wrap_content"
                     android:layout_columnWeight="1"
                     android:layout_marginStart="8dp">
-
                     <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
                         android:text="Cleanliness"
-                        android:textColor="#000000"
+                        android:textColor="#000"
                         android:textSize="14sp"
-                        android:ellipsize="end"
-                        android:maxLines="1" />
-
-                    <Spinner
-                        android:id="@+id/spinnerClean"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:prompt="@string/select_clean" />
-                </LinearLayout>
-
-                <!-- Guest Policy -->
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp">
-
-                    <TextView
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Guest Policy"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:ellipsize="end"
-                        android:maxLines="1" />
-
+                        android:layout_height="wrap_content"/>
                     <Spinner
-                        android:id="@+id/spinnerGuests"
+                        android:id="@+id/spinnerCleanPref"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:prompt="@string/select_guest" />
-                </LinearLayout>
-
-                <!-- Social Preference -->
-                <LinearLayout
-                    android:orientation="vertical"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Social Preference"
-                        android:textColor="#000000"
-                        android:textSize="14sp"
-                        android:ellipsize="end"
-                        android:maxLines="1" />
-
-                    <Spinner
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:columnCount="2"
-                        android:rowCount="3"
-                        android:alignmentMode="alignMargins"
-                        android:useDefaultMargins="true"
-                        android:columnOrderPreserved="false" />
-                    <Spinner
-                        android:id="@+id/spinnerSocial"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:prompt="@string/select_social" />
+                        android:prompt="@string/select_clean_pref"/>
                 </LinearLayout>
 
             </GridLayout>
-
 
             <!-- Next 버튼 -->
             <Button
@@ -267,3 +236,4 @@
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

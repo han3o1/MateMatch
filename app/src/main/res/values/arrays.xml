@@ -1,0 +1,121 @@
+<resources>
+
+
+    <!-- 나이 선택 (대략적인 범위로 구성) -->
+    <string-array name="ages">
+        <item>18-22</item>
+        <item>23-26</item>
+        <item>27-30</item>
+        <item>31-35</item>
+        <item>36+</item>
+    </string-array>
+
+    <!-- 성별 선택 -->
+    <string-array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Non-binary</item>
+        <item>Prefer not to say</item>
+    </string-array>
+
+    <!-- 직업 선택 -->
+    <string-array name="occupations">
+        <item>Student</item>
+        <item>Office Worker</item>
+        <item>Freelancer</item>
+        <item>Self-employed</item>
+        <item>Researcher</item>
+        <item>Other</item>
+    </string-array>
+
+    <!-- Lifestyle 선택 항목 추가 -->
+    <string-array name="select_sleep">
+        <item>Early Riser</item>
+        <item>Night Owl</item>
+        <item>Flexible</item>
+    </string-array>
+
+    <string-array name="select_smoking">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+
+    <string-array name="select_pets">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+
+    <string-array name="select_clean">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Occasionally</item>
+    </string-array>
+
+    <string-array name="select_guest">
+        <item>Often</item>
+        <item>Sometimes</item>
+        <item>Rarely</item>
+    </string-array>
+
+    <string-array name="select_social">
+        <item>Introvert</item>
+        <item>Extrovert</item>
+        <item>Balanced</item>
+    </string-array>
+
+
+    <string-array name="cities">
+        <item>Seoul</item>
+        <item>Busan</item>
+        <item>Incheon</item>
+        <item>Daegu</item>
+    </string-array>
+
+    <string-array name="districts">
+        <item>Gangnam</item>
+        <item>Mapo</item>
+        <item>Songpa</item>
+        <item>Seocho</item>
+    </string-array>
+
+    <string-array name="age_ranges">
+        <item>18–25</item>
+        <item>26–35</item>
+        <item>36–45</item>
+        <item>46+</item>
+    </string-array>
+
+    <string-array name="gender_preferences">
+        <item>Any</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <string-array name="sleep_preferences">
+        <item>Early Bird</item>
+        <item>Night Owl</item>
+        <item>Flexible</item>
+    </string-array>
+
+    <string-array name="smoking_preferences">
+        <item>Doesn\'t Matter</item>
+        <item>Non-Smoker</item>
+        <item>Smoker</item>
+    </string-array>
+
+    <string-array name="pets_preferences">
+        <item>No Pets</item>
+        <item>Has Pets</item>
+        <item>Doesn\'t Matter</item>
+    </string-array>
+
+    <string-array name="cleanliness_preferences">
+        <item>Very Clean</item>
+        <item>Average</item>
+        <item>Messy</item>
+    </string-array>
+
+
+
+</resources>
+
