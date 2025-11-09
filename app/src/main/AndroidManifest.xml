@@ -14,7 +14,10 @@
         android:theme="@style/Theme.MateMatch"
         tools:targetApi="31">
 
-        <!-- ✅ 앱 진입점 (로그인) -->
+        <!-- 테스트용 -->
+        <activity android:name=".main.TestActivity" />
+
+        <!-- 로그인 관련 -->
         <activity
             android:name=".auth.ui.LoginActivity"
             android:exported="true">
@@ -24,41 +27,25 @@
             </intent-filter>
         </activity>
 
-        <!-- 회원가입 / 목적 선택 -->
         <activity android:name=".auth.ui.SignUpActivity" />
+
+        <!-- 목적 선택 관련 -->
         <activity android:name=".purpose.ui.PurposeSelectionActivity" />
+        <activity android:name=".purpose.ui.SubPurposeSelectionActivity" />
 
         <!-- 메인화면 -->
         <activity android:name=".main.MainActivity" />
 
-        <!-- ✅ 프로필 설정 단계별 Activity (A~E) -->
-        <activity
-            android:name=".profile.ui.ProfileSetupActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MateMatch" />
+        <!-- 🔹 프로필 설정 관련 (A~E 단계) -->
+        <activity android:name=".profile.ui.ProfileSetupActivity" />
+        <activity android:name=".profile.ui.ProfileSetupAActivity" />
+        <activity android:name=".profile.ui.ProfileSetupBActivity" />
+        <activity android:name=".profile.ui.ProfileSetupB2Activity" />
+        <activity android:name=".profile.ui.ProfileSetupB3Activity" />
+        <activity android:name=".profile.ui.ProfileSetupCActivity" />
+        <activity android:name=".profile.ui.ProfileSetupDActivity" />
+        <activity android:name=".profile.ui.ProfileSetupEActivity" />
 
-        <activity
-            android:name=".profile.ui.ProfileSetupBActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MateMatch" />
-
-        <activity
-            android:name=".profile.ui.ProfileSetupCActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MateMatch" />
-
-        <activity
-            android:name=".profile.ui.ProfileSetupDActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MateMatch" />
-
-        <activity
-            android:name=".profile.ui.ProfileSetupEActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MateMatch" />
-
-        <!-- ✅ 추가적으로 Firebase 관련 서비스 (필요 시 자동 생성됨)
-             FirebaseMessagingService나 Dynamic Links 등을 여기서 등록 가능 -->
     </application>
 
 </manifest>
