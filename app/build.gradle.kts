@@ -13,7 +13,7 @@ android {
 
     defaultConfig {
         applicationId = "com.mp.matematch"
-        minSdk = 33
+        minSdk = 33 //23
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -56,6 +56,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    //implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.android.material:material:1.12.0")
 
@@ -70,4 +71,7 @@ dependencies {
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.1")
 }

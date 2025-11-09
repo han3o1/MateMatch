@@ -46,174 +46,224 @@
             android:gravity="end"/>
     </LinearLayout>
 
-    <!-- 카드 -->
+    <!-- Lifestyle 카드 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
-        app:cardElevation="6dp"
+        app:cardElevation="8dp"
         android:backgroundTint="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="24dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <!-- 제목 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Lifestyle"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- 설명 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tell us about your daily habits and preferences"
+                android:textSize="14sp"
+                android:textColor="#7D7D7D"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"/>
+
+            <!-- 2열 3행 Grid -->
+            <GridLayout
+                android:id="@+id/gridIdealRoommate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal">
+                android:columnCount="2"
+                android:rowCount="3"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false"
+                android:useDefaultMargins="true"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp">
 
-                <!-- 타이틀 -->
-                <TextView
-                    android:id="@+id/textTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Roommate Preferences"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- 수면 패턴 -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Sleeping Schedule">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputSleep"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="e.g., Night owl or Early riser" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- 청소 빈도 -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="Cleaning Frequency">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputClean"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="e.g., Daily, Weekly, Occasionally" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- 흡연 여부 -->
+                <!-- Sleep Schedule -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="16dp">
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Do you smoke?"
-                        android:textSize="16sp" />
-
-                    <Switch
-                        android:id="@+id/switchSmoking"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:text="Sleep Schedule"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <Spinner
+                        android:id="@+id/spinnerSleep"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_sleep" />
                 </LinearLayout>
 
-                <!-- 반려동물 -->
+                <!-- Smoking -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="16dp">
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
 
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Do you have pets?"
-                        android:textSize="16sp" />
-
-                    <Switch
-                        android:id="@+id/switchPets"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:text="Smoking"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <Spinner
+                        android:id="@+id/spinnerSmoking"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_smoking" />
                 </LinearLayout>
 
-                <!-- 룸메이트 성별 선호 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Preferred Roommate Gender"
-                    android:textStyle="bold"
-                    android:layout_marginTop="24dp" />
-
-                <RadioGroup
-                    android:id="@+id/radioGenderPreference"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <RadioButton
-                        android:id="@+id/radioMale"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Male"
-                        android:layout_marginEnd="16dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioFemale"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Female"
-                        android:layout_marginEnd="16dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioAny"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Any" />
-                </RadioGroup>
-
-                <!-- 다음 버튼 -->
+                <!-- Pets -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="32dp">
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPrevious"
-                        android:layout_width="0dp"
+                    <TextView
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Back"
-                        android:backgroundTint="#E0E0E0"
-                        android:textColor="#000000"/>
+                        android:text="Pets"
+                        android:textColor="#000000"
+                        android:textSize="14sp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNext"
-                        android:layout_width="0dp"
+                    <Spinner
+                        android:id="@+id/spinnerPets"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:text="Next →"
-                        android:backgroundTint="#5C3A00"
-                        android:textColor="@android:color/white"/>
+                        android:prompt="@string/select_pets" />
                 </LinearLayout>
 
-            </LinearLayout>
-        </ScrollView>
+                <!-- Cleanliness -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Cleanliness"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <Spinner
+                        android:id="@+id/spinnerClean"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_clean" />
+                </LinearLayout>
+
+                <!-- Guest Policy -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Guest Policy"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <Spinner
+                        android:id="@+id/spinnerGuests"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_guest" />
+                </LinearLayout>
+
+                <!-- Social Preference -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Social Preference"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:ellipsize="end"
+                        android:maxLines="1" />
+
+                    <Spinner
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2"
+                        android:rowCount="3"
+                        android:alignmentMode="alignMargins"
+                        android:useDefaultMargins="true"
+                        android:columnOrderPreserved="false" />
+                    <Spinner
+                        android:id="@+id/spinnerSocial"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_social" />
+                </LinearLayout>
+
+            </GridLayout>
+
+
+            <!-- Next 버튼 -->
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Next →"
+                android:backgroundTint="#5C3A00"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="24dp"/>
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

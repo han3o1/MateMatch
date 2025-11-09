@@ -1,11 +1,77 @@
 <resources>
     <string name="app_name">MateMatch</string>
+    <string name="filter_step1_title">Search Filters - Step 1</string>
+    <string name="filter_step1_subtitle">Select locations and building types</string>
+    <string name="filter_location">Location</string>
+    <string name="filter_building_type">Building Type</string>
+<!--본인프로필용-->
     <string name="select_age">Select age</string>
     <string name="select_gender">Select gender</string>
     <string name="select_occupation">Select occupation</string>
+
+    <string name="select_sleep">Select sleep schedule</string>
+    <string name="select_smoking">Select smoking preference</string>
+    <string name="select_pets">Select pets option</string>
+    <string name="select_clean">Select cleanliness level</string>
+    <string name="select_guest">Select guest policy</string>
+    <string name="select_social">Select social preference</string>
     <string name="select_city">Select city</string>
     <string name="select_district">Select district</string>
+    <!-- Ideal Roommate: Spinner 프롬프트용 -->
+    <string name="select_age_range">Select Age Range</string>
+    <string name="select_gender_pref">Select Gender Preference</string>
+    <string name="select_sleep_pref">Select Sleep Schedule</string>
+    <string name="select_smoking_pref">Select Smoking Habit</string>
+    <string name="select_pets_pref">Select Pets Option</string>
+    <string name="select_clean_pref">Select Cleanliness Level</string>
+
+    <!-- Ideal Roommate 관련 선택 항목 -->
+    <string-array name="select_age_range">
+        <item>18–25</item>
+        <item>26–35</item>
+        <item>36–45</item>
+        <item>46+</item>
+    </string-array>
+
+    <string-array name="select_gender_pref">
+        <item>Any</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
+    <string-array name="select_sleep_pref">
+        <item>Early Bird</item>
+        <item>Night Owl</item>
+        <item>Flexible</item>
+    </string-array>
+
+    <string-array name="select_smoking_pref">
+        <item>Doesn’t Matter</item>
+        <item>Non-Smoker</item>
+        <item>Smoker</item>
+    </string-array>
+
+    <string-array name="select_pets_pref">
+        <item>No Pets</item>
+        <item>Has Pets</item>
+        <item>Doesn’t Matter</item>
+    </string-array>
+
+    <string-array name="select_clean_pref">
+        <item>Very Clean</item>
+        <item>Average</item>
+        <item>Messy</item>
+    </string-array>
+
+
+    <!-- 버튼 / 기타 -->
+    <string name="next">Next →</string>
+    <string name="back">Back</string>
+
+    <string name="select_intro_hint">Tell potential roommates about yourself, your habits, and lifestyle.</string>
+    <string name="select_status_hint">A short message that appears on your profile.</string>
+
+
+
+
 </resources>
-
-
-

@@ -133,6 +133,8 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+
+                            android:tag="Officetel"
                             android:text="Officetel"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -143,6 +145,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:tag="Apartment"
                             android:text="Apartment"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -160,6 +163,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:tag="Studio"
                             android:text="Studio"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -170,6 +174,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:tag="Villa/2BR"
                             android:text="Villa/2BR"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -186,6 +191,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:tag="House"
                             android:text="House"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
@@ -196,6 +202,7 @@
 
                         <com.google.android.material.button.MaterialButton
                             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:tag="Office"
                             android:text="Office"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"

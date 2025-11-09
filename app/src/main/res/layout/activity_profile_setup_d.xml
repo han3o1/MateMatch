@@ -38,7 +38,7 @@
             android:id="@+id/textStep"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Step 4 of 5"
+            android:text="Step 3 of 4"
             android:textColor="#7D7D7D"
             android:textSize="14sp"
             android:layout_gravity="end"
@@ -46,187 +46,194 @@
             android:gravity="end"/>
     </LinearLayout>
 
-    <!-- 카드 영역 -->
+    <!-- 카드 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:cardCornerRadius="16dp"
-        app:cardElevation="6dp"
+        app:cardElevation="8dp"
         android:backgroundTint="@android:color/white"
         app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="24dp"
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="24dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
 
-            <LinearLayout
-                android:orientation="vertical"
+            <!-- 제목 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ideal Roommate"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#000000"
+                android:layout_marginBottom="8dp"/>
+
+            <!-- 설명 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="What are you looking for in a roommate?"
+                android:textSize="14sp"
+                android:textColor="#7D7D7D"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"/>
+
+            <!-- 2열 3행 Grid -->
+            <GridLayout
+                android:id="@+id/gridIdealRoommate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal">
+                android:columnCount="2"
+                android:rowCount="3"
+                android:alignmentMode="alignMargins"
+                android:columnOrderPreserved="false"
+                android:useDefaultMargins="true"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="8dp">
 
-                <!-- 타이틀 -->
-                <TextView
-                    android:id="@+id/textTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Lifestyle and Matching Preferences"
-                    android:textStyle="bold"
-                    android:textSize="18sp"
-                    android:layout_marginBottom="16dp" />
-
-                <!-- 기상 / 취침 시간 -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Wake-up Time">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputWakeup"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="e.g., 7:00 AM" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="Bedtime">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/inputBedtime"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="e.g., 12:00 AM" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- 소음 수용도 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Noise Tolerance Level"
-                    android:textStyle="bold"
-                    android:layout_marginTop="24dp" />
-
-                <RadioGroup
-                    android:id="@+id/radioNoiseLevel"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <RadioButton
-                        android:id="@+id/radioQuiet"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Quiet"
-                        android:layout_marginEnd="16dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioModerate"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Moderate"
-                        android:layout_marginEnd="16dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioNoisy"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Noisy" />
-                </RadioGroup>
-
-                <!-- 방문객 허용 여부 -->
+                <!-- Preferred Age Range -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="16dp">
-
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
                     <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Allow guests?"
-                        android:textSize="16sp" />
-
-                    <Switch
-                        android:id="@+id/switchGuests"
+                        android:text="Preferred Age Range"
+                        android:textColor="#000"
+                        android:textSize="14sp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerAgeRange"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_age_range"/>
                 </LinearLayout>
 
-                <!-- 요리 선호도 -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Cooking Frequency"
-                    android:textStyle="bold"
-                    android:layout_marginTop="24dp" />
-
-                <RadioGroup
-                    android:id="@+id/radioCooking"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <RadioButton
-                        android:id="@+id/radioCookOften"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Often"
-                        android:layout_marginEnd="16dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioCookSometimes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sometimes"
-                        android:layout_marginEnd="16dp" />
-
-                    <RadioButton
-                        android:id="@+id/radioNeverCook"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Rarely" />
-                </RadioGroup>
-
-                <!-- 버튼 영역 -->
+                <!-- Gender Preference -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:layout_marginTop="32dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnPrevious"
-                        android:layout_width="0dp"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:text="Gender Preference"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerGenderPref"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Back"
-                        android:backgroundTint="#E0E0E0"
-                        android:textColor="#000000"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnNext"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:text="Next →"
-                        android:backgroundTint="#5C3A00"
-                        android:textColor="@android:color/white"/>
+                        android:prompt="@string/select_gender_pref"/>
                 </LinearLayout>
-            </LinearLayout>
-        </ScrollView>
+
+                <!-- Sleep Schedule -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
+                    <TextView
+                        android:text="Sleep Schedule"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerSleepPref"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_sleep_pref"/>
+                </LinearLayout>
+
+                <!-- Smoking -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:text="Smoking"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerSmokingPref"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_smoking_pref"/>
+                </LinearLayout>
+
+                <!-- Pets -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginEnd="8dp">
+                    <TextView
+                        android:text="Pets"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerPetsPref"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_pets_pref"/>
+                </LinearLayout>
+
+                <!-- Cleanliness -->
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:layout_marginStart="8dp">
+                    <TextView
+                        android:text="Cleanliness"
+                        android:textColor="#000"
+                        android:textSize="14sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <Spinner
+                        android:id="@+id/spinnerCleanPref"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:prompt="@string/select_clean_pref"/>
+                </LinearLayout>
+
+            </GridLayout>
+
+            <!-- Next 버튼 -->
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Next →"
+                android:backgroundTint="#5C3A00"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="24dp"/>
+        </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
