@@ -7,5 +7,19 @@
     <color name="brown_active">#694004</color>
     <color name="gray_inactive">#9E9E9E</color>
     <color name="background_light">#2ECEC2B4</color>
+    <color name="brown_50">#F6EFE7</color>
+    <color name="brown_100">#EADDC8</color>
+    <color name="brown_200">#DCC4A3</color>
+    <color name="brown_300">#C7A67D</color>
+    <color name="brown_400">#A9824F</color>
+    <color name="brown_500">#5C3A00</color>
+    <color name="brown_600">#4B2E00</color>
+    <color name="brown_700">#3A2300</color>
+    <color name="brown_800">#2A1900</color>
+    <color name="brown_900">#1A0F00</color>
 
+    <!-- 선택된 버튼 강조용 색상 -->
+    <color name="button_selected_bg">@color/brown_500</color>
+    <color name="button_selected_text">@android:color/white</color>
+    <color name="button_unselected_text">@color/brown_500</color>
 </resources>

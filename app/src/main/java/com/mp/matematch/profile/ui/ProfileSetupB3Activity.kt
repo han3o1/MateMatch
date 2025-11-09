@@ -1,21 +1,22 @@
 package com.mp.matematch.profile.ui
 
+import android.content.Intent
 import android.os.Bundle
-import android.widget.CheckBox
+import android.widget.LinearLayout
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
+import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupBBinding
 import com.mp.matematch.profile.viewmodel.ProfileViewModel
-import android.content.Intent
-import com.mp.matematch.profile.ui.ProfileSetupCActivity
 
 class ProfileSetupB3Activity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileSetupBBinding
     private val viewModel: ProfileViewModel by viewModels()
 
-    private var selectedRoomType: String = ""
+    private var selectedBuildingType: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,32 +25,20 @@ class ProfileSetupB3Activity : AppCompatActivity() {
 
         val userType = intent.getStringExtra("USER_TYPE")
 
-        // 🔸 ViewModel 데이터 관찰
+        // ✅ ViewModel 데이터 관찰 (이전 단계 값 불러오기)
         viewModel.user.observe(this) { user ->
-            // 기존 데이터 로드 시 UI에 반영
-            binding.spinnerCity.setSelection(resources.getStringArray(com.mp.matematch.R.array.cities).indexOf(user.city))
-            binding.spinnerDistrict.setSelection(resources.getStringArray(com.mp.matematch.R.array.districts).indexOf(user.district))
+            binding.spinnerCity.setSelection(
+                resources.getStringArray(R.array.cities).indexOf(user.city).coerceAtLeast(0)
+            )
+            binding.spinnerDistrict.setSelection(
+                resources.getStringArray(R.array.districts).indexOf(user.district).coerceAtLeast(0)
+            )
             binding.inputRent.setText(user.budgetMin.toString())
             binding.inputFee.setText(user.budgetMax.toString())
         }
 
-        // 🔸 건물 유형 버튼 클릭 이벤트
-        val buildingButtons = listOf(
-            binding.layoutBuildingType.findViewWithTag<com.google.android.material.button.MaterialButton>("Officetel"),
-            binding.layoutBuildingType.findViewWithTag<com.google.android.material.button.MaterialButton>("Apartment"),
-            binding.layoutBuildingType.findViewWithTag<com.google.android.material.button.MaterialButton>("Studio"),
-            binding.layoutBuildingType.findViewWithTag<com.google.android.material.button.MaterialButton>("Villa/2BR"),
-            binding.layoutBuildingType.findViewWithTag<com.google.android.material.button.MaterialButton>("House"),
-            binding.layoutBuildingType.findViewWithTag<com.google.android.material.button.MaterialButton>("Office")
-        )
-
-        buildingButtons.forEach { button ->
-            button.setOnClickListener {
-                selectedRoomType = button.text.toString()
-                buildingButtons.forEach { it.isSelected = false }
-                button.isSelected = true
-            }
-        }
+        // ✅ 빌딩 타입 버튼 하나만 선택 가능하게 설정
+        setupBuildingTypeButtons()
 
         // 🔸 뒤로가기
         binding.btnBack.setOnClickListener { finish() }
@@ -60,20 +49,61 @@ class ProfileSetupB3Activity : AppCompatActivity() {
         }
     }
 
+    /** ✅ 빌딩 타입 버튼 하나만 선택 가능하게 설정 **/
+    private fun setupBuildingTypeButtons() {
+        val parentLayout = binding.layoutBuildingType
+        val buildingButtons = mutableListOf<MaterialButton>()
+
+        // 모든 MaterialButton을 layoutBuildingType 내부에서 찾아서 리스트에 추가
+        for (i in 0 until parentLayout.childCount) {
+            val row = parentLayout.getChildAt(i)
+            if (row is LinearLayout) {
+                for (j in 0 until row.childCount) {
+                    val button = row.getChildAt(j)
+                    if (button is MaterialButton) {
+                        buildingButtons.add(button)
+                    }
+                }
+            }
+        }
+
+        // 각 버튼 클릭 시 스타일 및 상태 변경
+        buildingButtons.forEach { button ->
+            button.setOnClickListener {
+                // 전체 버튼 초기화
+                buildingButtons.forEach {
+                    it.isChecked = false
+                    it.setBackgroundColor(getColor(android.R.color.transparent))
+                    it.strokeColor = getColorStateList(R.color.ic_launcher_background)
+                    it.setTextColor(getColor(R.color.ic_launcher_background))
+                }
+
+                // 클릭된 버튼만 활성화 스타일 적용
+                button.isChecked = true
+                button.setBackgroundColor(getColor(R.color.ic_launcher_background))
+                button.strokeColor = getColorStateList(R.color.ic_launcher_background)
+                button.setTextColor(getColor(android.R.color.white))
+
+                selectedBuildingType = button.tag.toString()
+            }
+        }
+    }
+
+    /** ✅ 프로필 저장 후 다음 단계로 **/
     private fun saveProfileAndNext(userType: String?) {
         val city = binding.spinnerCity.selectedItem?.toString() ?: ""
         val district = binding.spinnerDistrict.selectedItem?.toString() ?: ""
         val rent = binding.inputRent.text.toString().toIntOrNull() ?: 0
         val fee = binding.inputFee.text.toString().toIntOrNull() ?: 0
 
-        // ✅ ViewModel에 반영
+        // ViewModel에 반영
         viewModel.updateField("city", city)
         viewModel.updateField("district", district)
         viewModel.updateField("budgetMin", rent)
         viewModel.updateField("budgetMax", fee)
-        viewModel.updateField("roomType", selectedRoomType)
+        viewModel.updateField("roomType", selectedBuildingType)
 
-        // ✅ Firestore 저장
+        // Firestore 저장
         viewModel.saveUserProfile { success ->
             if (success) {
                 Snackbar.make(binding.root, "저장 완료!", Snackbar.LENGTH_SHORT).show()
@@ -84,24 +114,12 @@ class ProfileSetupB3Activity : AppCompatActivity() {
         }
     }
 
+    /** ✅ 다음 단계로 이동 **/
     private fun goToNextStep(userType: String?) {
         val nextIntent = Intent(this, ProfileSetupCActivity::class.java)
         nextIntent.putExtra("USER_TYPE", userType)
         startActivity(nextIntent)
     }
-
-    // 🔧 확장함수: 특정 텍스트를 가진 버튼 리스트 반환
-    private fun android.view.ViewGroup.findViewsWithText(vararg texts: String): List<com.google.android.material.button.MaterialButton> {
-        val buttons = mutableListOf<com.google.android.material.button.MaterialButton>()
-        for (i in 0 until childCount) {
-            val child = getChildAt(i)
-            if (child is com.google.android.material.button.MaterialButton && texts.contains(child.text.toString())) {
-                buttons.add(child)
-            } else if (child is android.view.ViewGroup) {
-                buttons.addAll(child.findViewsWithText(*texts))
-            }
-        }
-        return buttons
-    }
 }
+
 

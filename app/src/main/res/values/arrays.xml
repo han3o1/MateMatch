@@ -1,7 +1,6 @@
 <resources>
 
 
-    <!-- 나이 선택 (대략적인 범위로 구성) -->
     <string-array name="ages">
         <item>18-22</item>
         <item>23-26</item>
@@ -10,7 +9,6 @@
         <item>36+</item>
     </string-array>
 
-    <!-- 성별 선택 -->
     <string-array name="genders">
         <item>Male</item>
         <item>Female</item>
@@ -18,7 +16,6 @@
         <item>Prefer not to say</item>
     </string-array>
 
-    <!-- 직업 선택 -->
     <string-array name="occupations">
         <item>Student</item>
         <item>Office Worker</item>
@@ -27,6 +24,7 @@
         <item>Researcher</item>
         <item>Other</item>
     </string-array>
+
 
     <!-- Lifestyle 선택 항목 추가 -->
     <string-array name="select_sleep">
