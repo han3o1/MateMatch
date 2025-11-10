@@ -74,14 +74,14 @@ class ProfileSetupBActivity : AppCompatActivity() {
                 buildingButtons.forEach {
                     it.isChecked = false
                     it.setBackgroundColor(getColor(android.R.color.transparent))
-                    it.strokeColor = getColorStateList(R.color.ic_launcher_background)
-                    it.setTextColor(getColor(R.color.ic_launcher_background))
+                    it.strokeColor = getColorStateList(R.color.brown_active)
+                    it.setTextColor(getColor(R.color.brown_active))
                 }
 
                 // 클릭된 버튼만 활성화 스타일 적용
                 button.isChecked = true
-                button.setBackgroundColor(getColor(R.color.ic_launcher_background))
-                button.strokeColor = getColorStateList(R.color.ic_launcher_background)
+                button.setBackgroundColor(getColor(R.color.brown_active))
+                button.strokeColor = getColorStateList(R.color.brown_active)
                 button.setTextColor(getColor(android.R.color.white))
 
                 selectedBuildingType = button.tag.toString()
@@ -91,27 +91,50 @@ class ProfileSetupBActivity : AppCompatActivity() {
 
     /** ✅ 프로필 저장 후 다음 단계로 **/
     private fun saveProfileAndNext(userType: String?) {
-        val city = binding.spinnerCity.selectedItem?.toString() ?: ""
-        val district = binding.spinnerDistrict.selectedItem?.toString() ?: ""
-        val rent = binding.inputRent.text.toString().toIntOrNull() ?: 0
-        val fee = binding.inputFee.text.toString().toIntOrNull() ?: 0
+        val city = binding.spinnerCity.selectedItem?.toString()?.trim() ?: ""
+        val district = binding.spinnerDistrict.selectedItem?.toString()?.trim() ?: ""
+        val rentText = binding.inputRent.text.toString().trim()
+        val feeText = binding.inputFee.text.toString().trim()
+        val rent = rentText.toIntOrNull() ?: 0
+        val fee = feeText.toIntOrNull() ?: 0
 
-        // ViewModel에 반영
+        // ✅ 필수 필드 검증
+        if (city.isEmpty() || district.isEmpty() || selectedBuildingType.isEmpty() ||
+            rentText.isEmpty() || feeText.isEmpty()
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Missing Required Fields")
+                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        // ✅ ViewModel에 반영
         viewModel.updateField("city", city)
         viewModel.updateField("district", district)
         viewModel.updateField("budgetMin", rent)
         viewModel.updateField("budgetMax", fee)
         viewModel.updateField("roomType", selectedBuildingType)
 
-        // Firestore 저장
-        viewModel.saveUserProfile { success ->
-            if (success) {
-                Snackbar.make(binding.root, "저장 완료!", Snackbar.LENGTH_SHORT).show()
-                goToNextStep(userType)
-            } else {
-                Snackbar.make(binding.root, "저장 실패. 다시 시도해주세요.", Snackbar.LENGTH_LONG).show()
-            }
-        }
+//        // ✅ Firestore 저장 확인용
+//        viewModel.saveUserProfile { success ->
+//            if (success) {
+//                androidx.appcompat.app.AlertDialog.Builder(this)
+//                    .setTitle("Success")
+//                    .setMessage("Your information has been saved successfully.")
+//                    .setPositiveButton("Next") { _, _ ->
+//                        goToNextStep(userType)
+//                    }
+//                    .show()
+//            } else {
+//                androidx.appcompat.app.AlertDialog.Builder(this)
+//                    .setTitle("Save Failed")
+//                    .setMessage("An error occurred while saving. Please try again.")
+//                    .setPositiveButton("OK", null)
+//                    .show()
+//            }
+//        }
     }
 
     /** ✅ 다음 단계로 이동 **/

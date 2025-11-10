@@ -118,6 +118,18 @@ class ProfileSetupCActivity : AppCompatActivity() {
         val guest = binding.spinnerGuests.selectedItem?.toString() ?: ""
         val social = binding.spinnerSocial.selectedItem?.toString() ?: ""
 
+        // ✅ 필수 필드 확인
+        if (sleep.isEmpty() || smoking.isEmpty() || pets.isEmpty() || clean.isEmpty() ||
+            guest.isEmpty() || social.isEmpty()
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Missing Required Fields")
+                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
         // ViewModel 업데이트
         viewModel.updateField("sleepSchedule", sleep)
         viewModel.updateField("smoking", smoking)

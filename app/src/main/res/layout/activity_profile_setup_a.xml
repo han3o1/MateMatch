@@ -103,7 +103,7 @@
                     android:id="@+id/btnUploadPhoto"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Upload Photo"
+                    android:text="Upload Photo*"
                     android:icon="@drawable/ic_upload"
                     app:iconPadding="8dp"
                     android:iconTint="@android:color/white"
@@ -120,7 +120,7 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Full Name"
+                    android:text="Full Name*"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:layout_marginTop="16dp"/>
@@ -156,7 +156,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Age"
+                            android:text="Age*"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -185,7 +185,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Gender"
+                            android:text="Gender*"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -222,7 +222,7 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Occupation"
+                            android:text="Occupation*"
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
@@ -275,7 +275,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Available Move-in Date"
+                    android:text="Available Move-in Date*"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 

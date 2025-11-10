@@ -31,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 authViewModel.login(email, password) // ViewModel에 작업 요청
             } else {
-                Toast.makeText(this, "이메일과 비밀번호를 입력해주세요.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Enter your email and password.", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -52,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
 
             // 성공 상태
             if (state.isSuccess) {
-                Toast.makeText(this, "로그인 성공!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
 
                 // TODO: 프로필이 이미 작성되었는지 확인하는 로직 필요
                 // (지금은 임시로 '이용 목적 선택'으로 이동)
@@ -63,7 +63,7 @@ class LoginActivity : AppCompatActivity() {
 
             // 에러 상태
             state.error?.let {
-                Toast.makeText(this, "로그인 실패: $it", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Log in error: $it", Toast.LENGTH_LONG).show()
             }
         }
     }

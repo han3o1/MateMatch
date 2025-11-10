@@ -45,10 +45,22 @@ class ProfileSetupEActivity : AppCompatActivity() {
         val status = binding.inputStatus.text?.toString()?.trim() ?: ""
         val intro = binding.inputIntro.text?.toString()?.trim() ?: ""
 
+
+
         // ✅ bio는 상태메시지로, tags는 쉼표로 구분된 리스트로 저장
         val tagList = if (intro.isNotEmpty()) {
             intro.split(",").map { it.trim() }.filter { it.isNotEmpty() }
         } else emptyList()
+
+        if (tagList.isEmpty()
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Missing Required Fields")
+                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
 
         viewModel.updateField("bio", status)
         viewModel.updateField("tags", tagList)
@@ -56,10 +68,10 @@ class ProfileSetupEActivity : AppCompatActivity() {
         // ✅ Firestore 저장
         viewModel.saveUserProfile { success ->
             if (success) {
-                Snackbar.make(binding.root, "프로필이 성공적으로 완성되었습니다!", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "Profile Updated!", Snackbar.LENGTH_LONG).show()
                 goToMain()
             } else {
-                Snackbar.make(binding.root, "저장 실패. 다시 시도해주세요.", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(binding.root, "Profile Update Fail", Snackbar.LENGTH_LONG).show()
             }
         }
     }
@@ -84,11 +96,11 @@ private fun goToMain() {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
             } else {
-                Toast.makeText(this, "유저 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Cannot load user information.", Toast.LENGTH_SHORT).show()
             }
         }
         .addOnFailureListener {
-            Toast.makeText(this, "유저 타입 로드 실패", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Cannot load user type", Toast.LENGTH_SHORT).show()
         }
 }
 

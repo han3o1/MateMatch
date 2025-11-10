@@ -15,11 +15,13 @@ import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupABinding
 import com.mp.matematch.profile.model.User
 import java.util.UUID
+import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AlertDialog
 
 class ProfileSetupActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileSetupABinding
-    private var userType: String? = null
+    private lateinit var userType: String   // ✅ 단 한 번만 선언
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
@@ -34,7 +36,9 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding = ActivityProfileSetupABinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        userType = intent.getStringExtra("USER_TYPE")
+        // ✅ 인텐트로 전달된 userType 안전하게 저장
+        userType = intent.getStringExtra("USER_TYPE") ?: "Unknown"
+        Log.d("ProfileSetup", "🔸 Received USER_TYPE = $userType")
 
         /** ✅ 드롭다운 초기화 **/
         setupDropdowns()
@@ -44,14 +48,13 @@ class ProfileSetupActivity : AppCompatActivity() {
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Select Move-in Date")
                 .build()
-
             datePicker.addOnPositiveButtonClickListener {
                 binding.inputMoveInDate.setText(datePicker.headerText)
             }
             datePicker.show(supportFragmentManager, "DATE_PICKER")
         }
 
-        /** ✅ 이미지 업로드 버튼 **/
+        /** ✅ 이미지 업로드 **/
         binding.btnUploadPhoto.setOnClickListener {
             val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" }
             startActivityForResult(
@@ -69,52 +72,18 @@ class ProfileSetupActivity : AppCompatActivity() {
         binding.btnBack?.setOnClickListener { finish() }
     }
 
-    /** ✅ AutoCompleteTextView 드롭다운 초기화 **/
+    /** ✅ AutoCompleteTextView 드롭다운 설정 **/
     private fun setupDropdowns() {
-        // ▫️ 나이
-        val ageAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.ages,
-            android.R.layout.simple_dropdown_item_1line
-        )
+        val ageAdapter = ArrayAdapter.createFromResource(this, R.array.ages, android.R.layout.simple_dropdown_item_1line)
+        val genderAdapter = ArrayAdapter.createFromResource(this, R.array.genders, android.R.layout.simple_dropdown_item_1line)
+        val occupationAdapter = ArrayAdapter.createFromResource(this, R.array.occupations, android.R.layout.simple_dropdown_item_1line)
 
-        // ▫️ 성별
-        val genderAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.genders,
-            android.R.layout.simple_dropdown_item_1line
-        )
-
-        // ▫️ 직업
-        val occupationAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.occupations,
-            android.R.layout.simple_dropdown_item_1line
-        )
-
-        // ✅ 어댑터 연결
         binding.spinnerAge.setAdapter(ageAdapter)
         binding.spinnerGender.setAdapter(genderAdapter)
         binding.spinnerOccupation.setAdapter(occupationAdapter)
-
-        // ✅ 클릭 시 자동 드롭다운 표시
-        binding.spinnerAge.setOnClickListener { binding.spinnerAge.showDropDown() }
-        binding.spinnerGender.setOnClickListener { binding.spinnerGender.showDropDown() }
-        binding.spinnerOccupation.setOnClickListener { binding.spinnerOccupation.showDropDown() }
-
-        // ✅ 디버깅용 로그
-        binding.spinnerAge.setOnItemClickListener { parent, _, position, _ ->
-            Log.d("ProfileSetup", "선택된 나이: ${parent.getItemAtPosition(position)}")
-        }
-        binding.spinnerGender.setOnItemClickListener { parent, _, position, _ ->
-            Log.d("ProfileSetup", "선택된 성별: ${parent.getItemAtPosition(position)}")
-        }
-        binding.spinnerOccupation.setOnItemClickListener { parent, _, position, _ ->
-            Log.d("ProfileSetup", "선택된 직업: ${parent.getItemAtPosition(position)}")
-        }
     }
 
-    /** ✅ onActivityResult: 이미지 선택 결과 처리 **/
+    /** ✅ 이미지 선택 처리 **/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
@@ -122,6 +91,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             binding.profileImage.setImageURI(selectedImageUri)
         }
     }
+
 
     /** ✅ Firestore + Storage 저장 함수 **/
     private fun saveUserProfile() {
@@ -139,10 +109,16 @@ class ProfileSetupActivity : AppCompatActivity() {
         val mbti = binding.inputMbti.text.toString().trim()
         val moveInDate = binding.inputMoveInDate.text.toString().trim()
 
-        val age = ageText.filter { it.isDigit() }.toIntOrNull() ?: 0 // “23–26” 방지
+        val age = ageText.filter { it.isDigit() }.toIntOrNull() ?: 0
 
-        if (name.isEmpty()) {
-            Log.e("ProfileSetup", "❌ 이름이 비어 있습니다.")
+        // ✅ 필수 입력값 확인
+        if (name.isEmpty() || ageText.isEmpty() || gender.isEmpty() || occupation.isEmpty()|| moveInDate.isEmpty()) {
+            // Snackbar 또는 AlertDialog로 알림 표시
+            AlertDialog.Builder(this)
+                .setTitle("Missing Required Fields")
+                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setPositiveButton("OK", null)
+                .show()
             return
         }
 
@@ -153,7 +129,16 @@ class ProfileSetupActivity : AppCompatActivity() {
 
             uploadTask.addOnSuccessListener {
                 storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    saveUserToFirestore(uid, name, age, gender, occupation, mbti, moveInDate, uri.toString())
+                    saveUserToFirestore(
+                        uid,
+                        name,
+                        age,
+                        gender,
+                        occupation,
+                        mbti,
+                        moveInDate,
+                        uri.toString()
+                    )
                 }
             }.addOnFailureListener { e ->
                 Log.e("ProfileSetup", "❌ Image upload failed: ${e.message}")
@@ -164,7 +149,8 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
     }
 
-    /** ✅ Firestore 저장 **/
+
+    /** ✅ Firestore 저장 함수 **/
     private fun saveUserToFirestore(
         uid: String,
         name: String,
@@ -177,7 +163,7 @@ class ProfileSetupActivity : AppCompatActivity() {
     ) {
         val user = User(
             uid = uid,
-            userType = userType ?: "",
+            userType = userType,
             name = name,
             age = age,
             gender = gender,
@@ -185,29 +171,13 @@ class ProfileSetupActivity : AppCompatActivity() {
             mbti = mbti,
             moveInDate = moveInDate,
             profileImageUrl = imageUrl,
-
-            // 이후 단계에서 채워질 필드
-            city = "",
-            district = "",
-            addressDetail = "",
-            budgetMin = 0,
-            budgetMax = 0,
-            roomType = "",
-            duration = "",
-            sleepSchedule = "",
-            smoking = "",
-            pets = "",
-            cleanliness = "",
-            guestPolicy = "",
-            socialPreference = "",
-            prefAgeRange = "",
-            prefGender = "",
-            prefSleepSchedule = "",
-            prefSmoking = "",
-            prefPets = "",
-            prefCleanliness = "",
-            bio = "",
-            tags = emptyList()
+            city = "", district = "", addressDetail = "",
+            budgetMin = 0, budgetMax = 0, roomType = "",
+            duration = "", sleepSchedule = "", smoking = "", pets = "",
+            cleanliness = "", guestPolicy = "", socialPreference = "",
+            prefAgeRange = "", prefGender = "", prefSleepSchedule = "",
+            prefSmoking = "", prefPets = "", prefCleanliness = "",
+            bio = "", tags = emptyList()
         )
 
         db.collection("users").document(uid)
@@ -221,7 +191,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             }
     }
 
-    /** ✅ 다음 Activity로 분기 **/
+    /** ✅ 다음 단계 분기 **/
     private fun goToNextStep() {
         val nextActivity = when (userType) {
             "Provider" -> ProfileSetupBActivity::class.java
@@ -234,6 +204,6 @@ class ProfileSetupActivity : AppCompatActivity() {
             val intent = Intent(this, it)
             intent.putExtra("USER_TYPE", userType)
             startActivity(intent)
-        }
+        } ?: Log.e("ProfileSetup", "❌ Unknown userType: $userType")
     }
 }

@@ -9,60 +9,23 @@
     android:padding="20dp"
     tools:context=".profile.ui.ProfileSetupEActivity">
 
-    <!-- 상단 바 -->
-    <LinearLayout
-        android:id="@+id/topBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@android:color/transparent"
-            android:src="@drawable/ic_arrow_back"
-            android:contentDescription="Back" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Back"
-            android:textColor="#000000"
-            android:textSize="14sp"
-            android:layout_marginStart="4dp"/>
-
-        <TextView
-            android:id="@+id/textStep"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_weight="1"
-            android:gravity="end"
-            android:text="Step 5 of 5"
-            android:textColor="#7D7D7D"
-            android:textSize="14sp" />
-    </LinearLayout>
-
-    <!-- 카드 -->
+    <!-- 카드형 컨테이너 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="6dp"
-        android:backgroundTint="@android:color/white"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp">
+        android:backgroundTint="@android:color/white">
 
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:padding="24dp">
 
             <LinearLayout
@@ -71,6 +34,43 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal">
 
+                <!-- 상단 바 -->
+                <LinearLayout
+                    android:id="@+id/topBar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/btnBack"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/ic_arrow_back"
+                        android:contentDescription="Back" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Back"
+                        android:textColor="#000000"
+                        android:textSize="14sp"
+                        android:layout_marginStart="4dp"/>
+
+
+                </LinearLayout>
+
+                <!-- Step Indicator -->
+                <TextView
+                    android:id="@+id/textStep"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Step 5 of 5"
+                    android:textColor="#7D7D7D"
+                    android:textSize="14sp"
+                    android:layout_gravity="end" />
                 <!-- 타이틀 -->
                 <TextView
                     android:id="@+id/textTitle"
@@ -81,7 +81,16 @@
                     android:textSize="18sp"
                     android:layout_marginBottom="16dp" />
 
-                <!-- 자기소개 -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Status Message (Optional)"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="4dp"/>
+
+                <!-- 상태메시지 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -90,19 +99,17 @@
 
                     <!-- 예시 문구 (입력창) -->
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="hi! I have a fancy room! come!!"
-                        app:boxStrokeColor="#BDBDBD">
-
+                        android:hint="Hi! I have a fancy room!">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/inputStatus"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:textSize="14sp"
-                            android:gravity="bottom"
-                            android:paddingBottom="6dp"/>
+                            android:minLines="3"
+                            android:maxLines="5"
+                            android:gravity="top"
+                            android:hint=""/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <!-- 안내 문구 -->
@@ -122,7 +129,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Self-Introduction"
+                    android:text="Self-Introduction*"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     android:layout_marginTop="16dp"

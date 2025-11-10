@@ -117,6 +117,19 @@ class ProfileSetupDActivity : AppCompatActivity() {
         val petsPref = binding.spinnerPetsPref.selectedItem?.toString() ?: ""
         val cleanPref = binding.spinnerCleanPref.selectedItem?.toString() ?: ""
 
+
+        // ✅ 필수 필드 확인
+        if (ageRange.isEmpty() || genderPref.isEmpty() || sleepPref.isEmpty() ||
+            smokingPref.isEmpty() || petsPref.isEmpty() || cleanPref.isEmpty()
+        ) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Missing Required Fields")
+                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
         // ViewModel에 반영
         viewModel.updateField("prefAgeRange", ageRange)
         viewModel.updateField("prefGender", genderPref)
