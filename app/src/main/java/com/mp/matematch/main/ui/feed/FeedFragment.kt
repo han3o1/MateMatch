@@ -16,8 +16,7 @@ class FeedFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_feed, container, false)
 
         // 온보딩이나 로그인에서 전달된 userType 값 가져오기
-        val userType = requireActivity().intent.getStringExtra("userType")
-
+        val userType = arguments?.getString("userType") ?: ""
         // ✅ 기존 피드 코드 그대로 살려두고, 단순히 분기만 담당
         val targetFragment: Fragment = if (userType == "provider" || userType == "roommate-provider") {
             FeedHouseFragment()   // 👉 그대로 사용

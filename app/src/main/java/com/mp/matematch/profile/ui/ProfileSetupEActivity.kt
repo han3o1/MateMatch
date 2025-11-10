@@ -64,10 +64,33 @@ class ProfileSetupEActivity : AppCompatActivity() {
         }
     }
 
-    private fun goToMain() {
-        val intent = Intent(this, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-    }
+//    private fun goToMain() {
+//        val intent = Intent(this, MainActivity::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+//        startActivity(intent)
+//    }
+private fun goToMain() {
+    val currentUser = auth.currentUser ?: return
+
+    // Firestore에서 userType 불러오기
+    db.collection("users").document(currentUser.uid).get()
+        .addOnSuccessListener { document ->
+            if (document != null && document.exists()) {
+                val userType = document.getString("userType") ?: ""
+
+                // 🔹 userType 값을 MainActivity로 넘김
+                val intent = Intent(this, MainActivity::class.java)
+                intent.putExtra("userType", userType)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "유저 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+        .addOnFailureListener {
+            Toast.makeText(this, "유저 타입 로드 실패", Toast.LENGTH_SHORT).show()
+        }
+}
+
 
 }
