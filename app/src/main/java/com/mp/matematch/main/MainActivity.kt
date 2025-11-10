@@ -22,6 +22,19 @@ class MainActivity : AppCompatActivity() {
         val bottomNav = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNav.setupWithNavController(navController)
 
+        // ✅ 추가: ProfileSetupEActivity에서 넘어온 userType 가져오기
+        val userType = intent.getStringExtra("userType")
+
+        // ✅ 초기 화면이 FeedFragment일 때만 arguments 전달
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.feedFragment && userType != null) {
+                val bundle = Bundle().apply {
+                    putString("userType", userType)
+                }
+                navController.navigate(R.id.feedFragment, bundle)
+            }
+        }
+
         // ✅ 초기 화면은 FeedFragment (FeedFragment 안에서 userType으로 하위 피드 자동 분기)
         if (navController.currentDestination?.id != R.id.feedFragment) {
             navController.navigate(R.id.feedFragment)
