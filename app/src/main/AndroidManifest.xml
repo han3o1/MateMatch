@@ -34,11 +34,10 @@
         <activity android:name=".purpose.ui.SubPurposeSelectionActivity" />
 
         <!-- 메인화면 -->
-        <activity android:name=".main.MainActivity" />
+        <activity android:name=".main.ui.MainActivity" />
 
-        <!-- 🔹 프로필 설정 관련 (A~E 단계) -->
+        <!-- 프로필 설정 관련 (A~E 단계) -->
         <activity android:name=".profile.ui.ProfileSetupActivity" />
-        <activity android:name=".profile.ui.ProfileSetupAActivity" />
         <activity android:name=".profile.ui.ProfileSetupB1Activity" />
         <activity android:name=".profile.ui.ProfileSetupB2Activity" />
         <activity android:name=".profile.ui.ProfileSetupB3Activity" />
