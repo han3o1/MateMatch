@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.kotlin.android)
 
     id("com.google.gms.google-services")
+    id("kotlin-kapt")
+
 }
 
 
@@ -77,4 +79,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.1")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.1")
     implementation("com.google.android.material:material:1.11.0")
+
+    // 채팅기능 의존성 추가 (Kotlin DSL 문법)
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
+
 }

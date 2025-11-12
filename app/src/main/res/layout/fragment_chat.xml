@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center">
+    android:background="@color/brown_50"> <!-- 배경색 -->
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Chat Screen"
-        android:textSize="20sp"
-        android:textColor="@android:color/black" />
-</FrameLayout>
+    <!-- 채팅 없을 때 보여줄 빈 화면 -->
+    <include
+        android:id="@+id/emptyView"
+        layout="@layout/chat_empty"
+        android:visibility="gone" />
+
+    <!-- 채팅 리스트 -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewChatList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:layout_marginBottom="56dp" />
+</RelativeLayout>

@@ -72,6 +72,9 @@
     <string name="select_status_hint">A short message that appears on your profile.</string>
 
 
+    <!-- 채팅 -->
+    <string name="profile_picture">Profile Picture</string>
+
 
 
 </resources>

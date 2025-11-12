@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:orientation="horizontal"
+    android:gravity="start">
+
+    <!-- 프로필 사진 -->
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/profile_sample"
+        android:background="@drawable/circle_bg"
+        android:contentDescription="@string/profile_picture" />
+
+    <!-- 말풍선 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="8dp"
+        android:background="@drawable/bg_message_left"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tvMessageLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hi there!"
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvTimeLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="오후 11:28"
+            android:textSize="10sp"
+            android:textColor="@android:color/darker_gray"
+            android:layout_gravity="end"
+            android:layout_marginTop="4dp" />
+    </LinearLayout>
+</LinearLayout>
