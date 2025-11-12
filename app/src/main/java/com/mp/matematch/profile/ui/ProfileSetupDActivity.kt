@@ -3,10 +3,10 @@ package com.mp.matematch.profile.ui
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.Spinner
+import android.widget.AutoCompleteTextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.snackbar.Snackbar
+import androidx.appcompat.app.AlertDialog
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupDBinding
 import com.mp.matematch.profile.viewmodel.ProfileViewModel
@@ -23,10 +23,10 @@ class ProfileSetupDActivity : AppCompatActivity() {
 
         val userType = intent.getStringExtra("USER_TYPE")
 
-        // ✅ 스피너 초기화
+        // 스피너 초기화
         setupSpinners()
 
-        // 🔹 Firestore → UI 반영
+        // ViewModel 데이터 관찰 (이전 단계 값 불러오기)
         viewModel.user.observe(this) { user ->
             setSpinnerSelection(binding.spinnerAgeRange, user.prefAgeRange)
             setSpinnerSelection(binding.spinnerGenderPref, user.prefGender)
@@ -36,101 +36,83 @@ class ProfileSetupDActivity : AppCompatActivity() {
             setSpinnerSelection(binding.spinnerCleanPref, user.prefCleanliness)
         }
 
-        // 🔹 뒤로가기
+        // 뒤로가기
         binding.btnBack.setOnClickListener { finish() }
 
-        // 🔹 다음 버튼 → Firestore 저장 + E단계 이동
+        // 다음 버튼
         binding.btnNext.setOnClickListener {
             saveIdealRoommateAndNext(userType)
         }
     }
 
-    /** ✅ Spinner 초기화 */
+    /**  Spinner 세팅 함수 **/
     private fun setupSpinners() {
         // Age Range
         val ageAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.select_age_range,  // ✅ 배열명 수정 필요
-            android.R.layout.simple_spinner_item
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinnerAgeRange.adapter = ageAdapter
+            this, R.array.select_age_range, android.R.layout.simple_dropdown_item_1line
+        )
+        binding.spinnerAgeRange.setAdapter(ageAdapter)
 
         // Gender Preference
         val genderAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.select_gender_pref,  // ✅ 배열명 수정 필요
-            android.R.layout.simple_spinner_item
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinnerGenderPref.adapter = genderAdapter
+            this, R.array.select_gender_pref, android.R.layout.simple_dropdown_item_1line
+        )
+        binding.spinnerGenderPref.setAdapter(genderAdapter)
 
         // Sleep Schedule Preference
         val sleepAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.select_sleep,   // ✅ C단계와 동일하게 통일
-            android.R.layout.simple_spinner_item
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinnerSleepPref.adapter = sleepAdapter
+            this, R.array.select_sleep_pref, android.R.layout.simple_dropdown_item_1line
+        )
+        binding.spinnerSleepPref.setAdapter(sleepAdapter)
 
         // Smoking Preference
         val smokingAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.select_smoking,  // ✅ C단계 동일
-            android.R.layout.simple_spinner_item
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinnerSmokingPref.adapter = smokingAdapter
+            this, R.array.select_smoking_pref, android.R.layout.simple_dropdown_item_1line
+        )
+        binding.spinnerSmokingPref.setAdapter(smokingAdapter)
 
         // Pets Preference
         val petsAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.select_pets,     // ✅ C단계 동일
-            android.R.layout.simple_spinner_item
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinnerPetsPref.adapter = petsAdapter
+            this, R.array.select_pets_pref, android.R.layout.simple_dropdown_item_1line
+        )
+        binding.spinnerPetsPref.setAdapter(petsAdapter)
 
         // Cleanliness Preference
         val cleanAdapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.select_clean,    // ✅ C단계 동일
-            android.R.layout.simple_spinner_item
-        ).apply {
-            setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        }
-        binding.spinnerCleanPref.adapter = cleanAdapter
+            this, R.array.select_clean_pref, android.R.layout.simple_dropdown_item_1line
+        )
+        binding.spinnerCleanPref.setAdapter(cleanAdapter)
     }
 
-    /** ✅ 저장 + 다음 단계 이동 */
+    /** 데이터 저장 후 다음 단계로 **/
     private fun saveIdealRoommateAndNext(userType: String?) {
-        val ageRange = binding.spinnerAgeRange.selectedItem?.toString() ?: ""
-        val genderPref = binding.spinnerGenderPref.selectedItem?.toString() ?: ""
-        val sleepPref = binding.spinnerSleepPref.selectedItem?.toString() ?: ""
-        val smokingPref = binding.spinnerSmokingPref.selectedItem?.toString() ?: ""
-        val petsPref = binding.spinnerPetsPref.selectedItem?.toString() ?: ""
-        val cleanPref = binding.spinnerCleanPref.selectedItem?.toString() ?: ""
+        val ageRange = binding.spinnerAgeRange.text.toString()
+        val genderPref = binding.spinnerGenderPref.text.toString()
+        val sleepPref = binding.spinnerSleepPref.text.toString()
+        val smokingPref = binding.spinnerSmokingPref.text.toString()
+        val petsPref = binding.spinnerPetsPref.text.toString()
+        val cleanPref = binding.spinnerCleanPref.text.toString()
 
+        // 필수 필드 확인
+        val ageArray = resources.getStringArray(R.array.select_age_range)
+        val genderArray = resources.getStringArray(R.array.select_gender_pref)
+        val sleepArray = resources.getStringArray(R.array.select_sleep_pref)
+        val smokingArray = resources.getStringArray(R.array.select_smoking_pref)
+        val petsArray = resources.getStringArray(R.array.select_pets_pref)
+        val cleanArray = resources.getStringArray(R.array.select_clean_pref)
 
-        // ✅ 필수 필드 확인
-        if (ageRange.isEmpty() || genderPref.isEmpty() || sleepPref.isEmpty() ||
-            smokingPref.isEmpty() || petsPref.isEmpty() || cleanPref.isEmpty()
+        if (ageArray.isEmpty() || genderArray.isEmpty() || sleepArray.isEmpty() ||
+            smokingArray.isEmpty() || petsArray.isEmpty() || cleanArray.isEmpty()
         ) {
-            androidx.appcompat.app.AlertDialog.Builder(this)
+            AlertDialog.Builder(this)
                 .setTitle("Missing Required Fields")
-                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setMessage("Please select all ideal roommate preferences.")
                 .setPositiveButton("OK", null)
                 .show()
             return
         }
 
-        // ViewModel에 반영
+        // ViewModel 업데이트
         viewModel.updateField("prefAgeRange", ageRange)
         viewModel.updateField("prefGender", genderPref)
         viewModel.updateField("prefSleepSchedule", sleepPref)
@@ -138,30 +120,22 @@ class ProfileSetupDActivity : AppCompatActivity() {
         viewModel.updateField("prefPets", petsPref)
         viewModel.updateField("prefCleanliness", cleanPref)
 
-        // Firestore 저장
-        viewModel.saveUserProfile { success ->
-            if (success) {
-                Snackbar.make(binding.root, "Ideal roommate 정보가 저장되었습니다.", Snackbar.LENGTH_SHORT).show()
-                goToNextStep(userType)
-            } else {
-                Snackbar.make(binding.root, "저장 실패. 다시 시도해주세요.", Snackbar.LENGTH_LONG).show()
-            }
-        }
+        goToNextStep(userType)
     }
 
-    /** ✅ 다음 Activity로 이동 */
+    /** 다음 단계 Activity로 이동 **/
     private fun goToNextStep(userType: String?) {
         val nextIntent = Intent(this, ProfileSetupEActivity::class.java)
         nextIntent.putExtra("USER_TYPE", userType)
         startActivity(nextIntent)
     }
 
-    /** ✅ Firestore 값과 Spinner 텍스트 매칭 */
-    private fun setSpinnerSelection(spinner: Spinner, value: String) {
+    /** Firestore 값과 Spinner 텍스트 매칭 **/
+    private fun setSpinnerSelection(spinner: AutoCompleteTextView, value: String) {
         val adapter = spinner.adapter ?: return
         for (i in 0 until adapter.count) {
             if (adapter.getItem(i).toString() == value) {
-                spinner.setSelection(i)
+                spinner.setText(adapter.getItem(i).toString(), false)
                 break
             }
         }

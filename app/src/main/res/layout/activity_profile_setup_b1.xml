@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/roommate_ma"
     android:padding="20dp"
-    tools:context=".profile.ui.ProfileSetupBActivity">
+    tools:context=".profile.ui.ProfileSetupB1Activity">
 
 
     <!-- 카드형 컨테이너 -->
@@ -271,14 +271,38 @@
                     android:columnCount="2"
                     android:layout_marginTop="8dp">
 
-                    <CheckBox android:text="WiFi" />
-                    <CheckBox android:text="Washer/Dryer" />
-                    <CheckBox android:text="Parking" />
-                    <CheckBox android:text="Gym" />
-                    <CheckBox android:text="Pool" />
-                    <CheckBox android:text="Air Conditioning" />
-                    <CheckBox android:text="Heating" />
-                    <CheckBox android:text="Dishwasher" />
+                    <CheckBox
+                        android:id="@+id/checkWiFi" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="WiFi" />
+                    <CheckBox
+                        android:id="@+id/checkWasherDryer" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Washer/Dryer" />
+                    <CheckBox
+                        android:id="@+id/checkParking" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Parking" />
+                    <CheckBox
+                        android:id="@+id/checkGym" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Gym" />
+                    <CheckBox
+                        android:id="@+id/checkPool" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pool" />
+                    <CheckBox
+                        android:id="@+id/checkAirConditioning" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Air Conditioning" />
+                    <CheckBox
+                        android:id="@+id/checkHeating" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Heating" />
+                    <CheckBox
+                        android:id="@+id/checkDishwasher" android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dishwasher" />
                 </GridLayout>
 
                 <!-- Next 버튼 -->

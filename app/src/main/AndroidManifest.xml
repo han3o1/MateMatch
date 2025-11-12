@@ -39,7 +39,7 @@
         <!-- 🔹 프로필 설정 관련 (A~E 단계) -->
         <activity android:name=".profile.ui.ProfileSetupActivity" />
         <activity android:name=".profile.ui.ProfileSetupAActivity" />
-        <activity android:name=".profile.ui.ProfileSetupBActivity" />
+        <activity android:name=".profile.ui.ProfileSetupB1Activity" />
         <activity android:name=".profile.ui.ProfileSetupB2Activity" />
         <activity android:name=".profile.ui.ProfileSetupB3Activity" />
         <activity android:name=".profile.ui.ProfileSetupCActivity" />

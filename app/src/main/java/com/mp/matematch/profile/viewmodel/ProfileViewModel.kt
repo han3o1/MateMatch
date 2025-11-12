@@ -1,11 +1,14 @@
 package com.mp.matematch.profile.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.mp.matematch.profile.model.User
+import kotlin.String
 
 class ProfileViewModel : ViewModel() {
 
@@ -52,39 +55,47 @@ class ProfileViewModel : ViewModel() {
     fun updateField(fieldName: String, value: Any) {
         val current = _user.value ?: User(uid = auth.currentUser?.uid ?: "")
         val updated = when (fieldName) {
+            // A단계: 기본 프로필
             "name" -> current.copy(name = value.toString())
             "age" -> current.copy(age = (value as? Int) ?: 0)
-            "occupation" -> current.copy(occupation = value.toString())
             "gender" -> current.copy(gender = value.toString())
+            "occupation" -> current.copy(occupation = value.toString())
             "mbti" -> current.copy(mbti = value.toString())
             "moveInDate" -> current.copy(moveInDate = value.toString())
             "profileImageUrl" -> current.copy(profileImageUrl = value.toString())
+
+            // B, B2, B3 단계: 거주 관련
             "city" -> current.copy(city = value.toString())
             "district" -> current.copy(district = value.toString())
-            "addressDetail" -> current.copy(addressDetail = value.toString())
-            "budgetMin" -> current.copy(budgetMin = (value as? Int) ?: 0)
-            "budgetMax" -> current.copy(budgetMax = (value as? Int) ?: 0)
-            "roomType" -> current.copy(roomType = value.toString())
-            "duration" -> current.copy(duration = value.toString())
+            "buildingType" -> current.copy(buildingType = value.toString())
+            "monthlyRent" -> current.copy(monthlyRent = (value as? Int) ?: 0)
+            "maintenanceFee" -> current.copy(maintenanceFee = (value as? Int) ?: 0)
+            "amenities" -> current.copy(amenities = value as? List<String> ?: emptyList())
+
+            // C단계: Lifestyle
             "sleepSchedule" -> current.copy(sleepSchedule = value.toString())
             "smoking" -> current.copy(smoking = value.toString())
             "pets" -> current.copy(pets = value.toString())
             "cleanliness" -> current.copy(cleanliness = value.toString())
             "guestPolicy" -> current.copy(guestPolicy = value.toString())
             "socialPreference" -> current.copy(socialPreference = value.toString())
+
+            // D단계: Ideal Roommate
             "prefAgeRange" -> current.copy(prefAgeRange = value.toString())
             "prefGender" -> current.copy(prefGender = value.toString())
             "prefSleepSchedule" -> current.copy(prefSleepSchedule = value.toString())
             "prefSmoking" -> current.copy(prefSmoking = value.toString())
             "prefPets" -> current.copy(prefPets = value.toString())
             "prefCleanliness" -> current.copy(prefCleanliness = value.toString())
+
+            // E단계: 최종 요약 및 태그
+            "statusMessage" -> current.copy(statusMessage = value.toString())
             "bio" -> current.copy(bio = value.toString())
-            "tags" -> current.copy(tags = value as? List<String> ?: emptyList())
+
             else -> current
         }
         _user.value = updated
     }
-
 
     /**
      * Firestore에 프로필 저장
@@ -95,9 +106,10 @@ class ProfileViewModel : ViewModel() {
 
         db.collection("users")
             .document(userToSave.uid)
-            .set(userToSave)
+            .set(userToSave, SetOptions.merge())
             .addOnSuccessListener {
                 _isSaving.value = false
+                Log.d("ProfileViewModel", "Profile successfully merged!")
                 onComplete(true)
             }
             .addOnFailureListener { e ->
