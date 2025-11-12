@@ -1,6 +1,11 @@
 package com.mp.matematch.profile.model
+import android.os.Parcelable
+import androidx.annotation.Keep
+import kotlinx.parcelize.Parcelize
 
 // Firestore용 통합 데이터 모델 (모든 프로필 설정 단계 포함)
+@Keep
+@Parcelize
 data class User(
     // 공통 정보 (Firebase)
     val uid: String = "",
@@ -15,14 +20,13 @@ data class User(
     val moveInDate: String = "",
     val profileImageUrl: String = "",
 
-    // B, B2, B3 단계: 거주 관련
+    // B1, B2, B3 단계: 거주 관련
     val city: String = "",
     val district: String = "",
-    val addressDetail: String = "",
-    val budgetMin: Int = 0,
-    val budgetMax: Int = 0,
-    val roomType: String = "",       // 예: One-room, Shared, Studio 등
-    val duration: String = "",       // 예: 6개월, 1년 등
+    val buildingType: String? = null,
+    val monthlyRent: Int? = null,
+    val maintenanceFee: Int? = null,
+    val amenities: List<String>? = null,
 
     // C단계: Lifestyle
     val sleepSchedule: String = "",  // e.g., "Early riser", "Night owl"
@@ -41,7 +45,8 @@ data class User(
     val prefCleanliness: String = "",
 
     // E단계: 최종 요약 및 태그
-    val bio: String = "",              // 자기소개
-    val tags: List<String> = emptyList(),  // 관심사나 키워드 (예: ["조용한", "정리정돈"])
-    val timestamp: Long = System.currentTimeMillis()
-)
+    val statusMessage: String = "",              // 자기소개
+    val bio: String = "",
+    val timestamp: Long = 0L,
+
+) : Parcelable

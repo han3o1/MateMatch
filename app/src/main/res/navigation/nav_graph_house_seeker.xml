@@ -2,35 +2,30 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_nav_graph"
-    app:startDestination="@id/feedFragment">
+    android:id="@+id/nav_graph_house_seeker"
+    app:startDestination="@id/nav_feed">
 
-    <!-- 🏠 Feed -->
     <fragment
-        android:id="@+id/feedFragment"
-        android:name="com.mp.matematch.main.ui.feed.FeedFragment"
+        android:id="@+id/nav_feed"
+        android:name="com.mp.matematch.main.ui.feed.FeedHouseFragment"
         android:label="Feed"
-        tools:layout="@layout/fragment_feed" />
+        tools:layout="@layout/fragment_feed_house" />
 
-    <!-- 💗 Liked -->
     <fragment
-        android:id="@+id/likedFragment"
+        android:id="@+id/nav_liked"
         android:name="com.mp.matematch.main.ui.liked.LikedFragment"
         android:label="Liked"
         tools:layout="@layout/fragment_liked" />
 
-    <!-- 💬 Chat -->
     <fragment
-        android:id="@+id/chatFragment"
+        android:id="@+id/nav_chat"
         android:name="com.mp.matematch.main.ui.chat.ChatFragment"
         android:label="Chat"
         tools:layout="@layout/fragment_chat" />
 
-    <!-- 👤 Profile -->
     <fragment
-        android:id="@+id/profileFragment"
+        android:id="@+id/nav_profile"
         android:name="com.mp.matematch.main.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
-
 </navigation>

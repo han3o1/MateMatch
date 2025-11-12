@@ -5,6 +5,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.widget.*
 import com.mp.matematch.R
+import com.mp.matematch.databinding.DialogFilterStep1Binding
+import com.mp.matematch.databinding.DialogFilterStep2Binding
 
 class FilterDialog(
     private val context: Context,
@@ -17,13 +19,12 @@ class FilterDialog(
     private var selectedBuildingTypes = mutableListOf<String>()
 
     fun showStep1() {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_filter_step1, null)
-        val layoutLocation = view.findViewById<LinearLayout>(R.id.layoutLocation)
-        val layoutBuildingType = view.findViewById<LinearLayout>(R.id.layoutBuildingType)
-        val btnNext = view.findViewById<Button>(R.id.btnNextStep)
-
-        val locations = listOf("Seoul", "Busan", "Incheon", "Daejeon", "Daegu")
-        val buildingTypes = listOf("난 집을 찾고 있지 않아요", "Apartment", "Villa", "Officetel", "Studio")
+        val bindingStep1 = DialogFilterStep1Binding.inflate(LayoutInflater.from(context))
+        val layoutLocation = bindingStep1.layoutLocation
+        val layoutBuildingType = bindingStep1.layoutBuildingType
+        val btnNext = bindingStep1.btnNextStep
+        val locations = listOf("Seoul", "Busan", "Incheon", "Daejeon", "Daegu") // TODO: R.array.cities
+        val buildingTypes = listOf("난 집을 찾고 있지 않아요", "Apartment", "Villa", "Officetel", "Studio") // TODO: R.array
 
         locations.forEach { city ->
             val cb = CheckBox(context)
@@ -42,7 +43,6 @@ class FilterDialog(
             checkBoxes.add(cb)
         }
 
-        // “난 집을 찾고 있지 않아요” 처리
         checkBoxes[0].setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 for (i in 1 until checkBoxes.size) {
@@ -70,14 +70,14 @@ class FilterDialog(
             showStep2()
         }
 
-        step1Dialog = AlertDialog.Builder(context).setView(view).create()
+        step1Dialog = AlertDialog.Builder(context).setView(bindingStep1.root).create()
         step1Dialog?.show()
     }
 
     private fun showStep2() {
-        val view = LayoutInflater.from(context).inflate(R.layout.dialog_filter_step2, null)
-        val btnApply = view.findViewById<Button>(R.id.btnApply)
-        val btnBack = view.findViewById<Button>(R.id.btnBack)
+        val bindingStep2 = DialogFilterStep2Binding.inflate(LayoutInflater.from(context))
+        val btnApply = bindingStep2.btnApply
+        val btnBack = bindingStep2.btnBack
 
         btnBack.setOnClickListener {
             step2Dialog?.dismiss()
@@ -93,7 +93,7 @@ class FilterDialog(
             onApplyFilters(filters)
         }
 
-        step2Dialog = AlertDialog.Builder(context).setView(view).create()
+        step2Dialog = AlertDialog.Builder(context).setView(bindingStep2.root).create()
         step2Dialog?.show()
     }
 }

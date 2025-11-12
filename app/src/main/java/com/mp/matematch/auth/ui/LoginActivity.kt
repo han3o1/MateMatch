@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import com.mp.matematch.main.MainActivity
 import com.mp.matematch.databinding.ActivityLoginBinding
 import com.mp.matematch.purpose.ui.PurposeSelectionActivity
 

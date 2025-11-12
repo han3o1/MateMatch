@@ -88,12 +88,11 @@
                 <!-- Profile Image -->
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/profileImage"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
-                    android:src="@drawable/ic_person_ex"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:src="@drawable/ic_upload_image"
                     android:scaleType="centerCrop"
                     app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.None"
-
                     app:strokeColor="#CCCCCC"
                     app:strokeWidth="1dp"
                     android:layout_marginBottom="12dp" />
@@ -104,7 +103,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Upload Photo*"
-                    android:icon="@drawable/ic_upload"
                     app:iconPadding="8dp"
                     android:iconTint="@android:color/white"
                     android:textColor="@android:color/white"

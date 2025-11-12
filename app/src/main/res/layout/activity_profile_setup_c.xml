@@ -5,8 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/roommate_ma"
-    android:padding="16dp"
+    android:background="@color/background_light"
     tools:context=".profile.ui.ProfileSetupCActivity">
 
     <!-- 카드형 컨테이너 -->
@@ -92,152 +91,195 @@
                     android:gravity="center"/>
 
                 <!-- Lifestyle 항목 Grid -->
-                <GridLayout
-                    android:id="@+id/gridIdealRoommate"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:columnCount="2"
-                    android:alignmentMode="alignMargins"
-                    android:columnOrderPreserved="false"
-                    android:useDefaultMargins="true"
-                    android:layout_marginHorizontal="8dp"
-                    android:layout_marginVertical="4dp">
+                    android:orientation="vertical">
 
                     <!-- Sleep Schedule -->
                     <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_marginEnd="8dp">
+                        android:orientation="horizontal"
+                        android:weightSum="2">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Sleep Schedule*"
-                            android:textColor="#000000"
-                            android:textSize="14sp"/>
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
 
-                        <Spinner
-                            android:id="@+id/spinnerSleep"
-                            android:layout_width="match_parent"
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sleep Schedule*"
+                                android:textColor="#000000"
+                                android:textSize="14sp"/>
+
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <AutoCompleteTextView
+                                    android:id="@+id/spinnerSleep"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:hint="Select" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
+
+                        <!-- Smoking -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:prompt="@string/select_sleep" />
-                    </LinearLayout>
-
-                    <!-- Smoking -->
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_marginStart="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Smoking*"
-                            android:textColor="#000000"
-                            android:textSize="14sp"/>
-
-                        <Spinner
-                            android:id="@+id/spinnerSmoking"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:prompt="@string/select_smoking" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Smoking*"
+                                android:textColor="#000000"
+                                android:textSize="14sp"/>
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <AutoCompleteTextView
+                                    android:id="@+id/spinnerSmoking"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:hint="Select" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- Pets -->
                     <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_marginEnd="8dp">
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_marginTop="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Pets*"
-                            android:textColor="#000000"
-                            android:textSize="14sp" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Pets*"
+                                android:textColor="#000000"
+                                android:textSize="14sp"/>
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <AutoCompleteTextView
+                                    android:id="@+id/spinnerPets"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:hint="Select" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
 
-                        <Spinner
-                            android:id="@+id/spinnerPets"
-                            android:layout_width="match_parent"
+                        <!-- Cleanliness -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:prompt="@string/select_pets" />
-                    </LinearLayout>
-
-                    <!-- Cleanliness -->
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_marginStart="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Cleanliness*"
-                            android:textColor="#000000"
-                            android:textSize="14sp" />
-
-                        <Spinner
-                            android:id="@+id/spinnerClean"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:prompt="@string/select_clean" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Cleanliness*"
+                                android:textColor="#000000"
+                                android:textSize="14sp"/>
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <AutoCompleteTextView
+                                    android:id="@+id/spinnerClean"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:hint="Select" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
                     </LinearLayout>
 
                     <!-- Guest Policy -->
                     <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_marginEnd="8dp">
+                        android:orientation="horizontal"
+                        android:weightSum="2"
+                        android:layout_marginTop="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:text="Guest Policy*"
-                            android:textColor="#000000"
-                            android:textSize="14sp" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginEnd="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Guest Policy*"
+                                android:textColor="#000000"
+                                android:textSize="14sp"/>
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <AutoCompleteTextView
+                                    android:id="@+id/spinnerGuests"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:hint="Select" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
 
-                        <Spinner
-                            android:id="@+id/spinnerGuests"
-                            android:layout_width="match_parent"
+                        <!-- Social Preference -->
+                        <LinearLayout
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:prompt="@string/select_guest" />
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:layout_marginStart="8dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Social Preference*"
+                                android:textColor="#000000"
+                                android:textSize="14sp"/>
+                            <com.google.android.material.textfield.TextInputLayout
+                                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content">
+                                <AutoCompleteTextView
+                                    android:id="@+id/spinnerSocial"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:inputType="none"
+                                    android:hint="Select" />
+                            </com.google.android.material.textfield.TextInputLayout>
+                        </LinearLayout>
                     </LinearLayout>
-
-                    <!-- Social Preference -->
-                    <LinearLayout
-                        android:orientation="vertical"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_columnWeight="1"
-                        android:layout_marginStart="8dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Social Preference*"
-                            android:textColor="#000000"
-                            android:textSize="14sp" />
-
-                        <Spinner
-                            android:id="@+id/spinnerSocial"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:prompt="@string/select_social" />
-                    </LinearLayout>
-                </GridLayout>
+                </LinearLayout>
 
                 <!-- Next 버튼 -->
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNext"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
