@@ -45,6 +45,10 @@
         <activity android:name=".profile.ui.ProfileSetupDActivity" />
         <activity android:name=".profile.ui.ProfileSetupEActivity" />
 
+        <!-- chat -->
+        <activity android:name=".main.ui.chat.ChatRoomActivity" />
+
+
     </application>
 
 </manifest>

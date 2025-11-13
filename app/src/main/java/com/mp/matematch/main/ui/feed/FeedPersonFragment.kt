@@ -89,27 +89,41 @@ class FeedPersonFragment : Fragment() {
 
     // 채팅방 생성 / 이동 함수
     private fun startChat(partnerUid: String) {
-        val currentUid = FirebaseAuth.getInstance().uid!!
-        val chatId = if (currentUid < partnerUid)
-            "${currentUid}_${partnerUid}"
-        else
-            "${partnerUid}_${currentUid}"
-
-        val chatData = mapOf(
-            "participants" to listOf(currentUid, partnerUid),
-            "updatedAt" to FieldValue.serverTimestamp(),
-            "lastMessage" to ""
-        )
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val chatId = listOf(currentUid, partnerUid).sorted().joinToString("_")
 
         val db = FirebaseFirestore.getInstance()
+        val chatRef = db.collection("chats").document(chatId)
 
-        db.collection("chats").document(chatId)
-            .set(chatData, SetOptions.merge())
-            .addOnSuccessListener {
-                val intent = Intent(requireContext(), ChatRoomActivity::class.java)
-                intent.putExtra("chatId", chatId)
-                intent.putExtra("partnerUid", partnerUid)
-                startActivity(intent)
+        chatRef.get().addOnSuccessListener { document ->
+            if (!document.exists()) {
+                // 🔥 채팅방 처음 만드는 경우
+                val chatData = mapOf(
+                    "participants" to listOf(currentUid, partnerUid),
+                    "updatedAt" to FieldValue.serverTimestamp(),
+                    "lastMessage" to ""
+                )
+
+                chatRef.set(chatData).addOnSuccessListener {
+                    Log.d("FeedPersonFragment", "채팅방 생성 후 이동: $chatId")
+                    moveToChat(chatId, partnerUid)
+                }
+            } else {
+                // ✅ 이미 존재하는 채팅방
+                Log.d("FeedPersonFragment", "채팅방 존재 → 바로 이동: $chatId")
+                moveToChat(chatId, partnerUid)
             }
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "채팅방 조회 실패", Toast.LENGTH_SHORT).show()
+            Log.e("FeedPersonFragment", "Firestore 오류: ${it.message}")
+        }
     }
+    private fun moveToChat(chatId: String, partnerUid: String) {
+        val intent = Intent(requireContext(), ChatRoomActivity::class.java)
+        intent.putExtra("chatId", chatId)
+        intent.putExtra("receiverUid", partnerUid)
+        startActivity(intent)
+    }
+
+
 }

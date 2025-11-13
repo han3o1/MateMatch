@@ -14,10 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions
 import com.mp.matematch.databinding.FragmentFeedHouseBinding
 import com.mp.matematch.main.ui.chat.ChatRoomActivity
-import com.mp.matematch.profile.model.User
 
 class FeedHouseFragment : Fragment() {
 
@@ -37,12 +35,12 @@ class FeedHouseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        houseAdapter = HouseAdapter(mutableListOf<FeedItem>()) { partnerUid ->
+        houseAdapter = HouseAdapter(mutableListOf()) { partnerUid ->
             if (partnerUid != null) {
                 startChat(partnerUid)
             } else {
                 Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT).show()
-                Log.e("FeedPersonFragment", "사용자를 찾을 수 없습니다.")
+                Log.e("FeedHouseFragment", "사용자를 찾을 수 없습니다.")
             }
         }
 
@@ -81,29 +79,41 @@ class FeedHouseFragment : Fragment() {
         _binding = null
     }
 
-    // 채팅방 생성 / 이동 함수
+    // ✅ 기존 함수 유지, 기능만 확장
     private fun startChat(partnerUid: String) {
-        val currentUid = FirebaseAuth.getInstance().uid!!
-        val chatId = if (currentUid < partnerUid)
-            "${currentUid}_${partnerUid}"
-        else
-            "${partnerUid}_${currentUid}"
-
-        val chatData = mapOf(
-            "participants" to listOf(currentUid, partnerUid),
-            "updatedAt" to FieldValue.serverTimestamp(),
-            "lastMessage" to ""
-        )
+        val currentUid = FirebaseAuth.getInstance().uid ?: return
+        val chatId = listOf(currentUid, partnerUid).sorted().joinToString("_")
 
         val db = FirebaseFirestore.getInstance()
+        val chatRef = db.collection("chats").document(chatId)
 
-        db.collection("chats").document(chatId)
-            .set(chatData, SetOptions.merge())
-            .addOnSuccessListener {
-                val intent = Intent(requireContext(), ChatRoomActivity::class.java)
-                intent.putExtra("chatId", chatId)
-                intent.putExtra("partnerUid", partnerUid)
-                startActivity(intent)
+        chatRef.get().addOnSuccessListener { document ->
+            if (!document.exists()) {
+                val chatData = mapOf(
+                    "participants" to listOf(currentUid, partnerUid),
+                    "updatedAt" to FieldValue.serverTimestamp(),
+                    "lastMessage" to ""
+                )
+
+                chatRef.set(chatData).addOnSuccessListener {
+                    Log.d("FeedHouseFragment", "채팅방 생성 후 이동: $chatId")
+                    moveToChat(chatId, partnerUid)
+                }
+            } else {
+                Log.d("FeedHouseFragment", "채팅방 존재 → 바로 이동: $chatId")
+                moveToChat(chatId, partnerUid)
             }
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "채팅방 조회 실패", Toast.LENGTH_SHORT).show()
+            Log.e("FeedHouseFragment", "Firestore 오류: ${it.message}")
+        }
+    }
+
+    // ✅ ChatRoomActivity 연결용 Intent
+    private fun moveToChat(chatId: String, partnerUid: String) {
+        val intent = Intent(requireContext(), ChatRoomActivity::class.java)
+        intent.putExtra("chatId", chatId)
+        intent.putExtra("receiverUid", partnerUid)  // ChatRoomActivity에서 receiverUid로 받음
+        startActivity(intent)
     }
 }
