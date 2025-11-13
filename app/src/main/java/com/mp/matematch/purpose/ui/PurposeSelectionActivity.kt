@@ -24,7 +24,7 @@ class PurposeSelectionActivity : AppCompatActivity() {
         // [2] “Find a House” 선택 → 집 찾기 시나리오 바로 시작 (A → B → F)
         binding.btnFindHouse.setOnClickListener {
             val intent = Intent(this, ProfileSetupActivity::class.java).apply {
-                putExtra("USER_TYPE", "Finder")
+                putExtra("USER_TYPE", "HouseSeeker")
             }
             startActivity(intent)
         }
