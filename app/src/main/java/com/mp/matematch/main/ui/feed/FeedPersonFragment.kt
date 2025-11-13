@@ -57,9 +57,11 @@ class FeedPersonFragment : Fragment() {
 
         // 필터 다이얼로그
         binding.searchBoxPerson.setOnClickListener {
-            FilterDialog(requireContext()) { filters ->
-              viewModel.applyPersonFilters(filters, currentUserType)
-                .showStep1()
+            val dialog = FilterDialog(requireContext()) { filters ->
+                viewModel.applyPersonFilters(filters, currentUserType)
+            }
+            dialog.showStep1()
+
         }
     }
 
