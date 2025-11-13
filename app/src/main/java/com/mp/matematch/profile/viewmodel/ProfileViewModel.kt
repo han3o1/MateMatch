@@ -57,7 +57,7 @@ class ProfileViewModel : ViewModel() {
         val updated = when (fieldName) {
             // A단계: 기본 프로필
             "name" -> current.copy(name = value.toString())
-            "age" -> current.copy(age = value.toString())
+            "age" -> current.copy(age = (value as? Int) ?: 0)
             "gender" -> current.copy(gender = value.toString())
             "occupation" -> current.copy(occupation = value.toString())
             "mbti" -> current.copy(mbti = value.toString())
