@@ -101,7 +101,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         if (name.isEmpty() || gender.isEmpty() || occupation.isEmpty() || moveInDate.isEmpty()) {
             AlertDialog.Builder(this)
                 .setTitle("Missing Required Fields")
-                .setMessage("Please fill in all required fields.")
+                .setMessage("Please fill in all required fields before proceeding to the next step.")
                 .setPositiveButton("OK", null)
                 .show()
             return

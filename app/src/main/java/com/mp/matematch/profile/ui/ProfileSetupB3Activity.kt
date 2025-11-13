@@ -1,11 +1,15 @@
 package com.mp.matematch.profile.ui
 
+import android.util.Log
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import android.widget.ArrayAdapter
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupB3Binding
 import com.mp.matematch.profile.viewmodel.ProfileViewModel
@@ -14,8 +18,8 @@ class ProfileSetupB3Activity : AppCompatActivity() {
 
     private lateinit var binding: ActivityProfileSetupB3Binding
     private val viewModel: ProfileViewModel by viewModels()
-
     private var selectedBuildingType: String = ""
+    private var regionMap: Map<String, List<String>> = emptyMap()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,15 +30,12 @@ class ProfileSetupB3Activity : AppCompatActivity() {
 
         // ViewModel 데이터 관찰 (이전 단계 값 불러오기)
         viewModel.user.observe(this) { user ->
-            binding.spinnerCity.setSelection(
-                resources.getStringArray(R.array.cities).indexOf(user.city).coerceAtLeast(0)
-            )
-            binding.spinnerDistrict.setSelection(
-                resources.getStringArray(R.array.districts).indexOf(user.district).coerceAtLeast(0)
-            )
+            binding.spinnerCity.setText(user.city, false)
+            updateDistrictSpinner(user.city)
+            binding.spinnerDistrict.setText(user.district, false)
         }
 
-        // 빌딩 타입 버튼 하나만 선택 가능하게 설정
+        loadRegionsAndSetupSpinners()
         setupBuildingTypeButtons()
 
         // 뒤로가기
@@ -44,6 +45,45 @@ class ProfileSetupB3Activity : AppCompatActivity() {
         binding.btnNext.setOnClickListener {
             saveProfileAndNext(userType)
         }
+    }
+
+    /** assets/regions.json을 읽고 스피너 설정 **/
+    private fun loadRegionsAndSetupSpinners() {
+        // JSON 파일 읽기
+        val jsonString: String = try {
+            assets.open("regions.json").bufferedReader().use { it.readText() }
+        } catch (e: Exception) {
+            Log.e("ProfileSetupB3", "Error reading regions.json", e)
+            return
+        }
+
+        // Gson으로 JSON을 Map<String, List<String>>으로 변환
+        val mapType = object : TypeToken<Map<String, List<String>>>() {}.type
+        regionMap = Gson().fromJson(jsonString, mapType)
+
+        // city 스피너 설정
+        val cities = regionMap.keys.toList().sorted()
+        val cityAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, cities)
+        binding.spinnerCity.setAdapter(cityAdapter)
+
+        // district 스피너 초기 설정 (기본값)
+        val defaultDistrictAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line,
+            listOf("Select a city or province first"))
+        binding.spinnerDistrict.setAdapter(defaultDistrictAdapter)
+
+        // city 스피너 연동 리스너
+        binding.spinnerCity.setOnItemClickListener { parent, view, position, id ->
+            val selectedCity = parent.getItemAtPosition(position).toString()
+            binding.spinnerDistrict.setText("", false)
+            updateDistrictSpinner(selectedCity)
+        }
+    }
+
+    /** 선택된 도시에 맞게 District 스피너의 어댑터 교체 **/
+    private fun updateDistrictSpinner(selectedCity: String) {
+        val districts = regionMap[selectedCity] ?: listOf("도시를 선택하세요")
+        val newDistrictAdapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, districts)
+        binding.spinnerDistrict.setAdapter(newDistrictAdapter)
     }
 
     /** 빌딩 타입 버튼 하나만 선택 가능하게 설정 **/
@@ -88,8 +128,8 @@ class ProfileSetupB3Activity : AppCompatActivity() {
 
     /** 프로필 저장 후 다음 단계로 **/
     private fun saveProfileAndNext(userType: String?) {
-        val city = binding.spinnerCity.selectedItem?.toString()?.trim() ?: ""
-        val district = binding.spinnerDistrict.selectedItem?.toString()?.trim() ?: ""
+        val city = binding.spinnerCity.text.toString().trim()
+        val district = binding.spinnerDistrict.text.toString().trim()
         val rentText = binding.inputRent.text.toString().trim()
         val feeText = binding.inputFee.text.toString().trim()
         val rent = rentText.toIntOrNull() ?: 0
@@ -101,7 +141,7 @@ class ProfileSetupB3Activity : AppCompatActivity() {
         ) {
             AlertDialog.Builder(this)
                 .setTitle("Missing Required Fields")
-                .setMessage("Please fill in all required fields (marked with * ) before proceeding to the next step.")
+                .setMessage("Please fill in all required fields before proceeding to the next step.")
                 .setPositiveButton("OK", null)
                 .show()
             return
@@ -110,9 +150,9 @@ class ProfileSetupB3Activity : AppCompatActivity() {
         // ViewModel 업데이트
         viewModel.updateField("city", city)
         viewModel.updateField("district", district)
-        viewModel.updateField("buildingType", selectedBuildingType) // 'roomType' -> 'buildingType'
-        viewModel.updateField("monthlyRent", rent)                  // 'budgetMin' -> 'monthlyRent'
-        viewModel.updateField("maintenanceFee", fee)                // 'budgetMax' -> 'maintenanceFee'
+        viewModel.updateField("buildingType", selectedBuildingType)
+        viewModel.updateField("monthlyRent", rent)
+        viewModel.updateField("maintenanceFee", fee)
 
         viewModel.saveUserProfile { success ->
             if (success) {
