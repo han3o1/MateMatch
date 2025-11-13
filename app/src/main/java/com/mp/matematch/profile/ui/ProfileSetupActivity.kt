@@ -146,7 +146,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             "uid" to uid,
             "userType" to userType, // userType 저장
             "name" to binding.inputName.text.toString().trim(),
-            "age" to (binding.spinnerAge.text.toString().filter { it.isDigit() }.toIntOrNull() ?: 0),
+            "age" to binding.spinnerAge.text.toString().trim(),
             "gender" to binding.spinnerGender.text.toString().trim(),
             "occupation" to binding.spinnerOccupation.text.toString().trim(),
             "mbti" to binding.inputMbti.text.toString().trim(),

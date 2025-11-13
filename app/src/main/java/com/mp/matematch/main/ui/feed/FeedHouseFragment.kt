@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -36,8 +37,7 @@ class FeedHouseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // ★ HouseAdapter에 "메시지 버튼 클릭" 콜백 추가됨
-        houseAdapter = HouseAdapter(mutableListOf()) { partnerUid ->
+        houseAdapter = HouseAdapter(mutableListOf<FeedItem>()) { partnerUid ->
             startChat(partnerUid)
         }
 
@@ -46,9 +46,20 @@ class FeedHouseFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
-        viewModel.houseList.observe(viewLifecycleOwner, Observer { users ->
-            houseAdapter.updateData(users)
-            Log.d("FeedHouse", "피드 UI 업데이트: ${users.size}개")
+        viewModel.houseList.observe(viewLifecycleOwner, Observer { feedItems ->
+            houseAdapter.updateData(feedItems)
+            Log.d("FeedHouse", "피드 UI 업데이트: ${feedItems.size}개")
+        })
+
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            if (isLoading) {
+                Log.d("FeedHouse", "집 피드 로딩 중...")
+            }
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            Log.e("FeedHouse", "ViewModel 오류: $errorMessage")
         })
 
         viewModel.loadHouseFeed()
@@ -65,7 +76,7 @@ class FeedHouseFragment : Fragment() {
         _binding = null
     }
 
-    // ★ 채팅방 생성 함수
+    // 채팅방 생성 / 이동 함수
     private fun startChat(partnerUid: String) {
         val currentUid = FirebaseAuth.getInstance().uid!!
         val chatId = if (currentUid < partnerUid)

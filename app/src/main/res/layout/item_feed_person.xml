@@ -12,6 +12,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- 궁합 퍼센트 -->
+        <TextView
+            android:id="@+id/textMatchRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_round_button_brown"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="★ 87% Match"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
         <!-- 프로필 사진 -->
         <ImageView
             android:id="@+id/imageProfile"
@@ -20,23 +34,8 @@
             android:scaleType="centerCrop"
             android:contentDescription="Profile image"
             android:src="@drawable/ic_profile_placeholder"/>
-        <!-- 매칭률 뱃지 -->
 
         <!-- 이름, 나이 -->
-
-        <TextView
-            android:id="@+id/textMatchRate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_margin="8dp"
-            android:background="@drawable/bg_feed_tag_chip"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:text="87% Match"
-            android:textColor="@android:color/white"
-            android:textStyle="bold" />
-
         <TextView
             android:id="@+id/textNameAge"
             android:layout_width="wrap_content"

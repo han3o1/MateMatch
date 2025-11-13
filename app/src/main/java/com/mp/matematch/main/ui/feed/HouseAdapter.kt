@@ -10,14 +10,17 @@ import com.mp.matematch.databinding.ItemFeedHouseBinding
 import com.mp.matematch.profile.model.User
 
 class HouseAdapter(
-    private val userList: MutableList<User> = mutableListOf(),
-    private val onMessageClick: (String) -> Unit   // ★ 추가된 콜백
+    private val feedItemList: MutableList<FeedItem> = mutableListOf(),
+    private val onMessageClick: (String) -> Unit
 ) : RecyclerView.Adapter<HouseAdapter.HouseViewHolder>() {
 
     inner class HouseViewHolder(private val binding: ItemFeedHouseBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(user: User) {
+        fun bind(feedItem: FeedItem) {
+            val user = feedItem.user
+            val matchScore = feedItem.matchScore
+
             with(binding) {
                 textTitle.text = user.buildingType ?: "Building Type N/A"
                 textPrice.text = "₩${user.monthlyRent ?: 0} / mo"
@@ -45,11 +48,11 @@ class HouseAdapter(
                     tagContainer.addView(tagView)
                 }
 
-                textMatchRate.text = "90% Match" // 임시
+                textMatchRate.text = "${matchScore}% Match"
 
-                // ★ 메시지 버튼 클릭
+                // 메시지 버튼 클릭
                 btnMessage.setOnClickListener {
-                    onMessageClick(user.uid)   // 파트너 UID 전달!!
+                    onMessageClick(user.uid)
                 }
             }
         }
@@ -62,15 +65,15 @@ class HouseAdapter(
     }
 
     override fun onBindViewHolder(holder: HouseViewHolder, position: Int) {
-        val user = userList[position]
-        holder.bind(user)
+        val feedItem = feedItemList[position]
+        holder.bind(feedItem)
     }
 
-    override fun getItemCount(): Int = userList.size
+    override fun getItemCount(): Int = feedItemList.size
 
-    fun updateData(newList: List<User>) {
-        userList.clear()
-        userList.addAll(newList)
+    fun updateData(newList: List<FeedItem>) {
+        feedItemList.clear()
+        feedItemList.addAll(newList)
         notifyDataSetChanged()
     }
 }

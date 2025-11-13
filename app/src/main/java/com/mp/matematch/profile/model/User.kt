@@ -9,11 +9,11 @@ import kotlinx.parcelize.Parcelize
 data class User(
     // 공통 정보 (Firebase)
     val uid: String = "",
-    val userType: String = "",       // Provider / Seeker / Finder
+    val userType: String = "",       // Provider / Seeker / HouseSeeker
 
     // A단계: 기본 프로필
     val name: String = "",
-    val age: Int = 0,
+    val age: String = "",
     val gender: String = "",
     val occupation: String = "",
     val mbti: String = "",
@@ -29,12 +29,12 @@ data class User(
     val amenities: List<String>? = null,
 
     // C단계: Lifestyle
-    val sleepSchedule: String = "",  // e.g., "Early riser", "Night owl"
-    val smoking: String = "",        // "Yes"/"No"
-    val pets: String = "",           // "Yes"/"No"
-    val cleanliness: String = "",    // e.g., "Daily", "Weekly"
-    val guestPolicy: String = "",    // e.g., "Often", "Rarely"
-    val socialPreference: String = "", // e.g., "Introvert", "Extrovert"
+    val sleepSchedule: String = "",
+    val smoking: String = "",
+    val pets: String = "",
+    val cleanliness: String = "",
+    val guestPolicy: String = "",
+    val socialPreference: String = "",
 
     // D단계: Ideal Roommate
     val prefAgeRange: String = "",
@@ -45,8 +45,11 @@ data class User(
     val prefCleanliness: String = "",
 
     // E단계: 최종 요약 및 태그
-    val statusMessage: String = "",              // 자기소개
+    val statusMessage: String = "",
     val bio: String = "",
     val timestamp: Long = 0L,
+
+    // 매칭 로직
+    val likedUsers: Map<String, Boolean> = emptyMap()
 
 ) : Parcelable

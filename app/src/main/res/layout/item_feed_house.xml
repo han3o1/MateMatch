@@ -12,7 +12,21 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <!-- 집 사진 / sample_house.png -->
+        <!-- 궁합 퍼센트 -->
+        <TextView
+            android:id="@+id/textMatchRate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_round_button_brown"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="★ 87% Match"
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
+
+        <!-- 집 사진 -->
         <ImageView
             android:id="@+id/imageHouse"
             android:layout_width="match_parent"
@@ -20,20 +34,6 @@
             android:scaleType="centerCrop"
             android:src="@drawable/sample_house"
             android:contentDescription="House image"/>
-
-        <!-- 매칭률 -->
-        <TextView
-            android:id="@+id/textMatchRate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_margin="8dp"
-            android:background="@drawable/bg_feed_tag_chip"
-            android:text="87% Match"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:textColor="@android:color/white"
-            android:textStyle="bold" />
 
         <!-- 집 종류 -->
         <TextView

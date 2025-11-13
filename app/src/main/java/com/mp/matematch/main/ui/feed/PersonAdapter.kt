@@ -10,17 +10,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ItemFeedPersonBinding
 import com.mp.matematch.profile.model.User
-// import com.bumptech.glide.Glide
 
 class PersonAdapter(
-    private val userList: MutableList<User> = mutableListOf(),
+    private val feedItemList: MutableList<FeedItem> = mutableListOf(),
     private val onMessageClick: (String) -> Unit
 ) : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
 
     class PersonViewHolder(val binding: ItemFeedPersonBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(user: User, onMessageClick: (String) -> Unit) {
+        fun bind(feedItem: FeedItem, onMessageClick: (String) -> Unit) {
+            val user = feedItem.user
+            val matchScore = feedItem.matchScore
+
             with(binding) {
 
                 textNameAge.text = "${user.name}, ${user.age}"
@@ -29,7 +31,7 @@ class PersonAdapter(
                 textLocation.text = "${user.city}, ${user.district}"
                 textTime.text = "Move-in: ${user.moveInDate}"
 
-                // ★ 메시지 버튼 클릭 → 콜백 실행
+                // 메시지 버튼 클릭
                 btnMessage.setOnClickListener {
                     onMessageClick(user.uid)
                 }
@@ -43,15 +45,15 @@ class PersonAdapter(
     }
 
     override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
-        val user = userList[position]
-        holder.bind(user, onMessageClick)
+        val feedItem = feedItemList[position]
+        holder.bind(feedItem, onMessageClick)
     }
 
-    override fun getItemCount(): Int = userList.size
+    override fun getItemCount(): Int = feedItemList.size
 
-    fun updateData(newList: List<User>) {
-        userList.clear()
-        userList.addAll(newList)
+    fun updateData(newList: List<FeedItem>) {
+        feedItemList.clear()
+        feedItemList.addAll(newList)
         notifyDataSetChanged()
     }
 }

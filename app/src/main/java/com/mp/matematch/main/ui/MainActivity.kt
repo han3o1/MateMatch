@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
         // 3. userType에 따라 올바른 네비게이션 그래프(피드)를 설정합니다.
         when (userType) {
-            // "Finder" (B그룹: 집 찾기)
+            // "HouseSeeker" (B그룹: 집 찾기)
             "HouseSeeker" -> {
                 // "집 피드"가 시작 화면인 그래프를 설정합니다.
                 navController.setGraph(R.navigation.nav_graph_house_seeker,args)
