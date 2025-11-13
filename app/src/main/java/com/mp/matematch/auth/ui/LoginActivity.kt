@@ -8,19 +8,17 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.mp.matematch.databinding.ActivityLoginBinding
 import com.mp.matematch.purpose.ui.PurposeSelectionActivity
+import com.mp.matematch.main.ui.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val authViewModel: AuthViewModel by viewModels() // ViewModel 주입
-    // private lateinit var auth: FirebaseAuth // ViewModel이 관리하므로 삭제
+    private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        // auth = FirebaseAuth.getInstance() // ViewModel이 관리하므로 삭제
 
         // 1. 로그인 버튼 클릭
         binding.btnSignIn.setOnClickListener {
@@ -28,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
             val password = binding.etPassword.text.toString()
 
             if (email.isNotEmpty() && password.isNotEmpty()) {
-                authViewModel.login(email, password) // ViewModel에 작업 요청
+                authViewModel.login(email, password)
             } else {
                 Toast.makeText(this, "Enter your email and password.", Toast.LENGTH_SHORT).show()
             }
@@ -53,11 +51,15 @@ class LoginActivity : AppCompatActivity() {
             if (state.isSuccess) {
                 Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
 
-                // TODO: 프로필이 이미 작성되었는지 확인하는 로직 필요
-                // (지금은 임시로 '이용 목적 선택'으로 이동)
-                val intent = Intent(this, PurposeSelectionActivity::class.java)
-                startActivity(intent)
-                finish() // 로그인 화면 종료
+                if (state.isNewUser == true) {
+                    val intent = Intent(this, PurposeSelectionActivity::class.java)
+                    startActivity(intent)
+                } else {
+                    val intent = Intent(this, MainActivity::class.java)
+                    // (TODO: MainActivity가 userType을 필요로 한다면, Firestore에서 userType을 읽어와서 intent에 담아줘야 함)
+                    startActivity(intent)
+                }
+                finishAffinity()
             }
 
             // 에러 상태
