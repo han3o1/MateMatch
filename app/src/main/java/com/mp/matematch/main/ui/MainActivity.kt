@@ -29,22 +29,31 @@ class MainActivity : AppCompatActivity() {
         // 1. 프로필 설정에서 넘겨받은 userType을 가져옵니다.
         userType = intent.getStringExtra("USER_TYPE")
 
+        // ⭐ FEED 프래그먼트들에서 arguments로 받을 수 있게 Bundle 생성
+        val bundle = Bundle().apply {
+            putString("USER_TYPE", userType)
+        }
+
         // 2. NavController를 초기화합니다.
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+
+        val args = Bundle().apply {
+            putString("USER_TYPE", userType)
+        }
 
         // 3. userType에 따라 올바른 네비게이션 그래프(피드)를 설정합니다.
         when (userType) {
             // "Finder" (B그룹: 집 찾기)
             "HouseSeeker" -> {
                 // "집 피드"가 시작 화면인 그래프를 설정합니다.
-                navController.setGraph(R.navigation.nav_graph_house_seeker)
+                navController.setGraph(R.navigation.nav_graph_house_seeker,args)
             }
             // "Provider" (A그룹) 또는 "Seeker" (C그룹)
             else -> {
                 // "사람 피드"가 시작 화면인 그래프를 설정합니다.
-                navController.setGraph(R.navigation.nav_graph_roommate_seeker)
+                navController.setGraph(R.navigation.nav_graph_roommate_seeker,args)
             }
         }
 
