@@ -11,7 +11,7 @@ import com.mp.matematch.profile.model.User
 
 class HouseAdapter(
     private val feedItemList: MutableList<FeedItem> = mutableListOf(),
-    private val onMessageClick: (String) -> Unit
+    private val onMessageClick: (String?) -> Unit
 ) : RecyclerView.Adapter<HouseAdapter.HouseViewHolder>() {
 
     inner class HouseViewHolder(private val binding: ItemFeedHouseBinding)
