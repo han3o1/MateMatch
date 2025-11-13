@@ -1,71 +1,89 @@
 package com.mp.matematch.main.ui
 
-import android.util.Log
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import com.mp.matematch.R
-import com.mp.matematch.databinding.ActivityMainBinding
+import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
-
+import com.mp.matematch.R
+import com.mp.matematch.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
 
-    // (ProfileSetupEActivity에서 넘겨준 userType을 저장할 변수)
-    var userType: String? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. 프로필 설정에서 넘겨받은 userType을 가져옵니다.
-        userType = intent.getStringExtra("USER_TYPE")
-        Log.d("MainActivity", "넘겨받은 userType: $userType")
-
-        // ⭐ FEED 프래그먼트들에서 arguments로 받을 수 있게 Bundle 생성
-        val bundle = Bundle().apply {
-            putString("USER_TYPE", userType)
-        }
-
-        // 2. NavController를 초기화합니다.
+        // NavHostFragment 연결
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        val args = Bundle().apply {
-            putString("USER_TYPE", userType)
-        }
+        // ⭐ 앱 최초 진입 시 Firestore에서 userType 읽어서 올바른 그래프로 분기
+        setupNavigationByUserType()
 
-        // 3. userType에 따라 올바른 네비게이션 그래프(피드)를 설정합니다.
-        when (userType) {
-            // "HouseSeeker" (B그룹: 집 찾기)
-            "HouseSeeker" -> {
-                // "집 피드"가 시작 화면인 그래프를 설정합니다.
-                navController.setGraph(R.navigation.nav_graph_house_seeker,args)
-            }
-            // "Provider" (A그룹) 또는 "Seeker" (C그룹)
-            else -> {
-                // "사람 피드"가 시작 화면인 그래프를 설정합니다.
-                navController.setGraph(R.navigation.nav_graph_roommate_seeker,args)
-            }
-        }
-
-        // 4. 하단 탭 바(BottomNavigationView)와 NavController를 연결합니다.
+        // BottomNavigation 과 NavController 연결
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
 
-        // ③ 프로필 이미지 로딩
+        // 프로필 이미지 로드
         loadProfileImage()
     }
 
+    /**
+     * 🔥 가장 중요한 함수
+     * 인텐트가 아니라 Firestore에서 userType을 읽어서
+     * HouseSeeker → 집 피드 그래프
+     * Provider, RoommateSeeker → 사람 피드 그래프
+     * 로 완전히 분기해주는 함수
+     */
+    private fun setupNavigationByUserType() {
+        val uid = FirebaseAuth.getInstance().uid ?: return
+
+        FirebaseFirestore.getInstance().collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val type = doc.getString("userType") ?: ""
+                Log.d("MainActivity", "Firestore userType: $type")
+
+                val args = Bundle().apply {
+                    putString("USER_TYPE", type)
+                }
+
+                when (type) {
+                    "HouseSeeker" -> {
+                        Log.d("MainActivity", "➡ HouseSeeker → 집 피드로 이동")
+                        navController.setGraph(R.navigation.nav_graph_house_seeker, args)
+                    }
+
+                    "Provider", "RoommateSeeker" -> {
+                        Log.d("MainActivity", "➡ Provider/Roommate → 사람 피드로 이동")
+                        navController.setGraph(R.navigation.nav_graph_roommate_seeker, args)
+                    }
+
+                    else -> {
+                        Log.e("MainActivity", "Unknown userType=$type → 기본 사람 피드로 이동")
+                        navController.setGraph(R.navigation.nav_graph_roommate_seeker, args)
+                    }
+                }
+            }
+            .addOnFailureListener {
+                Log.e("MainActivity", "userType 불러오기 실패 → 기본 사람피드로 이동", it)
+                navController.setGraph(R.navigation.nav_graph_roommate_seeker)
+            }
+    }
+
+    /**
+     * Firestore에서 프로필 이미지 가져와서 하단 탭에 세팅
+     */
     private fun loadProfileImage() {
         val uid = FirebaseAuth.getInstance().uid ?: return
 
