@@ -98,24 +98,33 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
-                    <!-- City Spinner -->
-                    <Spinner
-                        android:id="@+id/spinnerCity"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:entries="@array/cities"
-                        android:prompt="@string/select_city" />
+                        android:layout_marginEnd="6dp"
+                        android:hint="@string/select_city">
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerCity"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- District Spinner -->
-                    <Spinner
-                        android:id="@+id/spinnerDistrict"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:entries="@array/districts"
-                        android:prompt="@string/select_district" />
+                        android:layout_marginStart="6dp"
+                        android:hint="@string/select_district">
+                        <AutoCompleteTextView
+                            android:id="@+id/spinnerDistrict"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
 

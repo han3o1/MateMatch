@@ -107,7 +107,7 @@ class ProfileSetupDActivity : AppCompatActivity() {
         ) {
             AlertDialog.Builder(this)
                 .setTitle("Missing Required Fields")
-                .setMessage("Please select all ideal roommate preferences.")
+                .setMessage("Please fill in all required fields before proceeding to the next step.")
                 .setPositiveButton("OK", null)
                 .show()
             return

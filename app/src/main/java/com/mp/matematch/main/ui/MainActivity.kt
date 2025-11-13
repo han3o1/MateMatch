@@ -1,5 +1,6 @@
 package com.mp.matematch.main.ui
 
+import android.util.Log
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
@@ -28,6 +29,7 @@ class MainActivity : AppCompatActivity() {
 
         // 1. 프로필 설정에서 넘겨받은 userType을 가져옵니다.
         userType = intent.getStringExtra("USER_TYPE")
+        Log.d("MainActivity", "넘겨받은 userType: $userType")
 
         // ⭐ FEED 프래그먼트들에서 arguments로 받을 수 있게 Bundle 생성
         val bundle = Bundle().apply {

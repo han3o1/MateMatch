@@ -74,20 +74,6 @@
         <item>Balanced</item>
     </string-array>
 
-    <string-array name="cities">
-        <item>Seoul</item>
-        <item>Busan</item>
-        <item>Incheon</item>
-        <item>Daegu</item>
-    </string-array>
-
-    <string-array name="districts">
-        <item>Gangnam</item>
-        <item>Mapo</item>
-        <item>Songpa</item>
-        <item>Seocho</item>
-    </string-array>
-
 
     <!-- Profile Setup D -->
     <string name="select_age_range">Select Age Range</string>
