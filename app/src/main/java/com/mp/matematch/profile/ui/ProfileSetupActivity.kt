@@ -7,12 +7,12 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts // 1. 최신 ActivityResultLauncher 사용
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.SetOptions // 2. SetOptions.merge 임포트
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupABinding
@@ -77,7 +77,6 @@ class ProfileSetupActivity : AppCompatActivity() {
     }
 
     private fun setupDropdowns() {
-        // R.array... 리소스가 res/values/arrays.xml 등에 정의되어 있어야 함
         val ageAdapter = ArrayAdapter.createFromResource(this, R.array.ages, android.R.layout.simple_dropdown_item_1line)
         val genderAdapter = ArrayAdapter.createFromResource(this, R.array.genders, android.R.layout.simple_dropdown_item_1line)
         val occupationAdapter = ArrayAdapter.createFromResource(this, R.array.occupations, android.R.layout.simple_dropdown_item_1line)
@@ -175,7 +174,7 @@ class ProfileSetupActivity : AppCompatActivity() {
         val nextActivity = when (userType) {
             "Provider" -> ProfileSetupB1Activity::class.java // 집 정보 입력
             "Seeker" -> ProfileSetupB2Activity::class.java // 라이프스타일 입력
-            "Finder" -> ProfileSetupB3Activity::class.java // 원하는 집 입력
+            "HouseSeeker" -> ProfileSetupB3Activity::class.java // 원하는 집 입력
             else -> null
         }
 

@@ -92,6 +92,8 @@ class ProfileViewModel : ViewModel() {
             "statusMessage" -> current.copy(statusMessage = value.toString())
             "bio" -> current.copy(bio = value.toString())
 
+            "userType" -> current.copy(userType = value.toString())
+
             else -> current
         }
         _user.value = updated

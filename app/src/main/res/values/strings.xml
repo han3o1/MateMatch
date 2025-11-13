@@ -1,14 +1,44 @@
 <resources>
+
+
+
     <string name="app_name">MateMatch</string>
     <string name="filter_step1_title">Search Filters - Step 1</string>
     <string name="filter_step1_subtitle">Select locations and building types</string>
     <string name="filter_location">Location</string>
     <string name="filter_building_type">Building Type</string>
-<!--본인프로필용-->
+
+    <!-- Profile Setup A -->
     <string name="select_age">Select age</string>
     <string name="select_gender">Select gender</string>
     <string name="select_occupation">Select occupation</string>
 
+    <string-array name="ages">
+        <item>18-22</item>
+        <item>23-26</item>
+        <item>27-30</item>
+        <item>31-35</item>
+        <item>36+</item>
+    </string-array>
+
+    <string-array name="genders">
+        <item>Male</item>
+        <item>Female</item>
+        <item>Non-binary</item>
+        <item>Prefer not to say</item>
+    </string-array>
+
+    <string-array name="occupations">
+        <item>Student</item>
+        <item>Office Worker</item>
+        <item>Freelancer</item>
+        <item>Self-employed</item>
+        <item>Researcher</item>
+        <item>Other</item>
+    </string-array>
+
+
+    <!-- Profile Setup C -->
     <string name="select_sleep">Select sleep schedule</string>
     <string name="select_smoking">Select smoking preference</string>
     <string name="select_pets">Select pets option</string>
@@ -17,7 +47,57 @@
     <string name="select_social">Select social preference</string>
     <string name="select_city">Select city</string>
     <string name="select_district">Select district</string>
-    <!-- Ideal Roommate: Spinner 프롬프트용 -->
+
+    <string-array name="select_sleep">
+        <item>Early Riser</item>
+        <item>Night Owl</item>
+        <item>Flexible</item>
+    </string-array>
+
+    <string-array name="select_smoking">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+
+    <string-array name="select_pets">
+        <item>Yes</item>
+        <item>No</item>
+    </string-array>
+
+    <string-array name="select_clean">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Occasionally</item>
+    </string-array>
+
+    <string-array name="select_guest">
+        <item>Often</item>
+        <item>Sometimes</item>
+        <item>Rarely</item>
+    </string-array>
+
+    <string-array name="select_social">
+        <item>Introvert</item>
+        <item>Extrovert</item>
+        <item>Balanced</item>
+    </string-array>
+
+    <string-array name="cities">
+        <item>Seoul</item>
+        <item>Busan</item>
+        <item>Incheon</item>
+        <item>Daegu</item>
+    </string-array>
+
+    <string-array name="districts">
+        <item>Gangnam</item>
+        <item>Mapo</item>
+        <item>Songpa</item>
+        <item>Seocho</item>
+    </string-array>
+
+
+    <!-- Profile Setup D -->
     <string name="select_age_range">Select Age Range</string>
     <string name="select_gender_pref">Select Gender Preference</string>
     <string name="select_sleep_pref">Select Sleep Schedule</string>
@@ -25,12 +105,12 @@
     <string name="select_pets_pref">Select Pets Option</string>
     <string name="select_clean_pref">Select Cleanliness Level</string>
 
-    <!-- Ideal Roommate 관련 선택 항목 -->
     <string-array name="select_age_range">
-        <item>18–25</item>
-        <item>26–35</item>
-        <item>36–45</item>
-        <item>46+</item>
+        <item>18-22</item>
+        <item>23-26</item>
+        <item>27-30</item>
+        <item>31-35</item>
+        <item>36+</item>
     </string-array>
 
     <string-array name="select_gender_pref">
@@ -40,7 +120,7 @@
     </string-array>
 
     <string-array name="select_sleep_pref">
-        <item>Early Bird</item>
+        <item>Early Riser</item>
         <item>Night Owl</item>
         <item>Flexible</item>
     </string-array>
@@ -74,7 +154,6 @@
 
     <!-- 채팅 -->
     <string name="profile_picture">Profile Picture</string>
-
 
 
 </resources>

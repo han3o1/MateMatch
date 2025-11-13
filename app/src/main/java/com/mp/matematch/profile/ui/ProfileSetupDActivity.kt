@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AlertDialog
@@ -120,7 +121,14 @@ class ProfileSetupDActivity : AppCompatActivity() {
         viewModel.updateField("prefPets", petsPref)
         viewModel.updateField("prefCleanliness", cleanPref)
 
-        goToNextStep(userType)
+        viewModel.saveUserProfile { success ->
+            if (success) {
+                // 저장이 성공해야만 다음 단계로 이동
+                goToNextStep(userType)
+            } else {
+                Toast.makeText(this, "Save failed. Please try again.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     /** 다음 단계 Activity로 이동 **/
