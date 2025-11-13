@@ -203,14 +203,17 @@
                 android:id="@+id/btnLike"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Like" />
+                android:text="Like"
+                android:backgroundTint="@color/brown_500"/>
 
             <Button
                 android:id="@+id/btnMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Message"
-                android:layout_marginStart="8dp" />
+                android:layout_marginStart="8dp"
+                android:backgroundTint="@color/brown_500"
+                />
         </LinearLayout>
 
     </LinearLayout>

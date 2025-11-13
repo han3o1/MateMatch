@@ -7,6 +7,11 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityMainBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CircleCrop
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -45,5 +50,24 @@ class MainActivity : AppCompatActivity() {
 
         // 4. 하단 탭 바(BottomNavigationView)와 NavController를 연결합니다.
         NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+
+        // ③ 프로필 이미지 로딩
+        loadProfileImage()
+    }
+
+    private fun loadProfileImage() {
+        val uid = FirebaseAuth.getInstance().uid ?: return
+
+        FirebaseFirestore.getInstance().collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener { doc ->
+                val url = doc.getString("profileImageUrl")
+
+                Glide.with(this)
+                    .load(url)
+                    .placeholder(R.drawable.ic_profile_placeholder)
+                    .into(binding.profileImageHouse)
+            }
     }
 }
