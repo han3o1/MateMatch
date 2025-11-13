@@ -45,6 +45,12 @@ class ChatFragment : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        loadUsersFromFirestore() // ✅ 채팅 탭 올 때마다 새로고침
+    }
+
+
     private fun loadUsersFromFirestore() {
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
