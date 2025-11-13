@@ -60,6 +60,7 @@ class ProfileSetupEActivity : AppCompatActivity() {
         // ViewModel 업데이트
         viewModel.updateField("statusMessage", status)
         viewModel.updateField("bio", intro)
+        viewModel.updateField("userType", userType ?: "")
 
         // Firestore에 최종 저장
         viewModel.saveUserProfile { success ->

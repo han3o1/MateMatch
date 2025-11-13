@@ -67,11 +67,17 @@ class FeedViewModel : ViewModel() {
     }
 
     /**
-     * '사람 찾기' 피드(그룹 C: Seeker)를 불러오는 함수
+     * '사람 찾기' 피드를 불러오는 함수
      */
-    fun loadPersonFeed() {
+    fun loadPersonFeed(userType: String?) {
+        val targetUserType = when (userType) {
+            "Provider" -> "HouseSeeker"
+            "Seeker" -> "Seeker"
+            else -> "None"       // 그 외 (오류 방지)
+        }
+
         usersCollection
-            .whereEqualTo("userType", "Seeker")
+            .whereEqualTo("userType", targetUserType)
             .get()
             .addOnSuccessListener { querySnapshot ->
                 val users = querySnapshot.toObjects<User>()
@@ -83,27 +89,26 @@ class FeedViewModel : ViewModel() {
     }
 
     /**
-     * '사람 찾기' 피드(그룹 C)에 필터 적용
+     * '사람 찾기' 피드에 필터 적용
      */
-    fun applyPersonFilters(filters: Map<String, Any?>) {
+    fun applyPersonFilters(filters: Map<String, Any?>, userType: String?) {
+        val targetUserType = when (userType) {
+            "Provider" -> "HouseSeeker"
+            "Seeker" -> "Seeker"
+            else -> "None"
+        }
+
         var query: Query = usersCollection
-            .whereEqualTo("userType", "Seeker")
+            .whereEqualTo("userType", targetUserType)
 
         // TODO: '사람 찾기'에 필요한 필터 로직 추가
         val locations = filters["locations"] as? List<*> ?: emptyList<String>()
         if (locations.isNotEmpty()) query = query.whereIn("city", locations)
 
-        // 예: 나이대(AgeRange) 필터
-        // val ageRange = filters["ageRange"] as? String
-        // if (ageRange != null && ageRange != "Any") {
-        //    query = query.whereEqualTo("prefAgeRange", ageRange) // (User.kt 모델 필드명 기준)
-        // }
-
         query.get()
             .addOnSuccessListener { result ->
                 val filtered = result.documents.mapNotNull { it.toObject(User::class.java) }
                 _personList.value = filtered
-                Log.d("FeedViewModel", "사람 피드 필터 적용 결과: ${filtered.size}개")
             }.addOnFailureListener {
                 Log.e("FeedViewModel", "사람 피드 필터 적용 실패", it)
             }

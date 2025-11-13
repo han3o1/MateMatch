@@ -19,6 +19,7 @@ class FeedPersonFragment : Fragment() {
     private val binding get() = _binding!!
     private val viewModel: FeedViewModel by viewModels()
     private lateinit var personAdapter: PersonAdapter
+    private var currentUserType: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,6 +31,7 @@ class FeedPersonFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        currentUserType = arguments?.getString("USER_TYPE")
 
         // 어댑터 초기화
         personAdapter = PersonAdapter(mutableListOf())
@@ -44,12 +46,12 @@ class FeedPersonFragment : Fragment() {
             Log.d("FeedPerson", "피드 UI 업데이트: ${people.size}개")
         })
 
-        viewModel.loadPersonFeed()
+        viewModel.loadPersonFeed(currentUserType)
 
         // 필터 다이얼로그
         binding.searchBoxPerson.setOnClickListener {
             FilterDialog(requireContext()) { filters ->
-                viewModel.applyPersonFilters(filters)
+                viewModel.applyPersonFilters(filters, currentUserType)
             }.showStep1() // (FilterDialog 구현 필요)
         }
     }
