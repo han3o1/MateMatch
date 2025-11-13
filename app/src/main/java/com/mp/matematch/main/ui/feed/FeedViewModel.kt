@@ -83,6 +83,8 @@ class FeedViewModel : ViewModel() {
             val otherUsers = snapshot.toObjects(User::class.java)
             val myUid = auth.currentUser?.uid
 
+            Log.d("FeedViewModel", "쿼리 userType=${query}, 결과 개수 = ${snapshot.size()}")
+
             // 3. FeedItem 리스트로 변환 (점수 계산 포함)
             val feedItems = otherUsers
                 .filter { it.uid != myUid } // 확실하게 '나'를 제외
@@ -105,16 +107,46 @@ class FeedViewModel : ViewModel() {
     }
 
     /**
+     * 현재 로그인한 유저 타입 → 어떤 userType을 불러올지 매핑
+     */
+    private fun getTargetUserType(currentType: String): String {
+        return when (currentType) {
+
+            // 1) 집 없고 룸메 찾는 사람
+            "Seeker" -> "Seeker"
+
+            // 2) 집 있고 룸메 찾는 사람
+            "Provider" -> "HouseSeeker"
+
+            // 3) 집 찾는 사람
+            "HouseSeeker" -> "Provider"
+
+            else -> "none"
+        }
+    }
+
+
+    /**
      * '집 찾기' 피드(그룹 A: Provider)를 불러오는 함수
      */
     fun loadHouseFeed() {
         viewModelScope.launch {
-            val query: Query = usersCollection
-                .whereEqualTo("userType", "Provider")
+            val me = fetchCurrentUser() ?: return@launch
+
+            // 로그인한 유저 기반으로 타겟 결정
+            val target = getTargetUserType(me.userType)
+
+            if (target == "none") {
+                _houseList.postValue(emptyList())
+                return@launch
+            }
+
+            val query = usersCollection.whereEqualTo("userType", target)
 
             processQueryToFeedItems(query, _houseList)
         }
     }
+
 
     /**
      * '집 찾기' 피드에 필터 적용
@@ -140,51 +172,53 @@ class FeedViewModel : ViewModel() {
     /**
      * '사람 찾기' 피드를 불러오는 함수
      */
-    fun loadPersonFeed(userType: String?) {
+    fun loadPersonFeed() {
         viewModelScope.launch {
-            val targetUserType = when (userType) {
-                "Provider" -> "HouseSeeker"
-                "Seeker" -> "Seeker"
-                else -> "None"
+
+            // 현재 로그인 유저 정보 가져오기
+            val me = fetchCurrentUser() ?: return@launch
+
+            // 현재 유저 타입 → 타겟 매핑
+            val target = getTargetUserType(me.userType)
+
+            if (target == "none") {
+                _personList.postValue(emptyList())
+                return@launch
             }
 
-            if (targetUserType == "None") {
-                _personList.postValue(emptyList()); return@launch
-            }
-
-            val query: Query = usersCollection
-                .whereEqualTo("userType", targetUserType)
+            val query = usersCollection.whereEqualTo("userType", target)
 
             processQueryToFeedItems(query, _personList)
         }
     }
+
 
     /**
      * '사람 찾기' 피드에 필터 적용
      */
-    fun applyPersonFilters(filters: Map<String, Any?>, userType: String?) {
+    fun applyPersonFilters(filters: Map<String, Any?>) {
         viewModelScope.launch {
-            val targetUserType = when (userType) {
-                "Provider" -> "HouseSeeker"
-                "Seeker" -> "Seeker"
-                else -> "None"
+            val me = fetchCurrentUser() ?: return@launch
+            val target = getTargetUserType(me.userType)
+
+            if (target == "none") {
+                _personList.postValue(emptyList())
+                return@launch
             }
 
-            if (targetUserType == "None") {
-                _personList.postValue(emptyList()); return@launch
-            }
+            var query: Query = usersCollection.whereEqualTo("userType", target)
 
-            var query: Query = usersCollection
-                .whereEqualTo("userType", targetUserType)
+            val locations = filters["locations"] as? List<*> ?: emptyList<String>()
+            if (locations.isNotEmpty())
+                query = query.whereIn("city", locations)
 
-            val locations = filters["locations"] as? List<*> ?: emptyList<FeedItem>()
-            if (locations.isNotEmpty()) query = query.whereIn("city", locations)
-
-            // TODO: 필터 로직 ...
+            // TODO: 다른 필터 추가
 
             processQueryToFeedItems(query, _personList)
         }
     }
+
+
 
     /**
      * F-007: 매칭 알고리즘 (궁합 점수 계산)

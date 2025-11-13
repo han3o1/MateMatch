@@ -6,8 +6,9 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.mp.matematch.R
 import com.mp.matematch.databinding.ItemFeedHouseBinding
-import com.mp.matematch.profile.model.User
 
 class HouseAdapter(
     private val feedItemList: MutableList<FeedItem> = mutableListOf(),
@@ -22,22 +23,52 @@ class HouseAdapter(
             val matchScore = feedItem.matchScore
 
             with(binding) {
-                textTitle.text = user.buildingType ?: "Building Type N/A"
-                textPrice.text = "₩${user.monthlyRent ?: 0} / mo"
-                val location = "${user.city}, ${user.district}"
-                val roomType = "Room: ${user.buildingType ?: "N/A"}"
-                val fee = "Fee: ₩${user.maintenanceFee ?: 0}"
-                val moveIn = "📅 ${user.moveInDate}"
-                textDetails.text = "$location\n$roomType\n$fee\n$moveIn"
-                textDescription.text = user.bio
 
-                // 태그
+                // ⭐ 궁합 퍼센트
+                textMatchRate.text = "★ ${matchScore}% Match"
+
+                // ⭐ 집 사진
+                if (!user.profileImageUrl.isNullOrEmpty()) {
+                    Glide.with(root.context)
+                        .load(user.profileImageUrl)
+                        .into(imageHouse)
+                } else {
+                    imageHouse.setImageResource(R.drawable.sample_house)
+                }
+
+                // ⭐ 집 종류
+                textTitle.text = user.buildingType ?: "N/A"
+
+                // ⭐ 월세
+                textPrice.text = "₩${user.monthlyRent ?: 0} / mo"
+
+                // ⭐ 위치
+                textLocation.text = "📍 ${user.city}, ${user.district}"
+
+                // ⭐ 방 타입
+                textType.text = "🛏 Room Type: ${user.buildingType ?: "N/A"}"
+
+                // ⭐ 입주 가능 날짜
+                textMoveIn.text = "📅 Available: ${user.moveInDate ?: "N/A"}"
+
+                // ⭐ 방 주인 정보
+                textOwnerInfo.text = "${user.name}, ${user.age} | ${user.occupation}"
+
+                // ⭐ 상세 설명
+                textDetails.text = "Deposit: ₩${user.maintenanceFee ?: 0}"
+
+                // ⭐ 소개
+                textDescription.text = user.bio ?: ""
+
+                // ⭐ 태그 (amenities)
                 tagContainer.removeAllViews()
                 user.amenities?.forEach { tag ->
                     val tagView = TextView(root.context).apply {
                         text = tag
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
                         setPadding(24, 12, 24, 12)
+                        setBackgroundResource(R.drawable.bg_feed_tag_chip)
+
                         val params = LinearLayout.LayoutParams(
                             LinearLayout.LayoutParams.WRAP_CONTENT,
                             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -47,8 +78,6 @@ class HouseAdapter(
                     }
                     tagContainer.addView(tagView)
                 }
-
-                textMatchRate.text = "${matchScore}% Match"
 
                 // 메시지 버튼 클릭
                 btnMessage.setOnClickListener {
@@ -65,8 +94,7 @@ class HouseAdapter(
     }
 
     override fun onBindViewHolder(holder: HouseViewHolder, position: Int) {
-        val feedItem = feedItemList[position]
-        holder.bind(feedItem)
+        holder.bind(feedItemList[position])
     }
 
     override fun getItemCount(): Int = feedItemList.size

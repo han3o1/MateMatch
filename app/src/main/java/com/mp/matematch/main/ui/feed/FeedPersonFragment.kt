@@ -37,7 +37,7 @@ class FeedPersonFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        currentUserType = arguments?.getString("USER_TYPE")
+
 
         personAdapter = PersonAdapter(mutableListOf<FeedItem>()) { partnerUid ->
             startChat(partnerUid)
@@ -64,12 +64,13 @@ class FeedPersonFragment : Fragment() {
             Log.e("FeedPerson", "ViewModel 오류: $errorMessage")
         })
 
-        viewModel.loadPersonFeed(currentUserType)
+        viewModel.loadPersonFeed()
+
 
         // 필터 다이얼로그
         binding.searchBoxPerson.setOnClickListener {
             val dialog = FilterDialog(requireContext()) { filters ->
-                viewModel.applyPersonFilters(filters, currentUserType)
+                viewModel.applyPersonFilters(filters)
             }
             dialog.showStep1()
 
