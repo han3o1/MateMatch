@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -38,8 +39,7 @@ class FeedPersonFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         currentUserType = arguments?.getString("USER_TYPE")
 
-        // ★ House와 동일하게 → 메시지 콜백 포함한 Adapter 생성
-        personAdapter = PersonAdapter(mutableListOf()) { partnerUid ->
+        personAdapter = PersonAdapter(mutableListOf<FeedItem>()) { partnerUid ->
             startChat(partnerUid)
         }
 
@@ -48,9 +48,20 @@ class FeedPersonFragment : Fragment() {
             layoutManager = LinearLayoutManager(context)
         }
 
-        viewModel.personList.observe(viewLifecycleOwner, Observer { people ->
-            personAdapter.updateData(people)
-            Log.d("FeedPerson", "피드 UI 업데이트: ${people.size}개")
+        viewModel.personList.observe(viewLifecycleOwner, Observer { feedItems ->
+            personAdapter.updateData(feedItems)
+            Log.d("FeedPerson", "피드 UI 업데이트: ${feedItems.size}개")
+        })
+
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
+            if(isLoading) {
+                Log.d("FeedPerson", "사람 피드 로딩 중...")
+            }
+        })
+
+        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
+            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+            Log.e("FeedPerson", "ViewModel 오류: $errorMessage")
         })
 
         viewModel.loadPersonFeed(currentUserType)
@@ -70,7 +81,7 @@ class FeedPersonFragment : Fragment() {
         _binding = null
     }
 
-    // ★ 채팅방 생성 + 이동 함수
+    // 채팅방 생성 / 이동 함수
     private fun startChat(partnerUid: String) {
         val currentUid = FirebaseAuth.getInstance().uid!!
         val chatId = if (currentUid < partnerUid)

@@ -106,6 +106,7 @@
     <string name="select_clean_pref">Select Cleanliness Level</string>
 
     <string-array name="select_age_range">
+        <item>Any</item>
         <item>18-22</item>
         <item>23-26</item>
         <item>27-30</item>
@@ -120,6 +121,7 @@
     </string-array>
 
     <string-array name="select_sleep_pref">
+        <item>Doesn’t Matter</item>
         <item>Early Riser</item>
         <item>Night Owl</item>
         <item>Flexible</item>
@@ -132,12 +134,13 @@
     </string-array>
 
     <string-array name="select_pets_pref">
+        <item>Doesn’t Matter</item>
         <item>No Pets</item>
         <item>Has Pets</item>
-        <item>Doesn’t Matter</item>
     </string-array>
 
     <string-array name="select_clean_pref">
+        <item>Doesn’t Matter</item>
         <item>Very Clean</item>
         <item>Average</item>
         <item>Messy</item>
