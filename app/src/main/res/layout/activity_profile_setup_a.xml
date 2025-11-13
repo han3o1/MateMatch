@@ -137,7 +137,7 @@
                         android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- ✅ Age & Gender -->
+                <!-- Age & Gender -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -159,17 +159,17 @@
                             android:textStyle="bold" />
 
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             app:boxStrokeColor="#BDBDBD">
 
-                            <AutoCompleteTextView
-                                android:id="@+id/spinnerAge"
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/inputAge"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:hint="Select age"
-                                android:inputType="none" />
+                                android:hint="e.g., 21"
+                                android:inputType="number" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -203,7 +203,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- ✅ Occupation & MBTI -->
+                <!-- Occupation & MBTI -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -268,7 +268,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- ✅ Move-in Date -->
+                <!-- Move-in Date -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

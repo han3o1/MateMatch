@@ -40,7 +40,12 @@ class FeedPersonFragment : Fragment() {
         currentUserType = arguments?.getString("USER_TYPE")
 
         personAdapter = PersonAdapter(mutableListOf<FeedItem>()) { partnerUid ->
-            startChat(partnerUid)
+            if (partnerUid != null) {
+                startChat(partnerUid)
+            } else {
+                Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT).show()
+                Log.e("FeedPersonFragment", "사용자를 찾을 수 없습니다.")
+            }
         }
 
         binding.recyclerViewPerson.apply {
