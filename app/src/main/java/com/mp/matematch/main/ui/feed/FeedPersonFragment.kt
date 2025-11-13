@@ -65,34 +65,34 @@ class FeedPersonFragment : Fragment() {
         }
     }
 
-        override fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null
-        }
-
-        // ★ 채팅방 생성 + 이동 함수
-        private fun startChat(partnerUid: String) {
-            val currentUid = FirebaseAuth.getInstance().uid!!
-            val chatId = if (currentUid < partnerUid)
-                "${currentUid}_${partnerUid}"
-            else
-                "${partnerUid}_${currentUid}"
-
-            val chatData = mapOf(
-                "participants" to listOf(currentUid, partnerUid),
-                "updatedAt" to FieldValue.serverTimestamp(),
-                "lastMessage" to ""
-            )
-
-            val db = FirebaseFirestore.getInstance()
-
-            db.collection("chats").document(chatId)
-                .set(chatData, SetOptions.merge())
-                .addOnSuccessListener {
-                    val intent = Intent(requireContext(), ChatRoomActivity::class.java)
-                    intent.putExtra("chatId", chatId)
-                    intent.putExtra("partnerUid", partnerUid)
-                    startActivity(intent)
-                }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
+
+    // ★ 채팅방 생성 + 이동 함수
+    private fun startChat(partnerUid: String) {
+        val currentUid = FirebaseAuth.getInstance().uid!!
+        val chatId = if (currentUid < partnerUid)
+            "${currentUid}_${partnerUid}"
+        else
+            "${partnerUid}_${currentUid}"
+
+        val chatData = mapOf(
+            "participants" to listOf(currentUid, partnerUid),
+            "updatedAt" to FieldValue.serverTimestamp(),
+            "lastMessage" to ""
+        )
+
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("chats").document(chatId)
+            .set(chatData, SetOptions.merge())
+            .addOnSuccessListener {
+                val intent = Intent(requireContext(), ChatRoomActivity::class.java)
+                intent.putExtra("chatId", chatId)
+                intent.putExtra("partnerUid", partnerUid)
+                startActivity(intent)
+            }
+    }
+}
