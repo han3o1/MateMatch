@@ -13,7 +13,7 @@ data class User(
 
     // A단계: 기본 프로필
     val name: String = "",
-    val age: Int? = null,
+    val age: Int = 0,
     val gender: String = "",
     val occupation: String = "",
     val mbti: String = "",
