@@ -29,8 +29,8 @@ class ChatFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_chat, container, false)
-        recyclerView = view.findViewById(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView = view.findViewById(R.id.recyclerViewChatList)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
         chatAdapter = ChatAdapter(chatList)
         recyclerView.adapter = chatAdapter
 
@@ -72,5 +72,15 @@ class ChatFragment : Fragment() {
             .addOnFailureListener { e ->
                 Log.e("ChatFragment", "Error fetching users", e)
             }
+    }
+    private fun updateEmptyState() {
+        val emptyView = view?.findViewById<View>(R.id.emptyView)
+        if (chatList.isEmpty()) {
+            recyclerView.visibility = View.GONE
+            emptyView?.visibility = View.VISIBLE
+        } else {
+            recyclerView.visibility = View.VISIBLE
+            emptyView?.visibility = View.GONE
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.mp.matematch.main.ui.feed
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,8 +10,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.mp.matematch.databinding.FragmentFeedHouseBinding
-import com.mp.matematch.main.ui.feed.FilterDialog
+import com.mp.matematch.main.ui.chat.ChatRoomActivity
 import com.mp.matematch.profile.model.User
 
 class FeedHouseFragment : Fragment() {
@@ -31,14 +36,16 @@ class FeedHouseFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // 어댑터 초기화
-        houseAdapter = HouseAdapter(mutableListOf())
+        // ★ HouseAdapter에 "메시지 버튼 클릭" 콜백 추가됨
+        houseAdapter = HouseAdapter(mutableListOf()) { partnerUid ->
+            startChat(partnerUid)
+        }
+
         binding.recyclerViewHouse.apply {
             adapter = houseAdapter
             layoutManager = LinearLayoutManager(context)
         }
 
-        // ViewModel의 'houseList' LiveData를 관찰
         viewModel.houseList.observe(viewLifecycleOwner, Observer { users ->
             houseAdapter.updateData(users)
             Log.d("FeedHouse", "피드 UI 업데이트: ${users.size}개")
@@ -46,16 +53,41 @@ class FeedHouseFragment : Fragment() {
 
         viewModel.loadHouseFeed()
 
-        // 필터 다이얼로그
         binding.searchBoxHouse.setOnClickListener {
             FilterDialog(requireContext()) { filters ->
                 viewModel.applyHouseFilters(filters)
-            }.showStep1() // (FilterDialog 구현 필요)
+            }.showStep1()
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    // ★ 채팅방 생성 함수
+    private fun startChat(partnerUid: String) {
+        val currentUid = FirebaseAuth.getInstance().uid!!
+        val chatId = if (currentUid < partnerUid)
+            "${currentUid}_${partnerUid}"
+        else
+            "${partnerUid}_${currentUid}"
+
+        val chatData = mapOf(
+            "participants" to listOf(currentUid, partnerUid),
+            "updatedAt" to FieldValue.serverTimestamp(),
+            "lastMessage" to ""
+        )
+
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("chats").document(chatId)
+            .set(chatData, SetOptions.merge())
+            .addOnSuccessListener {
+                val intent = Intent(requireContext(), ChatRoomActivity::class.java)
+                intent.putExtra("chatId", chatId)
+                intent.putExtra("partnerUid", partnerUid)
+                startActivity(intent)
+            }
     }
 }

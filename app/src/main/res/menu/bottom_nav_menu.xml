@@ -2,22 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/feedFragment"
+        android:id="@+id/nav_feed"
         android:icon="@drawable/ic_feed_selector"
         android:title="Feed" />
 
     <item
-        android:id="@+id/likedFragment"
+        android:id="@+id/nav_liked"
         android:icon="@drawable/ic_heart_selector"
         android:title="Liked" />
 
     <item
-        android:id="@+id/chatFragment"
+        android:id="@+id/nav_chat"
         android:icon="@drawable/ic_chat_selector"
         android:title="Chat" />
 
     <item
-        android:id="@+id/profileFragment"
+        android:id="@+id/nav_profile"
         android:icon="@drawable/ic_profile_selector"
         android:title="Profile" />
 </menu>

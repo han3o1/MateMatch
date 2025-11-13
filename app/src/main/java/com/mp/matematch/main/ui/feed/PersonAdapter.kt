@@ -12,21 +12,27 @@ import com.mp.matematch.databinding.ItemFeedPersonBinding
 import com.mp.matematch.profile.model.User
 // import com.bumptech.glide.Glide
 
-class PersonAdapter(private val userList: MutableList<User> = mutableListOf()) :
-    RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
+class PersonAdapter(
+    private val userList: MutableList<User> = mutableListOf(),
+    private val onMessageClick: (String) -> Unit
+) : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
 
-    class PersonViewHolder(val binding: ItemFeedPersonBinding) : RecyclerView.ViewHolder(binding.root) {
+    class PersonViewHolder(val binding: ItemFeedPersonBinding)
+        : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(user: User) {
+        fun bind(user: User, onMessageClick: (String) -> Unit) {
             with(binding) {
-                // 이미지 (TODO: Glide/Coil 라이브러리 필요)
-                // .setImageResource -> .load(URL)
-                // Glide.with(root.context).load(user.profileImageUrl).into(imageProfile)
+
                 textNameAge.text = "${user.name}, ${user.age}"
                 textJob.text = user.occupation
                 textQuote.text = "\"${user.statusMessage}\""
                 textLocation.text = "${user.city}, ${user.district}"
                 textTime.text = "Move-in: ${user.moveInDate}"
+
+                // ★ 메시지 버튼 클릭 → 콜백 실행
+                btnMessage.setOnClickListener {
+                    onMessageClick(user.uid)
+                }
             }
         }
     }
@@ -38,7 +44,7 @@ class PersonAdapter(private val userList: MutableList<User> = mutableListOf()) :
 
     override fun onBindViewHolder(holder: PersonViewHolder, position: Int) {
         val user = userList[position]
-        holder.bind(user)
+        holder.bind(user, onMessageClick)
     }
 
     override fun getItemCount(): Int = userList.size
