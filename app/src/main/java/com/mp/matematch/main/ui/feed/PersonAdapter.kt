@@ -35,6 +35,8 @@ class PersonAdapter(
                 btnMessage.setOnClickListener {
                     onMessageClick(user.uid)
                 }
+
+                textMatchRate.text = "★ ${matchScore}% Match"
             }
         }
     }
