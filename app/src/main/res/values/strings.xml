@@ -13,14 +13,6 @@
     <string name="select_gender">Select gender</string>
     <string name="select_occupation">Select occupation</string>
 
-    <string-array name="ages">
-        <item>18-22</item>
-        <item>23-26</item>
-        <item>27-30</item>
-        <item>31-35</item>
-        <item>36+</item>
-    </string-array>
-
     <string-array name="genders">
         <item>Male</item>
         <item>Female</item>
@@ -107,9 +99,9 @@
 
     <string-array name="select_age_range">
         <item>Any</item>
-        <item>18-22</item>
-        <item>23-26</item>
-        <item>27-30</item>
+        <item>18-20</item>
+        <item>21-25</item>
+        <item>26-30</item>
         <item>31-35</item>
         <item>36+</item>
     </string-array>

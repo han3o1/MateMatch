@@ -230,8 +230,27 @@ class FeedViewModel : ViewModel() {
         // 1. 나이대 선호도 비교
         val myAgePref = myUser.prefAgeRange // 내가 선호하는 나이대
         val otherAge = otherUser.age // 상대방의 실제 나이대
-        if (myAgePref == "Any" || myAgePref == otherAge) {
-            score += 10
+        try {
+            when (myAgePref) {
+                "Any" -> score += 10
+                "18-20" -> {
+                    if (otherAge in 18..20) score += 10
+                }
+                "21-25" -> {
+                    if (otherAge in 21..25) score += 10
+                }
+                "26-30" -> {
+                    if (otherAge in 26..30) score += 10
+                }
+                "31-35" -> {
+                    if (otherAge in 31..35) score += 10
+                }
+                "36+" -> {
+                    if (otherAge >= 36) score += 10
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MatchAlgorithm", "Age parsing failed: ${e.message}")
         }
 
         // 2. 성별 선호도 비교

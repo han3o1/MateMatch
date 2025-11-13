@@ -13,13 +13,13 @@ import com.mp.matematch.profile.model.User
 
 class PersonAdapter(
     private val feedItemList: MutableList<FeedItem> = mutableListOf(),
-    private val onMessageClick: (String) -> Unit
+    private val onMessageClick: (String?) -> Unit
 ) : RecyclerView.Adapter<PersonAdapter.PersonViewHolder>() {
 
     class PersonViewHolder(val binding: ItemFeedPersonBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(feedItem: FeedItem, onMessageClick: (String) -> Unit) {
+        fun bind(feedItem: FeedItem, onMessageClick: (String?) -> Unit) {
             val user = feedItem.user
             val matchScore = feedItem.matchScore
 

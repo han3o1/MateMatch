@@ -77,11 +77,8 @@ class ProfileSetupActivity : AppCompatActivity() {
     }
 
     private fun setupDropdowns() {
-        val ageAdapter = ArrayAdapter.createFromResource(this, R.array.ages, android.R.layout.simple_dropdown_item_1line)
         val genderAdapter = ArrayAdapter.createFromResource(this, R.array.genders, android.R.layout.simple_dropdown_item_1line)
         val occupationAdapter = ArrayAdapter.createFromResource(this, R.array.occupations, android.R.layout.simple_dropdown_item_1line)
-
-        binding.spinnerAge.setAdapter(ageAdapter)
         binding.spinnerGender.setAdapter(genderAdapter)
         binding.spinnerOccupation.setAdapter(occupationAdapter)
     }
@@ -95,16 +92,26 @@ class ProfileSetupActivity : AppCompatActivity() {
         }
 
         val name = binding.inputName.text.toString().trim()
-        val ageText = binding.spinnerAge.text.toString().trim()
+        val ageText = binding.inputAge.text.toString().trim()
         val occupation = binding.spinnerOccupation.text.toString().trim()
         val gender = binding.spinnerGender.text.toString().trim()
         val moveInDate = binding.inputMoveInDate.text.toString().trim()
 
         // 필수 필드 확인
-        if (name.isEmpty() || ageText.isEmpty() || gender.isEmpty() || occupation.isEmpty() || moveInDate.isEmpty()) {
+        if (name.isEmpty() || gender.isEmpty() || occupation.isEmpty() || moveInDate.isEmpty()) {
             AlertDialog.Builder(this)
                 .setTitle("Missing Required Fields")
                 .setMessage("Please fill in all required fields.")
+                .setPositiveButton("OK", null)
+                .show()
+            return
+        }
+
+        val age = ageText.toIntOrNull()
+        if (age == null || age < 18) {
+            AlertDialog.Builder(this)
+                .setTitle("Invalid Age")
+                .setMessage("Please enter a valid age. You must be at least 18 years old.")
                 .setPositiveButton("OK", null)
                 .show()
             return
@@ -146,7 +153,7 @@ class ProfileSetupActivity : AppCompatActivity() {
             "uid" to uid,
             "userType" to userType, // userType 저장
             "name" to binding.inputName.text.toString().trim(),
-            "age" to binding.spinnerAge.text.toString().trim(),
+            "age" to binding.inputAge.text.toString().trim().toInt(),
             "gender" to binding.spinnerGender.text.toString().trim(),
             "occupation" to binding.spinnerOccupation.text.toString().trim(),
             "mbti" to binding.inputMbti.text.toString().trim(),
