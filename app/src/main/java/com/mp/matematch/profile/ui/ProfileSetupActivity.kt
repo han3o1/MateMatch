@@ -28,12 +28,21 @@ class ProfileSetupActivity : AppCompatActivity() {
     private val storage = FirebaseStorage.getInstance()
     private var selectedImageUri: Uri? = null
 
-    // 3. 이미지 선택 결과 처리를 위한 Launcher 등록
+    // 이미지 선택 결과 처리를 위한 Launcher 등록
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             selectedImageUri = result.data?.data
+            if (selectedImageUri != null) {
+                try {
+                    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    contentResolver.takePersistableUriPermission(selectedImageUri!!, takeFlags)
+                    Log.d("ProfileSetup", "Persistent URI permission granted.")
+                } catch (e: SecurityException) {
+                    Log.e("ProfileSetup", "Failed to take persistable URI permission", e)
+                }
+            }
             binding.profileImage.setImageURI(selectedImageUri)
         }
     }
@@ -61,18 +70,19 @@ class ProfileSetupActivity : AppCompatActivity() {
 
         // '사진 업로드' 버튼 클릭 시 갤러리 열기
         binding.btnUploadPhoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" }
-            // 4. ActivityResultLauncher 실행
-            pickImageLauncher.launch(Intent.createChooser(intent, "Select Profile Image"))
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                flags = flags or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            pickImageLauncher.launch(intent)
         }
 
         // '다음' 버튼 클릭 시 유효성 검사 및 저장
         binding.btnNext.setOnClickListener {
-            // 5. 저장 함수 호출
             validateAndSave()
         }
 
-        // (XML에 btnBack이 있다는 가정 하에)
         binding.btnBack.setOnClickListener { finish() }
     }
 
@@ -123,23 +133,29 @@ class ProfileSetupActivity : AppCompatActivity() {
 
     /** 이미지 업로드 및 Firestore 저장 로직 분리 **/
     private fun uploadImageAndSaveData(uid: String) {
-        // TODO: 로딩 스피너 표시
-
         if (selectedImageUri != null) {
             // 이미지가 선택된 경우
             val storageRef = storage.reference.child("profile_images/${UUID.randomUUID()}.jpg")
-            val uploadTask = storageRef.putFile(selectedImageUri!!)
+            try {
+                val inputStream = contentResolver.openInputStream(selectedImageUri!!)
+                val uploadTask = storageRef.putStream(inputStream!!)
 
-            uploadTask.addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    // Firestore에 이미지 URL과 함께 저장
-                    saveDataToFirestore(uid, uri.toString())
+                uploadTask.addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        // Firestore에 이미지 URL과 함께 저장
+                        saveDataToFirestore(uid, uri.toString())
+                    }
+                }.addOnFailureListener { e ->
+                    // 업로드 실패 시 (네트워크 오류, Storage 규칙 등)
+                    Log.e("ProfileSetup", "Image upload failed: ${e.message}", e)
+                    saveDataToFirestore(uid, "")
                 }
-            }.addOnFailureListener { e ->
-                Log.e("ProfileSetup", "Image upload failed: ${e.message}")
-                // 이미지 업로드가 실패해도, 텍스트 데이터는 저장
+            } catch (e: Exception) {
+                // openInputStream 자체에서 실패할 경우 (권한 오류 등)
+                Log.e("ProfileSetup", "Failed to open InputStream: ${e.message}", e)
                 saveDataToFirestore(uid, "")
             }
+
         } else {
             // 이미지를 선택하지 않은 경우
             saveDataToFirestore(uid, "")
