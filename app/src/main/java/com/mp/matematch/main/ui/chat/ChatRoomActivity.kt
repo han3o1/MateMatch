@@ -20,6 +20,9 @@ import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.firestore.FieldValue
 import android.widget.Toast
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 
 
@@ -35,6 +38,15 @@ class ChatRoomActivity : AppCompatActivity() {
     private var isRecording = false
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var audioFile: File
+
+    private fun checkAudioPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun requestAudioPermission() {
+        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO), 1001)
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -114,6 +126,9 @@ class ChatRoomActivity : AppCompatActivity() {
             } else {
                 startRecording()
             }
+        }
+        if (!checkAudioPermission()) {
+            requestAudioPermission()
         }
     }
 
@@ -198,6 +213,20 @@ class ChatRoomActivity : AppCompatActivity() {
                 )
             )
     }
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "녹음 권한 허용됨", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this, "녹음 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+        }
+    }
+
 
 
 }
