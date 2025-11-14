@@ -63,6 +63,7 @@ class ChatFragment : Fragment() {
                 chatList.clear()
 
                 for (doc in documents) {
+                    val chatId = doc.id
                     val participants = doc.get("participants") as? List<String> ?: continue
                     val partnerUid = participants.firstOrNull { it != currentUid } ?: continue
 
@@ -80,6 +81,7 @@ class ChatFragment : Fragment() {
                             val profileImageUrl = userDoc.getString("profileImageUrl") ?: ""
 
                             val item = ChatItem(
+                                chatId = chatId,
                                 uid = partnerUid,
                                 name = name,
                                 job = job,
