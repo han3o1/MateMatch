@@ -30,6 +30,11 @@ class ChatFragment : Fragment() {
     private lateinit var chatAdapter: ChatAdapter
     private val chatList = mutableListOf<ChatItem>()
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadUsersFromFirestore()   // ★ 여기로 이동
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,7 +45,7 @@ class ChatFragment : Fragment() {
         chatAdapter = ChatAdapter(chatList)
         recyclerView.adapter = chatAdapter
 
-        loadUsersFromFirestore()
+
 
         return view
     }
@@ -49,7 +54,6 @@ class ChatFragment : Fragment() {
         super.onResume()
         loadUsersFromFirestore() // ✅ 채팅 탭 올 때마다 새로고침
     }
-
 
     private fun loadUsersFromFirestore() {
         val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -60,9 +64,19 @@ class ChatFragment : Fragment() {
             .orderBy("updatedAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
-                chatList.clear()
+                Log.d("ChatFragment", "✅ chats found = ${documents.size()}")
+
+                if (documents.isEmpty) {
+                    chatList.clear()
+                    chatAdapter.notifyDataSetChanged()
+                    updateEmptyState()
+                    return@addOnSuccessListener
+                }
+
+                val tempList = mutableListOf<ChatItem>()   // ⭐ 임시 리스트
 
                 for (doc in documents) {
+
                     val chatId = doc.id
                     val participants = doc.get("participants") as? List<String> ?: continue
                     val partnerUid = participants.firstOrNull { it != currentUid } ?: continue
@@ -71,8 +85,8 @@ class ChatFragment : Fragment() {
                     val timestampMillis = doc.getTimestamp("updatedAt")?.toDate()?.time ?: 0L
                     val formattedTime = formatTimestamp(timestampMillis)
 
-                    // 상대 유저 정보 불러오기
-                    FirebaseFirestore.getInstance().collection("users")
+                    FirebaseFirestore.getInstance()
+                        .collection("users")
                         .document(partnerUid)
                         .get()
                         .addOnSuccessListener { userDoc ->
@@ -88,23 +102,31 @@ class ChatFragment : Fragment() {
                                 lastMessage = lastMessage,
                                 timestamp = formattedTime,
                                 profileImageUrl = profileImageUrl,
-                                hasNewMessage = true // 필요 시 로직 추가
+                                hasNewMessage = false
                             )
 
-                            chatList.add(item)
-                            chatAdapter.notifyDataSetChanged()
-                            updateEmptyState()
-                        }
-                }
+                            tempList.add(item)
 
-                if (documents.isEmpty) {
-                    updateEmptyState()
+                            // ⭐ 모든 채팅 상대 정보 로딩 완료되었을 때만 RecyclerView 업데이트
+                            if (tempList.size == documents.size()) {
+                                chatList.clear()
+                                chatList.addAll(tempList)
+                                chatAdapter.notifyDataSetChanged()
+                                updateEmptyState()
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("ChatFragment", "🔥 Failed to load user info: $partnerUid", e)
+                        }
                 }
             }
             .addOnFailureListener { e ->
                 Log.e("ChatFragment", "Error fetching chats", e)
             }
     }
+
+
+
     private fun formatTimestamp(timeMillis: Long): String {
         val sdf = SimpleDateFormat("a hh:mm", Locale.getDefault())
         return sdf.format(Date(timeMillis))
