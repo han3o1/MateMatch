@@ -5,107 +5,54 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.SetOptions
-
-
-import com.google.firebase.firestore.Query
-import com.mp.matematch.main.ui.chat.ChatMessage
-
-
 
 class ChatViewModel : ViewModel() {
 
     private val db = FirebaseFirestore.getInstance()
-    private val currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+    private val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
 
     private val _messages = MutableLiveData<List<Message>>()
     val messages: LiveData<List<Message>> = _messages
 
-    private var listenerRegistration: ListenerRegistration? = null
-
-    fun loadMessages(receiverUid: String) {
-        val chatId = getChatId(currentUid, receiverUid)
-
-        listenerRegistration?.remove() // 중복 방지
-        listenerRegistration = db.collection("chats")
-            .document(chatId)
-            .collection("messages")
-            .orderBy("timestamp", Query.Direction.ASCENDING)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null || snapshot == null) return@addSnapshotListener
-                val msgList = snapshot.documents.mapNotNull { it.toObject(Message::class.java) }
-                _messages.value = msgList
-            }
-    }
-
-    fun sendMessage(receiverUid: String, text: String) {
-        if (text.isBlank()) return
-
-        val myUid = currentUid
-        val chatId = getChatId(myUid, receiverUid)
-
-        val message = Message(
-            senderId = myUid,
-            text = text,
-            timestamp = System.currentTimeMillis()
-        )
-
-        // 1️⃣ 메시지 저장
+    // 📌 메시지 불러오기 (실시간)
+    fun loadMessages(chatId: String) {
         db.collection("chats")
             .document(chatId)
             .collection("messages")
-            .add(message)
-            .addOnSuccessListener {
-                // 2️⃣ chatList 업데이트 (너한테 없던 기능)
-                updateChatList(chatId, myUid, receiverUid, text)
+            .orderBy("timestamp")
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot != null) {
+                    val list = snapshot.documents.mapNotNull { it.toObject(Message::class.java) }
+                    _messages.value = list
+                }
             }
     }
 
+    // 📌 메시지 보내기 (현재 사용자 → 상대에게)
+    fun sendMessage(chatId: String, text: String) {
+        if (text.isBlank()) return
 
-    private fun getChatId(uid1: String, uid2: String): String {
-        return if (uid1 < uid2) "${uid1}_$uid2" else "${uid2}_$uid1"
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        listenerRegistration?.remove()
-    }
-
-    private fun updateChatList(chatId: String, myUid: String, otherUid: String, lastMessage: String) {
-
-        val myRoomData = mapOf(
-            "chatId" to chatId,
-            "uid" to otherUid,
-            "lastMessage" to lastMessage,
-            "timestamp" to FieldValue.serverTimestamp(),
-            "hasNewMessage" to false
+        val msg = mapOf(
+            "senderId" to currentUid,
+            "text" to text,
+            "timestamp" to System.currentTimeMillis()
         )
 
-        val otherRoomData = mapOf(
-            "chatId" to chatId,
-            "uid" to myUid,
-            "lastMessage" to lastMessage,
-            "timestamp" to FieldValue.serverTimestamp(),
-            "hasNewMessage" to true
-        )
-
-        // 1) 내 chatList
-        db.collection("chatList")
-            .document(myUid)
-            .collection("rooms")
+        // 🔥 1. 메시지 저장
+        db.collection("chats")
             .document(chatId)
-            .set(myRoomData, SetOptions.merge())
+            .collection("messages")
+            .add(msg)
 
-        // 2) 상대방 chatList
-        db.collection("chatList")
-            .document(otherUid)
-            .collection("rooms")
+        // 🔥 2. chats/{chatId}의 lastMessage & updatedAt 업데이트
+        db.collection("chats")
             .document(chatId)
-            .set(otherRoomData, SetOptions.merge())
+            .update(
+                mapOf(
+                    "lastMessage" to text,
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            )
     }
-
 }
-
