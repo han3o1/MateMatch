@@ -99,6 +99,17 @@
             app:tint="@android:color/white"
             android:contentDescription="Send Message" />
 
+        <ImageButton
+            android:id="@+id/btnRecord"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_mic"
+            android:background="@drawable/circle_bg"
+            android:contentDescription="Voice_Record"
+            android:layout_marginStart="8dp"
+            app:tint="@android:color/white" />
+
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

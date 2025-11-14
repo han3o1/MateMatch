@@ -13,6 +13,16 @@ import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.R
+import android.media.MediaRecorder
+import java.io.File
+import java.io.IOException
+import android.net.Uri
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.firestore.FieldValue
+import android.widget.Toast
+
+
+
 
 class ChatRoomActivity : AppCompatActivity() {
 
@@ -20,6 +30,12 @@ class ChatRoomActivity : AppCompatActivity() {
     private lateinit var adapter: MessageAdapter
     private lateinit var chatId: String
     private lateinit var receiverUid: String
+
+    //음성 변수
+    private var isRecording = false
+    private var mediaRecorder: MediaRecorder? = null
+    private lateinit var audioFile: File
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,9 +106,98 @@ class ChatRoomActivity : AppCompatActivity() {
                 edtMessage.text.clear()
             }
         }
+
+        val btnRecord = findViewById<ImageButton>(R.id.btnRecord)
+        btnRecord.setOnClickListener {
+            if (isRecording) {
+                stopRecording()
+            } else {
+                startRecording()
+            }
+        }
     }
+
+    private fun startRecording() {
+        try {
+            val outputDir = externalCacheDir
+            audioFile = File.createTempFile("audio_", ".3gp", outputDir)
+
+            mediaRecorder = MediaRecorder().apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                setOutputFile(audioFile.absolutePath)
+                prepare()
+                start()
+            }
+
+            isRecording = true
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    private fun stopRecording() {
+        mediaRecorder?.apply {
+            stop()
+            release()
+        }
+        mediaRecorder = null
+        isRecording = false
+
+        uploadToStorage(audioFile)
+    }
+
+
+
+
 
     private fun getChatId(uid1: String, uid2: String): String {
         return listOf(uid1, uid2).sorted().joinToString("_")
     }
+
+    private fun uploadToStorage(file: File) {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val audioRef = storageRef.child("audio_messages/${file.name}")
+
+        val uploadTask = audioRef.putFile(Uri.fromFile(file))
+
+        uploadTask.addOnSuccessListener {
+            audioRef.downloadUrl.addOnSuccessListener { uri ->
+                val audioUrl = uri.toString()
+                sendAudioMessage(chatId, audioUrl)
+            }
+        }.addOnFailureListener {
+            it.printStackTrace()
+            Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun sendAudioMessage(chatId: String, audioUrl: String) {
+        val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+
+        val msg = mapOf(
+            "senderId" to currentUid,
+            "audioUrl" to audioUrl,
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        FirebaseFirestore.getInstance()
+            .collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .add(msg)
+
+        FirebaseFirestore.getInstance()
+            .collection("chats")
+            .document(chatId)
+            .update(
+                mapOf(
+                    "lastMessage" to "[음성 메시지]",
+                    "updatedAt" to FieldValue.serverTimestamp()
+                )
+            )
+    }
+
+
 }
