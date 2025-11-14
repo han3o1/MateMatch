@@ -23,6 +23,8 @@ import android.widget.Toast
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import android.view.View
+
 
 
 
@@ -33,6 +35,8 @@ class ChatRoomActivity : AppCompatActivity() {
     private lateinit var adapter: MessageAdapter
     private lateinit var chatId: String
     private lateinit var receiverUid: String
+
+    private lateinit var tvRecordingStatus: TextView
 
     //음성 변수
     private var isRecording = false
@@ -119,6 +123,8 @@ class ChatRoomActivity : AppCompatActivity() {
             }
         }
 
+        tvRecordingStatus = findViewById(R.id.tvRecordingStatus)
+
         val btnRecord = findViewById<ImageButton>(R.id.btnRecord)
         btnRecord.setOnClickListener {
             if (isRecording) {
@@ -147,9 +153,13 @@ class ChatRoomActivity : AppCompatActivity() {
             }
 
             isRecording = true
+            tvRecordingStatus.text = "🎙️ 음성 녹음 중..."
+            tvRecordingStatus.visibility = View.VISIBLE
+
         } catch (e: IOException) {
             e.printStackTrace()
         }
+
     }
 
     private fun stopRecording() {
@@ -159,6 +169,9 @@ class ChatRoomActivity : AppCompatActivity() {
         }
         mediaRecorder = null
         isRecording = false
+        tvRecordingStatus.text = ""
+        tvRecordingStatus.visibility = View.GONE
+
 
         uploadToStorage(audioFile)
     }
