@@ -9,7 +9,6 @@
     tools:context=".profile.ui.ProfileSetupActivity">
 
 
-
     <!-- 카드형 컨테이너 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cardContainer"
@@ -101,7 +100,7 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnUploadPhoto"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="45dp"
                     android:text="Upload Photo*"
                     app:iconPadding="8dp"
                     android:iconTint="@android:color/white"
@@ -112,16 +111,29 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="JPG, PNG or GIF (Max 5MB)"
-                    android:textSize="12sp"
+                    android:textSize="10sp"
                     android:textColor="#888888"
                     android:layout_marginTop="8dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_scan_id"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_gravity="end"
+                    android:text="학생증/사원증 스캔"
+                    app:icon="@android:drawable/ic_menu_camera"
+                    app:iconTint="#5C3A00"
+                    android:textColor="#5C3A00"
+                    android:backgroundTint="#095C3A00"/>
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Full Name*"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:layout_marginTop="16dp"/>
+                    android:layout_marginTop="5dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
