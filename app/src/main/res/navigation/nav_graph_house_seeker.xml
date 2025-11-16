@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_feed_house" />
 
     <fragment
-        android:id="@+id/nav_liked"
-        android:name="com.mp.matematch.main.ui.liked.LikedFragment"
-        android:label="Liked"
-        tools:layout="@layout/fragment_liked" />
+        android:id="@+id/nav_map"
+        android:name="com.mp.matematch.main.ui.map.MapActivity"
+        android:label="Map"
+        tools:layout="@layout/activity_map" />
 
     <fragment
         android:id="@+id/nav_chat"

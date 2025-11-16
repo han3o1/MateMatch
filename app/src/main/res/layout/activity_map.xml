@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".main.ui.map.MapActivity">
+
+    <!-- 카카오 지도 뷰 -->
+    <com.kakao.vectormap.MapView
+        android:id="@+id/map_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageButton
+            android:id="@+id/btn_my_location"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="16dp"
+            android:layout_marginBottom="158dp"
+            android:background="@drawable/bg_circle_white"
+            android:contentDescription="내 위치로 이동"
+            android:elevation="6dp"
+            android:src="@drawable/ic_my_location" />
+    </com.kakao.vectormap.MapView>
+
+
+    <!-- 줌 아웃 버튼 (추가됨) -->
+    <ImageButton
+        android:id="@+id/btn_zoom_out"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="138dp"
+        android:background="@drawable/bg_circle_white"
+        android:src="@drawable/ic_my_location"
+        android:contentDescription="지도 줌 아웃"
+        android:elevation="6dp" />
+    <!-- 줌 아웃 버튼 (추가됨) -->
+    <ImageButton
+        android:id="@+id/btn_zoom_in"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="208dp"
+        android:background="@drawable/bg_circle_white"
+        android:src="@drawable/ic_my_location"
+        android:contentDescription="지도 줌 인"
+        android:elevation="6dp" />
+
+    <!-- GPS 버튼 -->
+
+</FrameLayout>

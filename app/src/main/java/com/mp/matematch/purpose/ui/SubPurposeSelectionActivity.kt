@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.mp.matematch.databinding.ActivitySubPurposeSelectionBinding
+import com.mp.matematch.main.ui.map.MapActivity
 import com.mp.matematch.profile.ui.ProfileSetupActivity
 
 class SubPurposeSelectionActivity : AppCompatActivity() {
