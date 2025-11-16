@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.google.android.material.chip.Chip
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ItemFeedHouseBinding
 
@@ -45,8 +46,8 @@ class HouseAdapter(
                 // ⭐ 위치
                 textLocation.text = "📍 ${user.city}, ${user.district}"
 
-                // ⭐ 방 타입
-                textType.text = "🛏 Room Type: ${user.buildingType ?: "N/A"}"
+                // ⭐ 관리비
+                textMaintenanceFee.text = "💵 Maintenance Cost: ₩${user.maintenanceFee ?: 0}"
 
                 // ⭐ 입주 가능 날짜
                 textMoveIn.text = "📅 Available: ${user.moveInDate ?: "N/A"}"
@@ -54,29 +55,17 @@ class HouseAdapter(
                 // ⭐ 방 주인 정보
                 textOwnerInfo.text = "${user.name}, ${user.age} | ${user.occupation}"
 
-                // ⭐ 상세 설명
-                textDetails.text = "Deposit: ₩${user.maintenanceFee ?: 0}"
-
                 // ⭐ 소개
                 textDescription.text = user.bio ?: ""
 
-                // ⭐ 태그 (amenities)
+                // ⭐ 태그
                 tagContainer.removeAllViews()
                 user.amenities?.forEach { tag ->
-                    val tagView = TextView(root.context).apply {
+                    val chip = Chip(root.context).apply {
                         text = tag
                         setTextSize(TypedValue.COMPLEX_UNIT_SP, 12f)
-                        setPadding(24, 12, 24, 12)
-                        setBackgroundResource(R.drawable.bg_feed_tag_chip)
-
-                        val params = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.WRAP_CONTENT,
-                            LinearLayout.LayoutParams.WRAP_CONTENT
-                        )
-                        params.setMargins(8, 0, 8, 0)
-                        layoutParams = params
                     }
-                    tagContainer.addView(tagView)
+                    tagContainer.addView(chip)
                 }
 
                 // 메시지 버튼 클릭

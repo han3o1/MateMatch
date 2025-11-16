@@ -1,5 +1,7 @@
 package com.mp.matematch.main.ui.feed
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +14,7 @@ import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import com.mp.matematch.profile.model.User
+import com.mp.matematch.settings.SettingsRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -20,11 +23,19 @@ data class FeedItem(
     val matchScore: Int
 )
 
-class FeedViewModel : ViewModel() {
+class FeedViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = Firebase.firestore
     private val auth = Firebase.auth
     private val usersCollection = db.collection("users")
+
+    // SettingsRepository 인스턴스
+    private val settingsRepo = SettingsRepository
+    private val context = application.applicationContext
+
+    // 필터 상태를 관리하는 LiveData
+    private val _currentFilters = MutableLiveData<Pair<String, String>>()
+    val currentFilters: LiveData<Pair<String, String>> = _currentFilters
 
     // '집 목록' 피드를 위한 LiveData (그룹 A)
     private val _houseList = MutableLiveData<List<FeedItem>>()
@@ -42,6 +53,11 @@ class FeedViewModel : ViewModel() {
 
     // 현재 사용자 프로필을 캐시할 변수
     private var currentUser: User? = null
+
+    init {
+        val (lastCity, lastBuilding) = settingsRepo.getLastFilter(context)
+        _currentFilters.value = Pair(lastCity, lastBuilding)
+    }
 
     /**
      * 현재 사용자 정보를 가져오는 공통 함수
@@ -125,6 +141,13 @@ class FeedViewModel : ViewModel() {
         }
     }
 
+    /**
+     * 사용자가 새 필터 적용
+     */
+    fun applyFilter(city: String, buildingType: String) {
+        settingsRepo.setLastFilter(context, city, buildingType)
+        _currentFilters.value = Pair(city, buildingType)
+    }
 
     /**
      * '집 찾기' 피드(그룹 A: Provider)를 불러오는 함수
@@ -141,29 +164,14 @@ class FeedViewModel : ViewModel() {
                 return@launch
             }
 
-            val query = usersCollection.whereEqualTo("userType", target)
-
-            processQueryToFeedItems(query, _houseList)
-        }
-    }
-
-
-    /**
-     * '집 찾기' 피드에 필터 적용
-     */
-    fun applyHouseFilters(filters: Map<String, Any?>) {
-        viewModelScope.launch {
-            var query: Query = usersCollection
-                .whereEqualTo("userType", "Provider")
-
-            val locations = filters["locations"] as? List<*> ?: emptyList<FeedItem>()
-            if (locations.isNotEmpty()) query = query.whereIn("city", locations)
-
-            val buildingTypes = filters["buildingTypes"] as? List<*> ?: emptyList<FeedItem>()
-            if (buildingTypes.isNotEmpty())
-                query = query.whereIn("buildingType", buildingTypes)
-
-            // TODO: 필터 로직 ...
+            var query: Query = usersCollection.whereEqualTo("userType", target)
+            val (city, buildingType) = _currentFilters.value ?: Pair("", "")
+            if (city.isNotEmpty()) {
+                query = query.whereEqualTo("city", city)
+            }
+            if (buildingType.isNotEmpty()) {
+                query = query.whereEqualTo("buildingType", buildingType)
+            }
 
             processQueryToFeedItems(query, _houseList)
         }
@@ -186,39 +194,15 @@ class FeedViewModel : ViewModel() {
                 return@launch
             }
 
-            val query = usersCollection.whereEqualTo("userType", target)
-
-            processQueryToFeedItems(query, _personList)
-        }
-    }
-
-
-    /**
-     * '사람 찾기' 피드에 필터 적용
-     */
-    fun applyPersonFilters(filters: Map<String, Any?>) {
-        viewModelScope.launch {
-            val me = fetchCurrentUser() ?: return@launch
-            val target = getTargetUserType(me.userType)
-
-            if (target == "none") {
-                _personList.postValue(emptyList())
-                return@launch
+            var query = usersCollection.whereEqualTo("userType", target)
+            val (city, buildingType) = _currentFilters.value ?: Pair("", "")
+            if (city.isNotEmpty()) {
+                query = query.whereEqualTo("city", city)
             }
 
-            var query: Query = usersCollection.whereEqualTo("userType", target)
-
-            val locations = filters["locations"] as? List<*> ?: emptyList<String>()
-            if (locations.isNotEmpty())
-                query = query.whereIn("city", locations)
-
-            // TODO: 다른 필터 추가
-
             processQueryToFeedItems(query, _personList)
         }
     }
-
-
 
     /**
      * F-007: 매칭 알고리즘 (궁합 점수 계산)

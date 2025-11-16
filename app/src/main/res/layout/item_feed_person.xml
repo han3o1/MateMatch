@@ -30,7 +30,7 @@
         <ImageView
             android:id="@+id/imageProfile"
             android:layout_width="match_parent"
-            android:layout_height="240dp"
+            android:layout_height="180dp"
             android:scaleType="centerCrop"
             android:contentDescription="Profile image"
             android:src="@drawable/ic_profile_placeholder"/>
@@ -38,60 +38,85 @@
         <!-- 이름, 나이 -->
         <TextView
             android:id="@+id/textNameAge"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="Mike Rodriguez, 28"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="#0A0A0A" />
+            android:textColor="#0A0A0A"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
         <!-- 직업 -->
         <TextView
             android:id="@+id/textJob"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="Software Engineer"
             android:textSize="14sp"
-            android:textColor="#717182" />
+            android:textColor="#717182"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
         <!-- 한줄 소개 -->
         <TextView
             android:id="@+id/textQuote"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:layout_marginTop="2dp"
             android:text="'Chill roommate wanted! Respectful ,clean'"
             android:textSize="14sp"
-            android:textColor="#717182" />
+            android:textColor="#717182"
+            android:maxLines="4"
+            android:ellipsize="end" />
 
-        <!-- 위치 + 입주 가능 시간대 -->
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <!-- 위치 -->
+        <TextView
+            android:id="@+id/textLocation"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginStart="12dp"
-            android:layout_marginTop="4dp">
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="2dp"
+            android:text="📍 Capitol Hill"
+            android:textSize="14sp"
+            android:textColor="#717182"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/textLocation"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Capitol Hill"
-                android:textSize="14sp"
-                android:textColor="#717182" />
+        <!-- 월세 -->
+        <TextView
+            android:id="@+id/textMonthlyRent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="2dp"
+            android:text="💵 Monthly Rent: ₩1,000,000"
+            android:textSize="14sp"
+            android:textColor="#717182"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-            <TextView
-                android:id="@+id/textTime"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="  ₩ 1600-2000"
-                android:textSize="14sp"
-                android:textColor="#717182"
-                android:layout_marginStart="8dp" />
-        </LinearLayout>
+        <!-- 입주 가능 날짜 -->
+        <TextView
+            android:id="@+id/textTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginTop="2dp"
+            android:text="📅 Available from Dec 15, 2024"
+            android:textSize="14sp"
+            android:textColor="#717182"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
         <!-- 자기소개 -->
         <TextView
@@ -101,94 +126,17 @@
             android:layout_margin="12dp"
             android:text="Tech enthusiast and gym lover..."
             android:textSize="14sp"
-            android:textColor="#0A0A0A" />
+            android:textColor="#0A0A0A"
+            android:maxLines="4"
+            android:ellipsize="end" />
 
-        <!-- 태그 (예: Night Owl, Clean, Private) -->
-        <LinearLayout
+        <!-- 태그 -->
+        <com.google.android.material.chip.ChipGroup
             android:id="@+id/tagContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginHorizontal="12dp"
-            android:gravity="center">
-
-            <!-- Tag 1 -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_feed_tag_chip"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:layout_marginEnd="6dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🦉"
-                    android:textSize="14sp"
-                    android:layout_marginEnd="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Night Owl"
-                    android:textSize="12sp"
-                    android:textColor="#717182" />
-            </LinearLayout>
-
-            <!-- Tag 2 -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_feed_tag_chip"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:layout_marginEnd="6dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🧹"
-                    android:textSize="14sp"
-                    android:layout_marginEnd="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Clean"
-                    android:textSize="12sp"
-                    android:textColor="#717182" />
-            </LinearLayout>
-
-            <!-- Tag 3 -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="@drawable/bg_feed_tag_chip"
-                android:paddingHorizontal="10dp"
-                android:paddingVertical="6dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏠"
-                    android:textSize="14sp"
-                    android:layout_marginEnd="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Private"
-                    android:textSize="12sp"
-                    android:textColor="#717182" />
-            </LinearLayout>
-        </LinearLayout>
+            app:chipSpacing="4dp" />
 
         <!-- Like / Message 버튼 -->
         <LinearLayout
@@ -198,21 +146,30 @@
             android:gravity="end"
             android:padding="12dp">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnLike"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Like"
-                android:backgroundTint="@color/brown_500"/>
-
-            <Button
-                android:id="@+id/btnMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Message"
-                android:layout_marginStart="8dp"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_heart_filled"
+                android:background="@drawable/bg_round_button_brown"
                 android:backgroundTint="@color/brown_500"
-                />
+                android:scaleType="centerInside"
+                android:padding="12dp"
+                app:tint="@android:color/white"
+                android:contentDescription="Like"
+                android:layout_marginEnd="8dp" />
+
+            <ImageButton
+                android:id="@+id/btnMessage"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_chat_filled"
+                android:background="@drawable/bg_round_button_brown"
+                android:backgroundTint="@color/brown_500"
+                android:scaleType="centerInside"
+                android:padding="12dp"
+                app:tint="@android:color/white"
+                android:contentDescription="Message" />
         </LinearLayout>
 
     </LinearLayout>
