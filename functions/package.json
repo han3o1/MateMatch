@@ -1,0 +1,19 @@
+{
+  "name": "functions",
+  "description": "Firebase Functions for MateMatch",
+  "version": "1.0.0",
+  "engines": {
+    "node": "20"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "@google-cloud/speech": "^4.10.2",
+    "@google-cloud/storage": "^7.17.3",
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.0"
+  }
+}

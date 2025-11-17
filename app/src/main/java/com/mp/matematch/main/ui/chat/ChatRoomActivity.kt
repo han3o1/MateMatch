@@ -185,47 +185,22 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     private fun uploadToStorage(file: File) {
-        val storageRef = FirebaseStorage.getInstance().reference
-        val audioRef = storageRef.child("audio_messages/${file.name}")
-
-        val uploadTask = audioRef.putFile(Uri.fromFile(file))
-
-        uploadTask.addOnSuccessListener {
-            audioRef.downloadUrl.addOnSuccessListener { uri ->
-                val audioUrl = uri.toString()
-                sendAudioMessage(chatId, audioUrl)
-            }
-        }.addOnFailureListener {
-            it.printStackTrace()
-            Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun sendAudioMessage(chatId: String, audioUrl: String) {
         val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+        val timestamp = System.currentTimeMillis()
 
-        val msg = mapOf(
-            "senderId" to currentUid,
-            "audioUrl" to audioUrl,
-            "timestamp" to System.currentTimeMillis()
-        )
+        val storageRef = FirebaseStorage.getInstance().reference
+        val audioRef = storageRef.child("audio/${chatId}_${currentUid}_${timestamp}.3gp")
 
-        FirebaseFirestore.getInstance()
-            .collection("chats")
-            .document(chatId)
-            .collection("messages")
-            .add(msg)
-
-        FirebaseFirestore.getInstance()
-            .collection("chats")
-            .document(chatId)
-            .update(
-                mapOf(
-                    "lastMessage" to "[음성 메시지]",
-                    "updatedAt" to FieldValue.serverTimestamp()
-                )
-            )
+        audioRef.putFile(Uri.fromFile(file))
+            .addOnSuccessListener {
+                Toast.makeText(this, "음성 업로드 완료 → 변환 대기 중", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+            }
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
