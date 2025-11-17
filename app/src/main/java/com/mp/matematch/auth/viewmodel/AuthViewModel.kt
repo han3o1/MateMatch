@@ -11,6 +11,8 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.GoogleAuthProvider
 
 // UI 상태를 Livedata로 관리
 data class AuthUiState(
@@ -52,30 +54,48 @@ class AuthViewModel : ViewModel() {
             _loginState.value = AuthUiState(isLoading = true)
             try {
                 val authResult = auth.signInWithEmailAndPassword(email, password).await()
-                val uid = authResult.user?.uid
+                val uid = authResult.user?.uid ?: throw Exception("Failed to get user ID.")
 
-                if (uid == null) {
-                    _loginState.value = AuthUiState(error = "Failed to get user ID.")
-                    return@launch
-                }
-
-                db.collection("users").document(uid).get()
-                    .addOnSuccessListener { document ->
-                        if (document.exists()) {
-                            Log.d("AuthViewModel", "Existing user logged in.")
-                            _loginState.value = AuthUiState(isSuccess = true, isNewUser = false)
-                        } else {
-                            Log.d("AuthViewModel", "New user logged in.")
-                            _loginState.value = AuthUiState(isSuccess = true, isNewUser = true)
-                        }
-                    }
-                    .addOnFailureListener {
-                        _loginState.value = AuthUiState(error = "Failed to check profile.")
-                    }
+                checkProfileAndSetLoginState(uid)
 
             } catch (e: Exception) {
                 _loginState.value = AuthUiState(error = e.message)
             }
+        }
+    }
+
+    // 구글 소셜 로그인 기능
+    fun firebaseAuthWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _loginState.value = AuthUiState(isLoading = true)
+            try {
+                val credential = GoogleAuthProvider.getCredential(idToken, null)
+                val authResult = auth.signInWithCredential(credential).await()
+                val uid = authResult.user?.uid ?: throw Exception("Failed to get user ID from Google.")
+
+                checkProfileAndSetLoginState(uid)
+
+            } catch (e: Exception) {
+                _loginState.value = AuthUiState(error = e.message)
+            }
+        }
+    }
+
+    // 프로필 존재 여부 확인 및 상태 업데이트
+    private suspend fun checkProfileAndSetLoginState(uid: String) {
+        try {
+            val document = db.collection("users").document(uid).get().await()
+            if (document.exists()) {
+                Log.d("AuthViewModel", "Existing user logged in.")
+                // 프로필이 존재 -> 기존 유저
+                _loginState.value = AuthUiState(isSuccess = true, isNewUser = false)
+            } else {
+                Log.d("AuthViewModel", "New user logged in.")
+                // 프로필이 없음 -> 신규 유저
+                _loginState.value = AuthUiState(isSuccess = true, isNewUser = true)
+            }
+        } catch (e: Exception) {
+            throw Exception("Failed to check user profile: ${e.message}")
         }
     }
 }
