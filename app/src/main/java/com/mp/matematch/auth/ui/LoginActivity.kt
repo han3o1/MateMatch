@@ -9,6 +9,10 @@ import androidx.appcompat.app.AppCompatActivity
 import com.mp.matematch.databinding.ActivityLoginBinding
 import com.mp.matematch.purpose.ui.PurposeSelectionActivity
 import com.mp.matematch.main.ui.MainActivity
+import android.content.pm.PackageManager
+import android.util.Base64
+import android.util.Log
+import java.security.MessageDigest
 
 class LoginActivity : AppCompatActivity() {
 
@@ -20,7 +24,9 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // 1. 로그인 버튼 클릭
+        printKakaoHashKey() // ✅ Kakao Developers 등록용 키 해시 확인용
+
+        // ✅ 로그인 버튼 클릭
         binding.btnSignIn.setOnClickListener {
             val email = binding.etEmail.text.toString()
             val password = binding.etPassword.text.toString()
@@ -32,40 +38,64 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // 2. 회원가입 텍스트 클릭 (SignUpActivity로 이동)
+        // ✅ 회원가입 버튼 클릭
         binding.tvSignUp.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }
 
-        // 3. ViewModel의 상태(Livedata) 관찰
+        // ✅ 로그인 상태 관찰
         observeLoginState()
     }
 
     private fun observeLoginState() {
         authViewModel.loginState.observe(this) { state ->
-            // 로딩 상태
             binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
-            // 성공 상태
             if (state.isSuccess) {
                 Toast.makeText(this, "Logged in", Toast.LENGTH_SHORT).show()
 
-                if (state.isNewUser == true) {
-                    val intent = Intent(this, PurposeSelectionActivity::class.java)
-                    startActivity(intent)
+                val nextActivity = if (state.isNewUser == true) {
+                    PurposeSelectionActivity::class.java
                 } else {
-                    val intent = Intent(this, MainActivity::class.java)
-                    // (TODO: MainActivity가 userType을 필요로 한다면, Firestore에서 userType을 읽어와서 intent에 담아줘야 함)
-                    startActivity(intent)
+                    MainActivity::class.java
                 }
+
+                startActivity(Intent(this, nextActivity))
                 finishAffinity()
             }
 
-            // 에러 상태
             state.error?.let {
                 Toast.makeText(this, "Log in error: $it", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    /** ✅ Kakao Developers 등록용 해시 키 출력 함수 **/
+    private fun printKakaoHashKey() {
+        try {
+            val packageInfo = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNING_CERTIFICATES)
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getPackageInfo(packageName, PackageManager.GET_SIGNATURES)
+            }
+
+            val signatures = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                packageInfo.signingInfo?.apkContentsSigners
+            } else {
+                @Suppress("DEPRECATION")
+                packageInfo.signatures
+            }
+
+            signatures?.forEach { signature ->
+                val md = MessageDigest.getInstance("SHA")
+                md.update(signature.toByteArray())
+                val keyHash = Base64.encodeToString(md.digest(), Base64.DEFAULT)
+                Log.e("🔑 Kakao Key Hash", keyHash)
+            } ?: Log.e("🔑 Kakao Key Hash", "No signatures found.")
+        } catch (e: Exception) {
+            Log.e("🔑 Kakao Key Hash", "Error getting KeyHash", e)
         }
     }
 }

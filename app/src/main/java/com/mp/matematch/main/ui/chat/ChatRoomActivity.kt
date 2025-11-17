@@ -19,12 +19,19 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private val viewModel: ChatViewModel by viewModels()
     private lateinit var adapter: MessageAdapter
+    private lateinit var chatId: String
     private lateinit var receiverUid: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_room)
 
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
+        btnBack.setOnClickListener {
+            finish()
+        }
+
+        chatId = intent.getStringExtra("chatId") ?: return
         receiverUid = intent.getStringExtra("receiverUid") ?: return
         val receiverName = intent.getStringExtra("receiverName") ?: "Unknown"
         val receiverProfileImageUrl = intent.getStringExtra("receiverProfileImageUrl") ?: ""
@@ -43,8 +50,8 @@ class ChatRoomActivity : AppCompatActivity() {
         rvMessages.adapter = adapter
         rvMessages.layoutManager = LinearLayoutManager(this)
 
-        // 메시지 로딩
-        viewModel.loadMessages(receiverUid)
+        // 🔥 chatId 기준 메시지 로딩
+        viewModel.loadMessages(chatId)
 
         viewModel.messages.observe(this) { messages ->
             adapter.updateMessages(messages)
@@ -54,9 +61,11 @@ class ChatRoomActivity : AppCompatActivity() {
         btnSend.setOnClickListener {
             val text = edtMessage.text.toString()
             if (text.isNotBlank()) {
-                viewModel.sendMessage(receiverUid, text)
+                viewModel.sendMessage(chatId, text)
                 edtMessage.text.clear()
             }
         }
     }
+
 }
+
