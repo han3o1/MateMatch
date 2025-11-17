@@ -135,26 +135,13 @@
             android:maxLines="2"
             android:ellipsize="end" />
 
-        <!-- Like / Message -->
+        <!-- Message -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="end"
             android:padding="12dp">
-
-            <ImageButton
-                android:id="@+id/btnLike"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/ic_heart_filled"
-                android:background="@drawable/bg_round_button_brown"
-                android:backgroundTint="@color/brown_500"
-                android:scaleType="centerInside"
-                android:padding="12dp"
-                app:tint="@android:color/white"
-                android:contentDescription="Like"
-                android:layout_marginEnd="8dp" />
 
             <ImageButton
                 android:id="@+id/btnMessage"
