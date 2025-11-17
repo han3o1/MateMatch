@@ -15,6 +15,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+import com.google.firebase.firestore.Query
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Date
+
+
 
 
 
@@ -23,6 +29,11 @@ class ChatFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var chatAdapter: ChatAdapter
     private val chatList = mutableListOf<ChatItem>()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        loadUsersFromFirestore()   // ★ 여기로 이동
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,45 +45,94 @@ class ChatFragment : Fragment() {
         chatAdapter = ChatAdapter(chatList)
         recyclerView.adapter = chatAdapter
 
-        loadUsersFromFirestore()
+
 
         return view
     }
 
-    private fun loadUsersFromFirestore() {
-        val currentUid = FirebaseAuth.getInstance().currentUser?.uid
+    override fun onResume() {
+        super.onResume()
+        loadUsersFromFirestore() // ✅ 채팅 탭 올 때마다 새로고침
+    }
 
-        FirebaseFirestore.getInstance().collection("users")
+    private fun loadUsersFromFirestore() {
+        val currentUid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+
+        FirebaseFirestore.getInstance()
+            .collection("chats")
+            .whereArrayContains("participants", currentUid)
+            .orderBy("updatedAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
-                chatList.clear()
-                for (doc in documents) {
-                    val uid = doc.getString("uid") ?: continue
-                    if (uid == currentUid) continue  // 자기 자신 제외
+                Log.d("ChatFragment", "✅ chats found = ${documents.size()}")
 
-                    val name = doc.getString("name") ?: "Unknown"
-                    val job = doc.getString("job") ?: ""
-                    val profileImageUrl = doc.getString("profileImageUrl") ?: ""
-                    val lastMessage = doc.getString("statusMessage") ?: ""
-                    val timestamp = "2h ago" // 예시 (실제 채팅 DB 있다면 갱신 가능)
-
-                    val item = ChatItem(
-                        uid = uid,
-                        name = name,
-                        job = job,
-                        lastMessage = lastMessage,
-                        timestamp = timestamp,
-                        profileImageUrl = profileImageUrl,
-                        hasNewMessage = true // 임시 처리. 추후 실시간 여부로 제어 가능
-                    )
-                    chatList.add(item)
+                if (documents.isEmpty) {
+                    chatList.clear()
+                    chatAdapter.notifyDataSetChanged()
+                    updateEmptyState()
+                    return@addOnSuccessListener
                 }
-                chatAdapter.notifyDataSetChanged()
+
+                val tempList = mutableListOf<ChatItem>()   // ⭐ 임시 리스트
+
+                for (doc in documents) {
+
+                    val chatId = doc.id
+                    val participants = doc.get("participants") as? List<String> ?: continue
+                    val partnerUid = participants.firstOrNull { it != currentUid } ?: continue
+
+                    val lastMessage = doc.getString("lastMessage") ?: ""
+                    val timestampMillis = doc.getTimestamp("updatedAt")?.toDate()?.time ?: 0L
+                    val formattedTime = formatTimestamp(timestampMillis)
+
+                    FirebaseFirestore.getInstance()
+                        .collection("users")
+                        .document(partnerUid)
+                        .get()
+                        .addOnSuccessListener { userDoc ->
+                            val name = userDoc.getString("name") ?: "Unknown"
+                            val job = userDoc.getString("job") ?: ""
+                            val profileImageUrl = userDoc.getString("profileImageUrl") ?: ""
+
+                            val item = ChatItem(
+                                chatId = chatId,
+                                uid = partnerUid,
+                                name = name,
+                                job = job,
+                                lastMessage = lastMessage,
+                                timestamp = formattedTime,
+                                profileImageUrl = profileImageUrl,
+                                hasNewMessage = false
+                            )
+
+                            tempList.add(item)
+
+                            // ⭐ 모든 채팅 상대 정보 로딩 완료되었을 때만 RecyclerView 업데이트
+                            if (tempList.size == documents.size()) {
+                                chatList.clear()
+                                chatList.addAll(tempList)
+                                chatAdapter.notifyDataSetChanged()
+                                updateEmptyState()
+                            }
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("ChatFragment", "🔥 Failed to load user info: $partnerUid", e)
+                        }
+                }
             }
             .addOnFailureListener { e ->
-                Log.e("ChatFragment", "Error fetching users", e)
+                Log.e("ChatFragment", "Error fetching chats", e)
             }
     }
+
+
+
+    private fun formatTimestamp(timeMillis: Long): String {
+        val sdf = SimpleDateFormat("a hh:mm", Locale.getDefault())
+        return sdf.format(Date(timeMillis))
+    }
+
+
     private fun updateEmptyState() {
         val emptyView = view?.findViewById<View>(R.id.emptyView)
         if (chatList.isEmpty()) {

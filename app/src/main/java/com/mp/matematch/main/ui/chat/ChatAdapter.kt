@@ -46,6 +46,7 @@ class ChatAdapter(private val chatList: List<ChatItem>) :
 
         holder.itemView.setOnClickListener {
             val intent = Intent(holder.itemView.context, ChatRoomActivity::class.java).apply {
+                putExtra("chatId", chat.chatId)
                 putExtra("receiverUid", chat.uid)
                 putExtra("receiverName", chat.name)
                 putExtra("receiverProfileImageUrl", chat.profileImageUrl)

@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- voice -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+
     <application
         android:name=".MateMatchApplication"
         android:allowBackup="true"
@@ -14,10 +20,17 @@
         android:theme="@style/Theme.MateMatch"
         tools:targetApi="31">
 
-        <!-- 테스트용 -->
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="306ea9db2d08a4684b5a8e110f9f0a4e" />
+
         <activity android:name=".main.TestActivity" />
 
-        <!-- 로그인 관련 -->
+        <activity
+            android:name=".main.ui.map.MapActivity"
+            android:exported="true"
+            android:label="지도 보기" />
+
         <activity
             android:name=".auth.ui.LoginActivity"
             android:exported="true">
@@ -44,6 +57,11 @@
         <activity android:name=".profile.ui.ProfileSetupCActivity" />
         <activity android:name=".profile.ui.ProfileSetupDActivity" />
         <activity android:name=".profile.ui.ProfileSetupEActivity" />
+
+        <!-- chat -->
+        <activity android:name=".main.ui.chat.ChatRoomActivity" />
+
+
 
     </application>
 

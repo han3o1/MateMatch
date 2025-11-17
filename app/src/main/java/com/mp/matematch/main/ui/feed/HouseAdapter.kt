@@ -19,7 +19,7 @@ class HouseAdapter(
     inner class HouseViewHolder(private val binding: ItemFeedHouseBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(feedItem: FeedItem) {
+        fun bind(feedItem: FeedItem, onMessageClick: (String?) -> Unit) {
             val user = feedItem.user
             val matchScore = feedItem.matchScore
 
@@ -83,7 +83,7 @@ class HouseAdapter(
     }
 
     override fun onBindViewHolder(holder: HouseViewHolder, position: Int) {
-        holder.bind(feedItemList[position])
+        holder.bind(feedItemList[position], onMessageClick)
     }
 
     override fun getItemCount(): Int = feedItemList.size
