@@ -29,4 +29,10 @@
         android:name="com.mp.matematch.main.ui.profile.ProfileFragment"
         android:label="Profile"
         tools:layout="@layout/fragment_profile" />
+
+    <include app:graph="@navigation/settings_nav_graph" />
+
+    <action
+        android:id="@+id/action_global_to_settings"
+        app:destination="@id/settings_nav_graph" />
 </navigation>
