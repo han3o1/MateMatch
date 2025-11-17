@@ -82,6 +82,7 @@ class SignUpActivity : AppCompatActivity() {
         }
 
         observeLoginState()
+        observeSignUpState()
     }
 
     private fun signInWithGoogle() {
@@ -107,6 +108,27 @@ class SignUpActivity : AppCompatActivity() {
                     val intent = Intent(this, MainActivity::class.java)
                     startActivity(intent)
                 }
+                finishAffinity()
+            }
+
+            // 에러 상태
+            state.error?.let {
+                Toast.makeText(this, "Sign-up Failed: $it", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun observeSignUpState() {
+        authViewModel.signUpState.observe(this) { state ->
+            // 로딩 상태
+            binding.progressBar.visibility = if (state.isLoading) View.VISIBLE else View.GONE
+
+            // 성공 상태
+            if (state.isSuccess) {
+                Toast.makeText(this, "Account Created!", Toast.LENGTH_SHORT).show()
+
+                val intent = Intent(this, PurposeSelectionActivity::class.java)
+                startActivity(intent)
                 finishAffinity()
             }
 
