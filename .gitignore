@@ -44,3 +44,5 @@ render.experimental.xml
 
 # Android Profiling
 *.hprof
+
+functions/*.json
