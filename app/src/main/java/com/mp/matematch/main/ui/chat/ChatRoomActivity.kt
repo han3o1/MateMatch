@@ -25,10 +25,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.view.View
 
-
-
-
-
 class ChatRoomActivity : AppCompatActivity() {
 
     private val viewModel: ChatViewModel by viewModels()
@@ -38,20 +34,25 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private lateinit var tvRecordingStatus: TextView
 
-    //음성 변수
+    // 음성 변수
     private var isRecording = false
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var audioFile: File
 
     private fun checkAudioPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            this,
+            android.Manifest.permission.RECORD_AUDIO
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestAudioPermission() {
-        ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.RECORD_AUDIO), 1001)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(android.Manifest.permission.RECORD_AUDIO),
+            1001
+        )
     }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +61,6 @@ class ChatRoomActivity : AppCompatActivity() {
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         btnBack.setOnClickListener { finish() }
 
-        // 📌 1. Intent 값 가져오기
         receiverUid = intent.getStringExtra("receiverUid") ?: ""
         chatId = intent.getStringExtra("chatId")
             ?: getChatId(FirebaseAuth.getInstance().currentUser!!.uid, receiverUid)
@@ -74,7 +74,7 @@ class ChatRoomActivity : AppCompatActivity() {
         val edtMessage = findViewById<EditText>(R.id.etMessage)
         val btnSend = findViewById<ImageButton>(R.id.btnSend)
 
-        // 📌 2. 이름이나 프로필이 비어있으면 Firestore에서 가져오기
+        // 2. Firestore에서 유저 정보 보충
         if (receiverName.isEmpty() || receiverProfileImageUrl.isEmpty()) {
             FirebaseFirestore.getInstance()
                 .collection("users")
@@ -92,7 +92,6 @@ class ChatRoomActivity : AppCompatActivity() {
                         .into(imgProfile)
                 }
         } else {
-            // Intent 값으로 UI 바인딩
             tvName.text = receiverName
             Glide.with(this)
                 .load(receiverProfileImageUrl)
@@ -100,21 +99,18 @@ class ChatRoomActivity : AppCompatActivity() {
                 .into(imgProfile)
         }
 
-        // 📌 3. 메시지 목록 초기화
+        // 메시지 리스트
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         adapter = MessageAdapter(mutableListOf(), currentUserId)
         rvMessages.adapter = adapter
         rvMessages.layoutManager = LinearLayoutManager(this)
 
-        // 📌 4. 메시지 불러오기
         viewModel.loadMessages(chatId)
-
         viewModel.messages.observe(this) { messages ->
             adapter.updateMessages(messages)
             rvMessages.scrollToPosition(messages.size - 1)
         }
 
-        // 📌 5. 메시지 보내기
         btnSend.setOnClickListener {
             val text = edtMessage.text.toString()
             if (text.isNotBlank()) {
@@ -127,15 +123,11 @@ class ChatRoomActivity : AppCompatActivity() {
 
         val btnRecord = findViewById<ImageButton>(R.id.btnRecord)
         btnRecord.setOnClickListener {
-            if (isRecording) {
-                stopRecording()
-            } else {
-                startRecording()
-            }
+            if (isRecording) stopRecording()
+            else startRecording()
         }
-        if (!checkAudioPermission()) {
-            requestAudioPermission()
-        }
+
+        if (!checkAudioPermission()) requestAudioPermission()
     }
 
     private fun startRecording() {
@@ -159,7 +151,6 @@ class ChatRoomActivity : AppCompatActivity() {
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
     }
 
     private fun stopRecording() {
@@ -172,33 +163,33 @@ class ChatRoomActivity : AppCompatActivity() {
         tvRecordingStatus.text = ""
         tvRecordingStatus.visibility = View.GONE
 
-
         uploadToStorage(audioFile)
     }
-
-
-
-
 
     private fun getChatId(uid1: String, uid2: String): String {
         return listOf(uid1, uid2).sorted().joinToString("_")
     }
 
+    // ✅ 최종 통합된 업로드 함수
     private fun uploadToStorage(file: File) {
+        val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+        val timestamp = System.currentTimeMillis()
+
         val storageRef = FirebaseStorage.getInstance().reference
-        val audioRef = storageRef.child("audio_messages/${file.name}")
+        val audioRef =
+            storageRef.child("audio_messages/${chatId}_${currentUid}_${timestamp}.3gp")
 
-        val uploadTask = audioRef.putFile(Uri.fromFile(file))
-
-        uploadTask.addOnSuccessListener {
-            audioRef.downloadUrl.addOnSuccessListener { uri ->
-                val audioUrl = uri.toString()
-                sendAudioMessage(chatId, audioUrl)
+        audioRef.putFile(Uri.fromFile(file))
+            .addOnSuccessListener {
+                audioRef.downloadUrl.addOnSuccessListener { uri ->
+                    val audioUrl = uri.toString()
+                    sendAudioMessage(chatId, audioUrl)
+                }
             }
-        }.addOnFailureListener {
-            it.printStackTrace()
-            Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
-        }
+            .addOnFailureListener {
+                it.printStackTrace()
+                Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun sendAudioMessage(chatId: String, audioUrl: String) {
@@ -226,6 +217,7 @@ class ChatRoomActivity : AppCompatActivity() {
                 )
             )
     }
+
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
@@ -239,7 +231,4 @@ class ChatRoomActivity : AppCompatActivity() {
             Toast.makeText(this, "녹음 권한이 필요합니다", Toast.LENGTH_SHORT).show()
         }
     }
-
-
-
 }
