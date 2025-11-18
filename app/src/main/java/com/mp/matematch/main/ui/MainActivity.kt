@@ -2,11 +2,12 @@ package com.mp.matematch.main.ui
 
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
-import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.R
@@ -16,36 +17,40 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
+    private var isNavGraphReady = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // NavHostFragment 연결
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // ⭐ 앱 최초 진입 시 Firestore에서 userType 읽어서 올바른 그래프로 분기
         setupNavigationByUserType()
 
-        // BottomNavigation 과 NavController 연결
-        NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
-
-        // 프로필 이미지 로드
-        loadProfileImage()
+        binding.btnSettings.setOnClickListener {
+            if (isNavGraphReady) {
+                navController.navigate(R.id.action_global_to_settings)
+            } else {
+                Toast.makeText(this, "Loading user data...", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    /**
-     * 🔥 가장 중요한 함수
-     * 인텐트가 아니라 Firestore에서 userType을 읽어서
-     * HouseSeeker → 집 피드 그래프
-     * Provider, RoommateSeeker → 사람 피드 그래프
-     * 로 완전히 분기해주는 함수
-     */
     private fun setupNavigationByUserType() {
-        val uid = FirebaseAuth.getInstance().uid ?: return
+        val uid = FirebaseAuth.getInstance().uid
+
+        if (uid == null) {
+            Log.e("MainActivity", "User is logged out! Setting default graph.")
+            navController.setGraph(R.navigation.nav_graph_roommate_seeker)
+            NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+            isNavGraphReady = true
+
+            setupDestinationListener()
+            return
+        }
 
         FirebaseFirestore.getInstance().collection("users")
             .document(uid)
@@ -60,43 +65,39 @@ class MainActivity : AppCompatActivity() {
 
                 when (type) {
                     "HouseSeeker" -> {
-                        Log.d("MainActivity", "➡ HouseSeeker → 집 피드로 이동")
                         navController.setGraph(R.navigation.nav_graph_house_seeker, args)
                     }
-
                     "Provider", "RoommateSeeker" -> {
-                        Log.d("MainActivity", "➡ Provider/Roommate → 사람 피드로 이동")
                         navController.setGraph(R.navigation.nav_graph_roommate_seeker, args)
                     }
-
                     else -> {
-                        Log.e("MainActivity", "Unknown userType=$type → 기본 사람 피드로 이동")
                         navController.setGraph(R.navigation.nav_graph_roommate_seeker, args)
                     }
                 }
+
+                NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+                isNavGraphReady = true
+
+                setupDestinationListener()
             }
             .addOnFailureListener {
                 Log.e("MainActivity", "userType 불러오기 실패 → 기본 사람피드로 이동", it)
+
                 navController.setGraph(R.navigation.nav_graph_roommate_seeker)
+                NavigationUI.setupWithNavController(binding.bottomNavigationView, navController)
+                isNavGraphReady = true
+
+                setupDestinationListener()
             }
     }
 
-    /**
-     * Firestore에서 프로필 이미지 가져와서 하단 탭에 세팅
-     */
-    private fun loadProfileImage() {
-        val uid = FirebaseAuth.getInstance().uid ?: return
-
-        FirebaseFirestore.getInstance().collection("users")
-            .document(uid)
-            .get()
-            .addOnSuccessListener { doc ->
-                val url = doc.getString("profileImageUrl")
-
-                Glide.with(this)
-                    .load(url)
-                    .placeholder(R.drawable.ic_profile_placeholder)
-                    .into(binding.profileImageHouse)
+    private fun setupDestinationListener() {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.settingsFragment) {
+                binding.bottomNavigationView.visibility = View.GONE
+            } else {
+                binding.bottomNavigationView.visibility = View.VISIBLE
             }
+        }
     }
 }

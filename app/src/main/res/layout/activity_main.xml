@@ -31,22 +31,20 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="MateMatch"
-            android:textSize="18sp"
+            android:textSize="23sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:textColor="@color/black"/>
+            android:textColor="#5C3A00"/>
 
-        <ImageView
-            android:id="@+id/profileImageHouse"
+        <ImageButton
+            android:id="@+id/btnSettings"
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_profile_placeholder"
-            android:scaleType="centerCrop"
-            android:background="@drawable/bg_round"
-            android:contentDescription="Profile Image" />
+            android:src="@drawable/ic_settings"
+            android:contentDescription="Settings"
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </LinearLayout>
 
-    <!-- 🧭 네비게이션 호스트 -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -58,19 +56,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ⛳ 하단 네비게이션 -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:menu="@menu/bottom_nav_menu"
+        android:background="@color/white"
         app:itemIconTint="@color/bottom_nav_text_color"
+        app:itemRippleColor="@android:color/transparent"
         app:itemTextColor="@color/bottom_nav_text_color"
         app:labelVisibilityMode="labeled"
-        android:background="@color/white"
-        app:itemRippleColor="@android:color/transparent" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

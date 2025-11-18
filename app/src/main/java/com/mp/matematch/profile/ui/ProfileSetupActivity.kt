@@ -18,6 +18,11 @@ import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityProfileSetupABinding
 import java.util.UUID
 import androidx.appcompat.app.AlertDialog
+import android.graphics.Bitmap
+import android.provider.MediaStore
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
 
 class ProfileSetupActivity : AppCompatActivity() {
 
@@ -28,13 +33,43 @@ class ProfileSetupActivity : AppCompatActivity() {
     private val storage = FirebaseStorage.getInstance()
     private var selectedImageUri: Uri? = null
 
-    // 3. 이미지 선택 결과 처리를 위한 Launcher 등록
+    // 이미지 선택 결과 처리를 위한 Launcher 등록
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             selectedImageUri = result.data?.data
+            if (selectedImageUri != null) {
+                try {
+                    val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    contentResolver.takePersistableUriPermission(selectedImageUri!!, takeFlags)
+                    Log.d("ProfileSetup", "Persistent URI permission granted.")
+                } catch (e: SecurityException) {
+                    Log.e("ProfileSetup", "Failed to take persistable URI permission", e)
+                }
+            }
             binding.profileImage.setImageURI(selectedImageUri)
+        }
+    }
+
+    // ML Kit 한글 텍스트 인식기 인스턴스
+    private val recognizer = TextRecognition.getClient(
+        KoreanTextRecognizerOptions.Builder().build()
+    )
+
+    // 카메라 앱 실행 결과 처리를 위한 Launcher
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // 카메라 앱에서 이미지를 비트맵으로 받아옴
+            val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+            if (imageBitmap != null) {
+                // 받아온 비트맵으로 텍스트 인식 실행
+                runTextRecognition(imageBitmap)
+            } else {
+                Toast.makeText(this, "Failed to capture image.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -50,6 +85,11 @@ class ProfileSetupActivity : AppCompatActivity() {
         // 드롭다운 메뉴 초기화
         setupDropdowns()
 
+        // '학생증/사원증 스캔' 버튼 클릭 리스너
+        binding.btnScanId.setOnClickListener {
+            dispatchTakePictureIntent()
+        }
+
         // '입주 가능 날짜' EditText 클릭 시 날짜 선택기 표시
         binding.inputMoveInDate.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker().build()
@@ -61,18 +101,19 @@ class ProfileSetupActivity : AppCompatActivity() {
 
         // '사진 업로드' 버튼 클릭 시 갤러리 열기
         binding.btnUploadPhoto.setOnClickListener {
-            val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "image/*" }
-            // 4. ActivityResultLauncher 실행
-            pickImageLauncher.launch(Intent.createChooser(intent, "Select Profile Image"))
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "image/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                flags = flags or Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            pickImageLauncher.launch(intent)
         }
 
         // '다음' 버튼 클릭 시 유효성 검사 및 저장
         binding.btnNext.setOnClickListener {
-            // 5. 저장 함수 호출
             validateAndSave()
         }
 
-        // (XML에 btnBack이 있다는 가정 하에)
         binding.btnBack.setOnClickListener { finish() }
     }
 
@@ -123,23 +164,29 @@ class ProfileSetupActivity : AppCompatActivity() {
 
     /** 이미지 업로드 및 Firestore 저장 로직 분리 **/
     private fun uploadImageAndSaveData(uid: String) {
-        // TODO: 로딩 스피너 표시
-
         if (selectedImageUri != null) {
             // 이미지가 선택된 경우
             val storageRef = storage.reference.child("profile_images/${UUID.randomUUID()}.jpg")
-            val uploadTask = storageRef.putFile(selectedImageUri!!)
+            try {
+                val inputStream = contentResolver.openInputStream(selectedImageUri!!)
+                val uploadTask = storageRef.putStream(inputStream!!)
 
-            uploadTask.addOnSuccessListener {
-                storageRef.downloadUrl.addOnSuccessListener { uri ->
-                    // Firestore에 이미지 URL과 함께 저장
-                    saveDataToFirestore(uid, uri.toString())
+                uploadTask.addOnSuccessListener {
+                    storageRef.downloadUrl.addOnSuccessListener { uri ->
+                        // Firestore에 이미지 URL과 함께 저장
+                        saveDataToFirestore(uid, uri.toString())
+                    }
+                }.addOnFailureListener { e ->
+                    // 업로드 실패 시 (네트워크 오류, Storage 규칙 등)
+                    Log.e("ProfileSetup", "Image upload failed: ${e.message}", e)
+                    saveDataToFirestore(uid, "")
                 }
-            }.addOnFailureListener { e ->
-                Log.e("ProfileSetup", "Image upload failed: ${e.message}")
-                // 이미지 업로드가 실패해도, 텍스트 데이터는 저장
+            } catch (e: Exception) {
+                // openInputStream 자체에서 실패할 경우 (권한 오류 등)
+                Log.e("ProfileSetup", "Failed to open InputStream: ${e.message}", e)
                 saveDataToFirestore(uid, "")
             }
+
         } else {
             // 이미지를 선택하지 않은 경우
             saveDataToFirestore(uid, "")
@@ -166,12 +213,10 @@ class ProfileSetupActivity : AppCompatActivity() {
             .set(userMap, SetOptions.merge())
             .addOnSuccessListener {
                 Log.d("ProfileSetup", "Step 1 data saved for $uid")
-                // TODO: 로딩 스피너 숨기기
                 goToNextStep() // 저장이 성공해야 다음으로 이동
             }
             .addOnFailureListener { e ->
                 Log.e("ProfileSetup", "Firestore save failed: ${e.message}")
-                // TODO: 로딩 스피너 숨기기
                 Toast.makeText(this, "Error saving data. Please try again.", Toast.LENGTH_SHORT).show()
             }
     }
@@ -190,5 +235,70 @@ class ProfileSetupActivity : AppCompatActivity() {
             intent.putExtra("USER_TYPE", userType) // userType을 다음 Activity로 전달
             startActivity(intent)
         } ?: Log.e("ProfileSetup", "Unknown userType: $userType")
+    }
+
+    /** (OCR 1) 카메라 인텐트 실행 함수 */
+    private fun dispatchTakePictureIntent() {
+        Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
+            if (takePictureIntent.resolveActivity(packageManager) != null) {
+                takePictureLauncher.launch(takePictureIntent)
+            } else {
+                Log.e("OCR", "No camera app found.")
+                Toast.makeText(this, "Camera app not found.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    /** (OCR 2) ML Kit 텍스트 인식 실행 함수 */
+    private fun runTextRecognition(bitmap: Bitmap) {
+        val image = InputImage.fromBitmap(bitmap, 0)
+        recognizer.process(image)
+            .addOnSuccessListener { visionText ->
+                // 텍스트 인식 성공
+                Log.d("OCR", "Full Text: ${visionText.text}")
+                // 텍스트를 파싱하여 UI에 적용
+                parseTextAndAutofill(visionText.text)
+            }
+            .addOnFailureListener { e ->
+                // 텍스트 인식 실패
+                Log.e("OCR", "Text recognition failed", e)
+                Toast.makeText(this, "Text recognition failed: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    /** (OCR 3) 텍스트 파싱 및 자동 채우기 함수 */
+    private fun parseTextAndAutofill(fullText: String) {
+        val lines = fullText.split("\n")
+
+        var foundName: String? = null
+        var foundSchool: String? = null
+
+        for (line in lines) {
+            Log.d("OCR_Parse", "Line: $line")
+
+            // (1) 학교/회사 찾기 (00님 학교 '서울과학기술대학교' 키워드 추가)
+            if (line.contains("대학교") || line.contains("University") || line.contains("서울과학기술대학교")) {
+                foundSchool = line.trim()
+                Log.d("OCR_Parse", "Found School: $foundSchool")
+            }
+
+            // (2) 이름 찾기 (예: '성명', '이름' 키워드)
+            if (line.startsWith("성명") || line.startsWith("이름")) {
+                foundName = line.split(":", " ").lastOrNull()?.trim()
+                Log.d("OCR_Parse", "Found Name: $foundName")
+            }
+        }
+
+        // 찾은 텍스트를 EditText에 자동으로 채워넣기
+        foundName?.let {
+            binding.inputName.setText(it)
+        }
+        foundSchool?.let {
+            binding.spinnerOccupation.setText(it, false)
+        }
+
+        if (foundName == null && foundSchool == null) {
+            Toast.makeText(this, "Could not find valid name or occupation.", Toast.LENGTH_SHORT).show()
+        }
     }
 }

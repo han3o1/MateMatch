@@ -43,29 +43,29 @@
     <string-array name="select_sleep">
         <item>Early Riser</item>
         <item>Night Owl</item>
-        <item>Flexible</item>
+        <item>Flexible Sleeper</item>
     </string-array>
 
     <string-array name="select_smoking">
-        <item>Yes</item>
-        <item>No</item>
+        <item>Smoker</item>
+        <item>Non-Smoker</item>
     </string-array>
 
     <string-array name="select_pets">
-        <item>Yes</item>
-        <item>No</item>
+        <item>Has Pets</item>
+        <item>No Pets</item>
     </string-array>
 
     <string-array name="select_clean">
-        <item>Daily</item>
-        <item>Weekly</item>
-        <item>Occasionally</item>
+        <item>Daily Clean</item>
+        <item>Weekly Clean</item>
+        <item>Occasionally Clean</item>
     </string-array>
 
     <string-array name="select_guest">
-        <item>Often</item>
-        <item>Sometimes</item>
-        <item>Rarely</item>
+        <item>Often Invite</item>
+        <item>Sometimes Invite</item>
+        <item>Rarely Invite</item>
     </string-array>
 
     <string-array name="select_social">

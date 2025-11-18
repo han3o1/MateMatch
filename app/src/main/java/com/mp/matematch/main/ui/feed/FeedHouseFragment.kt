@@ -10,12 +10,15 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.databinding.FragmentFeedHouseBinding
 import com.mp.matematch.main.ui.chat.ChatRoomActivity
+import com.mp.matematch.settings.SettingsRepository
+import com.mp.matematch.profile.model.User
 
 class FeedHouseFragment : Fragment() {
 
@@ -39,21 +42,49 @@ class FeedHouseFragment : Fragment() {
             if (partnerUid != null) {
                 startChat(partnerUid)
             } else {
-                Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT).show()
-                Log.e("FeedHouseFragment", "사용자를 찾을 수 없습니다.")
+                Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT)
+                    .show()
+                Log.e("FeedPersonFragment", "사용자를 찾을 수 없습니다.")
             }
         }
 
+        setupRecyclerView()
+        observeViewModel()
+        setupListeners()
+    }
+
+    /**
+     * RecyclerView 뷰 모드 설정 함수
+     */
+    private fun setupRecyclerView() {
+        // SettingsRepository에서 현재 뷰 모드 읽기
+        val settingsRepo = SettingsRepository
+        val currentViewMode = settingsRepo.getFeedViewMode(requireContext())
+
+        // 뷰 모드에 따라 LayoutManager 동적 변경
         binding.recyclerViewHouse.apply {
             adapter = houseAdapter
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = if (currentViewMode == SettingsRepository.VIEW_MODE_CARD) {
+                // '카드 뷰'일 때
+                GridLayoutManager(requireContext(), 2)
+            } else {
+                // '리스트 뷰'일 때
+                LinearLayoutManager(requireContext())
+            }
         }
+    }
 
+    /**
+     * 2. ViewModel 관찰자 설정 함수
+     */
+    private fun observeViewModel() {
+        // '집 목록'이 변경되면 어댑터에 데이터 전달
         viewModel.houseList.observe(viewLifecycleOwner, Observer { feedItems ->
             houseAdapter.updateData(feedItems)
             Log.d("FeedHouse", "피드 UI 업데이트: ${feedItems.size}개")
         })
 
+        // (로딩/에러 관찰자 - 기존 코드)
         viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
             if (isLoading) {
                 Log.d("FeedHouse", "집 피드 로딩 중...")
@@ -65,12 +96,25 @@ class FeedHouseFragment : Fragment() {
             Log.e("FeedHouse", "ViewModel 오류: $errorMessage")
         })
 
-        viewModel.loadHouseFeed()
+        viewModel.currentFilters.observe(viewLifecycleOwner, Observer { (city, building) ->
+            Log.d("FeedHouse", "필터 감지: $city, $building. 피드 로드 시작.")
+            viewModel.loadHouseFeed()
+        })
+    }
 
+    /**
+     * 3. 필터 리스너 설정 함수
+     */
+    private fun setupListeners() {
+        // 필터 다이얼로그
         binding.searchBoxHouse.setOnClickListener {
-            FilterDialog(requireContext()) { filters ->
-                viewModel.applyHouseFilters(filters)
-            }.showStep1()
+            val dialog = FilterDialog(requireContext()) { filters ->
+                val city = filters["city"] as? String ?: ""
+                val buildingType = filters["buildingType"] as? String ?: "" // (사람 필터는 이 값을 무시할 수 있음)
+
+                viewModel.applyFilter(city, buildingType)
+            }
+            dialog.showStep1()
         }
     }
 

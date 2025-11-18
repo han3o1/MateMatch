@@ -30,7 +30,7 @@
         <ImageView
             android:id="@+id/imageHouse"
             android:layout_width="match_parent"
-            android:layout_height="220dp"
+            android:layout_height="120dp"
             android:scaleType="centerCrop"
             android:src="@drawable/sample_house"
             android:contentDescription="House image"/>
@@ -38,20 +38,24 @@
         <!-- 집 종류 -->
         <TextView
             android:id="@+id/textTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="Officetel"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#0A0A0A" />
+            android:textColor="#0A0A0A"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <!-- 가격 -->
         <TextView
             android:id="@+id/textPrice"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="₩400-500(k)/mo"
             android:textSize="16sp"
             android:textColor="#0A0A0A" />
@@ -59,45 +63,52 @@
         <!-- 위치 -->
         <TextView
             android:id="@+id/textLocation"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="📍 Seoul, Gangnam-gu"
             android:textSize="14sp"
             android:textColor="#717182"
-            android:layout_marginTop="6dp" />
+            android:layout_marginTop="6dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-        <!-- 방 타입 + 보증금 -->
+        <!-- 관리비 -->
         <TextView
-            android:id="@+id/textType"
-            android:layout_width="wrap_content"
+            android:id="@+id/textMaintenanceFee"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
-            android:text="🛏 Private Room   💰 Deposit: ₩2000(k)"
+            android:layout_marginEnd="12dp"
+            android:text="💵 Maintenance Cost: ₩100,000"
             android:textSize="14sp"
             android:textColor="#717182"
-            android:layout_marginTop="2dp" />
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <!-- 입주 가능 날짜 -->
         <TextView
             android:id="@+id/textMoveIn"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
             android:text="📅 Available from Dec 15, 2024"
             android:textSize="14sp"
             android:textColor="#717182"
-            android:layout_marginTop="2dp" />
+            android:layout_marginTop="2dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
-        <!-- 태그 -->
-        <LinearLayout
+        <com.google.android.material.chip.ChipGroup
             android:id="@+id/tagContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="start"
             android:layout_marginTop="8dp"
-            android:layout_marginHorizontal="12dp"/>
+            android:layout_marginHorizontal="12dp"
+            app:chipSpacing="4dp" />
 
         <!-- 방 주인 정보 -->
         <TextView
@@ -107,18 +118,9 @@
             android:layout_margin="12dp"
             android:text="Mike Rodríguez, 28 | Software Engineer"
             android:textSize="14sp"
-            android:textColor="#0A0A0A" />
-
-        <TextView
-            android:id="@+id/textDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Details"
-            android:textSize="14sp"
-            android:textColor="#717182"
-            android:layout_marginTop="4dp"/>
-
+            android:textColor="#0A0A0A"
+            android:maxLines="1"
+            android:ellipsize="end" />
 
         <!-- 설명 -->
         <TextView
@@ -129,9 +131,11 @@
             android:layout_marginBottom="12dp"
             android:text="Tech enthusiast and gym lover..."
             android:textColor="#717182"
-            android:textSize="14sp" />
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="end" />
 
-        <!-- Like / Message -->
+        <!-- Message -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -139,20 +143,17 @@
             android:gravity="end"
             android:padding="12dp">
 
-            <Button
-                android:id="@+id/btnLike"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Like"
-                android:backgroundTint="@color/brown_500"/>
-
-            <Button
+            <ImageButton
                 android:id="@+id/btnMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Message"
-                android:layout_marginStart="8dp"
-                android:backgroundTint="@color/brown_500"/>
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_chat_filled"
+                android:background="@drawable/bg_round_button_brown"
+                android:backgroundTint="@color/brown_500"
+                android:scaleType="centerInside"
+                android:padding="12dp"
+                app:tint="@android:color/white"
+                android:contentDescription="Message" />
         </LinearLayout>
 
     </LinearLayout>
