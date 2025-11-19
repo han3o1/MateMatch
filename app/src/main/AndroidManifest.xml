@@ -26,6 +26,7 @@
 
         <activity android:name=".main.TestActivity" />
 
+
         <activity
             android:name=".auth.ui.LoginActivity"
             android:exported="true">
@@ -55,6 +56,10 @@
 
         <!-- chat -->
         <activity android:name=".main.ui.chat.ChatRoomActivity" />
+
+        <!-- level -->
+        <activity android:name=".main.ui.chat.LevelMeterActivity" />
+
 
 
 
