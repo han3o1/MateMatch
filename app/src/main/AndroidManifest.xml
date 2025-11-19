@@ -27,11 +27,6 @@
         <activity android:name=".main.TestActivity" />
 
         <activity
-            android:name=".main.ui.map.MapActivity"
-            android:exported="true"
-            android:label="지도 보기" />
-
-        <activity
             android:name=".auth.ui.LoginActivity"
             android:exported="true">
             <intent-filter>
