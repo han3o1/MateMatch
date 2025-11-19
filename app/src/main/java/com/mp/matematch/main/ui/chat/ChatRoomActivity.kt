@@ -25,6 +25,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.view.View
 import android.content.Intent
+import androidx.activity.result.contract.ActivityResultContracts
+
 
 
 class ChatRoomActivity : AppCompatActivity() {
@@ -40,6 +42,17 @@ class ChatRoomActivity : AppCompatActivity() {
     private var isRecording = false
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var audioFile: File
+
+    private val levelMeterLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+
+            if (result.resultCode == RESULT_OK) {
+                val levelMsg = result.data?.getStringExtra("levelResult") ?: return@registerForActivityResult
+
+                // 채팅으로 보내기
+                viewModel.sendMessage(chatId, "📐 수평계 결과:\n$levelMsg")
+            }
+        }
 
     private fun checkAudioPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -122,11 +135,13 @@ class ChatRoomActivity : AppCompatActivity() {
         }
 
         val btnLevel = findViewById<ImageButton>(R.id.btnLevel)
-
         btnLevel.setOnClickListener {
             val intent = Intent(this, LevelMeterActivity::class.java)
-            startActivity(intent)
+            levelMeterLauncher.launch(intent)
         }
+
+
+
 
 
         tvRecordingStatus = findViewById(R.id.tvRecordingStatus)

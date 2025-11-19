@@ -94,9 +94,8 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="8dp"
-
             android:src="@drawable/ic_send"
-            app:tint="@android:color/white"
+            app:tint="@color/brown_500"
             android:contentDescription="Send Message" />
 
         <ImageButton
@@ -104,10 +103,10 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_mic"
-
             android:contentDescription="Voice_Record"
+            app:tint="@color/brown_500"
             android:layout_marginStart="8dp"
-            app:tint="@android:color/white" />
+             />
 
         <TextView
             android:id="@+id/tvRecordingStatus"
