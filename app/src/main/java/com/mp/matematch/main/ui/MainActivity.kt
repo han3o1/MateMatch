@@ -37,6 +37,22 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Loading user data...", Toast.LENGTH_SHORT).show()
             }
         }
+
+        try {
+            val info = packageManager.getPackageInfo(packageName, android.content.pm.PackageManager.GET_SIGNATURES)
+
+            info.signatures?.let { signatures ->
+                for (signature in signatures) {
+                    val md = java.security.MessageDigest.getInstance("SHA")
+                    md.update(signature.toByteArray())
+                    val keyHash = android.util.Base64.encodeToString(md.digest(), android.util.Base64.NO_WRAP)
+
+                    Log.d("KakaoKeyHash", "현재 나의 키 해시: $keyHash")
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("KakaoKeyHash", "해시 키를 찾을 수 없습니다.", e)
+        }
     }
 
     private fun setupNavigationByUserType() {

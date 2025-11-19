@@ -27,7 +27,6 @@
         <activity android:name=".main.TestActivity" />
 
 
-
         <activity
             android:name=".auth.ui.LoginActivity"
             android:exported="true">
