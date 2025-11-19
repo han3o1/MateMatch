@@ -1,6 +1,9 @@
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+
+//    alias(libs.plugins.android.application)
+//    alias(libs.plugins.kotlin.android)
 
     id("com.google.gms.google-services")
     id("kotlin-kapt")
@@ -60,6 +63,9 @@ android {
 
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.22")
+
+    implementation("androidx.core:core-ktx:1.13.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -109,4 +115,6 @@ dependencies {
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
     kapt("com.github.bumptech.glide:compiler:4.16.0")
+
+
 }

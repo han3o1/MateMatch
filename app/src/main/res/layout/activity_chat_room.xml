@@ -120,6 +120,17 @@
             android:layout_marginTop="8dp"
             android:visibility="gone" />
 
+        <ImageButton
+            android:id="@+id/btnLevel"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@null"
+            android:src="@drawable/ic_level"
+            android:contentDescription="Check Level"
+            app:tint="@color/brown_500"
+            android:layout_marginEnd="8dp"/>
+
+
 
 
     </LinearLayout>

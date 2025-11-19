@@ -24,6 +24,8 @@ import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import android.view.View
+import android.content.Intent
+
 
 class ChatRoomActivity : AppCompatActivity() {
 
@@ -119,6 +121,14 @@ class ChatRoomActivity : AppCompatActivity() {
             }
         }
 
+        val btnLevel = findViewById<ImageButton>(R.id.btnLevel)
+
+        btnLevel.setOnClickListener {
+            val intent = Intent(this, LevelMeterActivity::class.java)
+            startActivity(intent)
+        }
+
+
         tvRecordingStatus = findViewById(R.id.tvRecordingStatus)
 
         val btnRecord = findViewById<ImageButton>(R.id.btnRecord)
@@ -129,6 +139,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
         if (!checkAudioPermission()) requestAudioPermission()
     }
+
 
     private fun startRecording() {
         try {
