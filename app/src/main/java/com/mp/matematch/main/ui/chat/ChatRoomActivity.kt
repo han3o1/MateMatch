@@ -133,7 +133,7 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun startRecording() {
         try {
             val outputDir = externalCacheDir
-            audioFile = File.createTempFile("audio_", ".3gp", outputDir)
+            audioFile = File.createTempFile("audio_", ".m4a", outputDir)
 
             mediaRecorder = MediaRecorder().apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
