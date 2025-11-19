@@ -132,39 +132,65 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private fun startRecording() {
         try {
-            val outputDir = externalCacheDir
+            val outputDir = externalCacheDir ?: cacheDir
             audioFile = File.createTempFile("audio_", ".m4a", outputDir)
 
-            mediaRecorder = MediaRecorder().apply {
+            mediaRecorder = MediaRecorder()
+            mediaRecorder?.apply {
+
+                // 순서 매우 중요!
                 setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+
                 setOutputFile(audioFile.absolutePath)
-                prepare()
-                start()
+
+                try {
+                    prepare()
+                    start()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Toast.makeText(this@ChatRoomActivity, "녹음 준비 실패", Toast.LENGTH_SHORT).show()
+                    return
+                }
             }
 
             isRecording = true
             tvRecordingStatus.text = "🎙️ 음성 녹음 중..."
             tvRecordingStatus.visibility = View.VISIBLE
 
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             e.printStackTrace()
+            Toast.makeText(this, "녹음 시작 오류 발생", Toast.LENGTH_SHORT).show()
         }
     }
+
 
     private fun stopRecording() {
-        mediaRecorder?.apply {
-            stop()
-            release()
+        try {
+            mediaRecorder?.apply {
+                try {
+                    stop()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                release()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+
         mediaRecorder = null
         isRecording = false
-        tvRecordingStatus.text = ""
         tvRecordingStatus.visibility = View.GONE
 
-        uploadToStorage(audioFile)
+        if (audioFile.exists() && audioFile.length() > 1000) {
+            uploadToStorage(audioFile)
+        } else {
+            Toast.makeText(this, "녹음 실패. 파일 없음", Toast.LENGTH_SHORT).show()
+        }
     }
+
 
     private fun getChatId(uid1: String, uid2: String): String {
         return listOf(uid1, uid2).sorted().joinToString("_")
@@ -177,7 +203,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
         val storageRef = FirebaseStorage.getInstance().reference
         val audioRef =
-            storageRef.child("audio_messages/${chatId}_${currentUid}_${timestamp}.3gp")
+            storageRef.child("audio_messages/${chatId}_${currentUid}_${timestamp}.m4a")
 
         audioRef.putFile(Uri.fromFile(file))
             .addOnSuccessListener {

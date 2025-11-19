@@ -51,7 +51,7 @@ class MessageAdapter(
         }
     }
 
-    // ------------------ LEFT ------------------
+    // ---------------- LEFT ----------------
     inner class LeftMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val tvMessage = itemView.findViewById<TextView>(R.id.tvMessageLeft)
@@ -59,21 +59,19 @@ class MessageAdapter(
         private val btnPlayAudio = itemView.findViewById<ImageButton>(R.id.btnPlayAudio)
 
         fun bind(message: Message) {
-            // 텍스트 메시지
             tvMessage.text = message.text
             tvTime.text = formatTime(message.timestamp)
 
-            // 음성 메시지 버튼 표시 여부
             btnPlayAudio.visibility =
                 if (!message.audioUrl.isNullOrEmpty()) View.VISIBLE else View.GONE
 
             btnPlayAudio.setOnClickListener {
-                playAudio(message.audioUrl)
+                playAudio(message.audioUrl!!, this)
             }
         }
     }
 
-    // ------------------ RIGHT ------------------
+    // ---------------- RIGHT ----------------
     inner class RightMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val tvMessage = itemView.findViewById<TextView>(R.id.tvMessageRight)
@@ -88,15 +86,14 @@ class MessageAdapter(
                 if (!message.audioUrl.isNullOrEmpty()) View.VISIBLE else View.GONE
 
             btnPlayAudio.setOnClickListener {
-                playAudio(message.audioUrl)
+                playAudio(message.audioUrl!!, this)
             }
         }
     }
 
-    // ------------------ 재생 기능 ------------------
-    private fun playAudio(url: String?) {
-        if (url.isNullOrEmpty()) return
-
+    // ---------------- 재생 기능 ----------------
+    private fun playAudio(url: String, holder: RecyclerView.ViewHolder) {
+        val context = holder.itemView.context
         val mediaPlayer = MediaPlayer()
 
         try {
@@ -104,48 +101,26 @@ class MessageAdapter(
             mediaPlayer.prepare()
             mediaPlayer.start()
 
-            Toast.makeText(
-                contextFromAdapter(),
-                "음성 재생 시작",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, "재생 시작", Toast.LENGTH_SHORT).show()
 
             mediaPlayer.setOnCompletionListener {
                 mediaPlayer.release()
-                Toast.makeText(
-                    contextFromAdapter(),
-                    "재생 종료",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Toast.makeText(context, "재생 종료", Toast.LENGTH_SHORT).show()
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(
-                contextFromAdapter(),
-                "재생 실패",
-                Toast.LENGTH_SHORT
-            ).show()
+            Toast.makeText(context, "재생 실패", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun contextFromAdapter() =
-    // adapter 사용 시 Context가 없으니까 itemView의 context 사용
-        // (항상 리스트 중 첫 번째 item 기준으로 안전)
-        if (messageList.isNotEmpty())
-            messageListViewHolder?.itemView?.context
-        else null
-
-    private val messageListViewHolder: RecyclerView.ViewHolder?
-        get() = null // 안전용 placeholder (필요 없음)
-
-    // ------------------ 시간 포맷 ------------------
+    // ---------------- 시간 포맷 ----------------
     private fun formatTime(timestamp: Long): String {
         val sdf = SimpleDateFormat("a hh:mm", Locale.getDefault())
         return sdf.format(Date(timestamp))
     }
 
-    // ------------------ 업데이트 ------------------
+    // ---------------- 업데이트 ----------------
     fun updateMessages(newList: List<Message>) {
         messageList.clear()
         messageList.addAll(newList)
