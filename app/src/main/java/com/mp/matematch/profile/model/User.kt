@@ -10,6 +10,7 @@ data class User(
     // 공통 정보 (Firebase)
     val uid: String = "",
     val userType: String = "",       // Provider / Seeker / HouseSeeker
+    val fcmToken: String? = null,
 
     // A단계: 기본 프로필
     val name: String = "",

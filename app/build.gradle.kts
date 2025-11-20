@@ -26,7 +26,7 @@ android {
             abiFilters.add("arm64-v8a")
             abiFilters.add("armeabi-v7a")
             abiFilters.add("x86")
-            abiFilters.add("x86_64")
+//            abiFilters.add("x86_64")
 
         }
 
