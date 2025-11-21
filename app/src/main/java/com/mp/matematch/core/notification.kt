@@ -15,8 +15,8 @@ import com.mp.matematch.main.ui.chat.ChatRoomActivity
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        val title = remoteMessage.notification?.title ?: "새 메시지"
-        val body = remoteMessage.notification?.body ?: "MateMatch에서 새 메시지가 도착했습니다."
+        val title = remoteMessage.notification?.title ?: "Mate Match"
+        val body = remoteMessage.notification?.body ?: "You have a new message."
         val chatRoomId = remoteMessage.data["chatRoomId"]
 
         // ✅ 알림 클릭 시 채팅방으로 이동
@@ -36,7 +36,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val channelName = "채팅 알림"
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_chat_filled) // ✅ drawable/ic_chat.xml or png 파일 필요
+            .setSmallIcon(R.drawable.ic_logo) // ✅ drawable/ic_chat.xml or png 파일 필요
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
