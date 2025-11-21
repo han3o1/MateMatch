@@ -19,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val authViewModel: AuthViewModel by viewModels()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -71,6 +72,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+
+
+    private fun signInWithGoogle() {
+        val signInIntent = googleSignInClient.signInIntent
+        googleSignInLauncher.launch(signInIntent)
     /** ✅ Kakao Developers 등록용 해시 키 출력 함수 **/
     private fun printKakaoHashKey() {
         try {
