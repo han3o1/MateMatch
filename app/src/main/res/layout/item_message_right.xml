@@ -31,5 +31,14 @@
             android:textColor="@android:color/darker_gray"
             android:layout_marginTop="4dp"
             android:gravity="end" />
+
+        <ImageButton
+            android:id="@+id/btnPlayAudio"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@android:color/transparent"
+            android:src="@drawable/ic_play_arrow"
+            android:visibility="gone" />
+
     </LinearLayout>
 </LinearLayout>

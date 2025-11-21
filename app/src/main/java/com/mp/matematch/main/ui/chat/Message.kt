@@ -6,4 +6,6 @@ data class Message(
     val timestamp: Long = 0L,
 
     val audioUrl: String? = null
+    val audioUrl: String? = null,
+    val timestamp: Long = 0L
 )
