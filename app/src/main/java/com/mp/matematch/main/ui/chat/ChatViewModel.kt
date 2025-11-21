@@ -23,11 +23,16 @@ class ChatViewModel : ViewModel() {
             .orderBy("timestamp")
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null) {
-                    val list = snapshot.documents.mapNotNull { it.toObject(Message::class.java) }
+                    val list = snapshot.documents.map { doc ->
+                        val msg = doc.toObject(Message::class.java)!!
+                        msg.id = doc.id      // 🔥 문서 ID 저장
+                        msg
+                    }
                     _messages.value = list
                 }
             }
     }
+
 
     // 📌 메시지 보내기 (현재 사용자 → 상대에게)
     fun sendMessage(chatId: String, text: String) {

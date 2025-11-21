@@ -153,7 +153,42 @@ class ChatRoomActivity : AppCompatActivity() {
         }
 
         if (!checkAudioPermission()) requestAudioPermission()
+
+        adapter.onMessageLongClick = { message ->
+            showDeleteDialog(message)
+        }
+
+
     }
+
+    private fun showDeleteDialog(message: Message) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("메시지 삭제")
+            .setMessage("이 메시지를 삭제할까요?")
+            .setPositiveButton("삭제") { _, _ ->
+                deleteMessage(message)
+            }
+            .setNegativeButton("취소", null)
+            .show()
+    }
+
+    private fun deleteMessage(message: Message) {
+        val db = FirebaseFirestore.getInstance()
+
+        db.collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .document(message.id)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "삭제됨", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "삭제 실패", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+
 
 
     private fun startRecording() {

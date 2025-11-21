@@ -42,14 +42,24 @@ class MessageAdapter(
 
     override fun getItemCount(): Int = messageList.size
 
+    var onMessageLongClick: ((Message) -> Unit)? = null
+
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val msg = messageList[position]
+
+        holder.itemView.setOnLongClickListener {
+            onMessageLongClick?.invoke(msg)   // 콜백 호출
+            true
+        }
+
         if (holder is RightMessageViewHolder) {
             holder.bind(msg)
         } else if (holder is LeftMessageViewHolder) {
             holder.bind(msg)
         }
     }
+
+
 
     // ---------------- LEFT ----------------
     inner class LeftMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
