@@ -51,6 +51,7 @@ class LevelMeterActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         val x = event!!.values[0].toDouble()
         val y = event.values[1].toDouble()
+
         val z = event.values[2].toDouble()
 
         val tiltX = Math.toDegrees(atan2(x, z))
