@@ -18,7 +18,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.databinding.FragmentFeedHouseBinding
 import com.mp.matematch.main.ui.chat.ChatRoomActivity
 import com.mp.matematch.settings.SettingsRepository
-import com.mp.matematch.profile.model.User
 
 class FeedHouseFragment : Fragment() {
 
@@ -42,77 +41,55 @@ class FeedHouseFragment : Fragment() {
             if (partnerUid != null) {
                 startChat(partnerUid)
             } else {
-                Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT)
-                    .show()
-                Log.e("FeedPersonFragment", "사용자를 찾을 수 없습니다.")
+                Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT).show()
             }
         }
 
         setupRecyclerView()
         observeViewModel()
         setupListeners()
+
+        viewModel.loadHouseFeed()
     }
 
-    /**
-     * RecyclerView 뷰 모드 설정 함수
-     */
     private fun setupRecyclerView() {
-        // SettingsRepository에서 현재 뷰 모드 읽기
         val settingsRepo = SettingsRepository
-        val currentViewMode = settingsRepo.getFeedViewMode(requireContext())
+        val mode = settingsRepo.getFeedViewMode(requireContext())
 
-        // 뷰 모드에 따라 LayoutManager 동적 변경
         binding.recyclerViewHouse.apply {
             adapter = houseAdapter
-            layoutManager = if (currentViewMode == SettingsRepository.VIEW_MODE_CARD) {
-                // '카드 뷰'일 때
-                GridLayoutManager(requireContext(), 2)
-            } else {
-                // '리스트 뷰'일 때
-                LinearLayoutManager(requireContext())
-            }
+            layoutManager =
+                if (mode == SettingsRepository.VIEW_MODE_CARD)
+                    GridLayoutManager(requireContext(), 2)
+                else
+                    LinearLayoutManager(requireContext())
         }
     }
 
-    /**
-     * 2. ViewModel 관찰자 설정 함수
-     */
     private fun observeViewModel() {
-        // '집 목록'이 변경되면 어댑터에 데이터 전달
+
         viewModel.houseList.observe(viewLifecycleOwner, Observer { feedItems ->
             houseAdapter.updateData(feedItems)
-            Log.d("FeedHouse", "피드 UI 업데이트: ${feedItems.size}개")
+            Log.d("FeedHouse", "피드 업데이트: ${feedItems.size}개")
         })
 
-        // (로딩/에러 관찰자 - 기존 코드)
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer { isLoading ->
-            if (isLoading) {
-                Log.d("FeedHouse", "집 피드 로딩 중...")
-            }
+        viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+            if (loading) Log.d("FeedHouse", "로딩 중..")
         })
 
-        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
-            Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
-            Log.e("FeedHouse", "ViewModel 오류: $errorMessage")
+        viewModel.error.observe(viewLifecycleOwner, Observer { msg ->
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
         })
 
-        viewModel.currentFilters.observe(viewLifecycleOwner, Observer { (city, building) ->
-            Log.d("FeedHouse", "필터 감지: $city, $building. 피드 로드 시작.")
-            viewModel.loadHouseFeed()
-        })
+        // ❌ 기존 Pair(city, buildingType)은 더 이상 쓰지 않음
+        // viewModel.currentFilters.observe {...} 제거 가능
     }
 
-    /**
-     * 3. 필터 리스너 설정 함수
-     */
     private fun setupListeners() {
-        // 필터 다이얼로그
         binding.searchBoxHouse.setOnClickListener {
             val dialog = FilterDialog(requireContext()) { filters ->
-                val city = filters["city"] as? String ?: ""
-                val buildingType = filters["buildingType"] as? String ?: "" // (사람 필터는 이 값을 무시할 수 있음)
-
-                viewModel.applyFilter(city, buildingType)
+                // 🔥 FeedViewModel에서 모든 필터 관리함
+                viewModel.applyFilters(filters)
             }
             dialog.showStep1()
         }
@@ -123,41 +100,35 @@ class FeedHouseFragment : Fragment() {
         _binding = null
     }
 
-    // ✅ 기존 함수 유지, 기능만 확장
     private fun startChat(partnerUid: String) {
         val currentUid = FirebaseAuth.getInstance().uid ?: return
         val chatId = listOf(currentUid, partnerUid).sorted().joinToString("_")
 
         val db = FirebaseFirestore.getInstance()
-        val chatRef = db.collection("chats").document(chatId)
+        val ref = db.collection("chats").document(chatId)
 
-        chatRef.get().addOnSuccessListener { document ->
-            if (!document.exists()) {
+        ref.get().addOnSuccessListener { doc ->
+            if (!doc.exists()) {
                 val chatData = mapOf(
                     "participants" to listOf(currentUid, partnerUid),
                     "updatedAt" to FieldValue.serverTimestamp(),
                     "lastMessage" to ""
                 )
-
-                chatRef.set(chatData).addOnSuccessListener {
-                    Log.d("FeedHouseFragment", "채팅방 생성 후 이동: $chatId")
+                ref.set(chatData).addOnSuccessListener {
                     moveToChat(chatId, partnerUid)
                 }
             } else {
-                Log.d("FeedHouseFragment", "채팅방 존재 → 바로 이동: $chatId")
                 moveToChat(chatId, partnerUid)
             }
-        }.addOnFailureListener {
-            Toast.makeText(requireContext(), "채팅방 조회 실패", Toast.LENGTH_SHORT).show()
-            Log.e("FeedHouseFragment", "Firestore 오류: ${it.message}")
         }
     }
 
-    // ✅ ChatRoomActivity 연결용 Intent
     private fun moveToChat(chatId: String, partnerUid: String) {
         val intent = Intent(requireContext(), ChatRoomActivity::class.java)
         intent.putExtra("chatId", chatId)
-        intent.putExtra("receiverUid", partnerUid)  // ChatRoomActivity에서 receiverUid로 받음
+        intent.putExtra("receiverUid", partnerUid)
         startActivity(intent)
     }
+
+
 }
