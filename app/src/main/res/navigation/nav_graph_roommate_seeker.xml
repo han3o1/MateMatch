@@ -15,7 +15,8 @@
         android:id="@+id/nav_map"
         android:name="com.mp.matematch.main.ui.map.MapFragment"
         android:label="Map"
-        tools:layout="@layout/activity_map" />
+        tools:layout="@layout/fragment_map"/>
+
 
 
     <fragment
