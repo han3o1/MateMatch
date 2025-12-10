@@ -50,7 +50,7 @@ class ChatRoomActivity : AppCompatActivity() {
                 val levelMsg = result.data?.getStringExtra("levelResult") ?: return@registerForActivityResult
 
                 // 채팅으로 보내기
-                viewModel.sendMessage(chatId, "📐 수평계 결과:\n$levelMsg")
+                viewModel.sendMessage(chatId, "📐 Tilt Measure:\n$levelMsg")
             }
         }
 
@@ -79,7 +79,7 @@ class ChatRoomActivity : AppCompatActivity() {
         val btnBack = findViewById<ImageView>(R.id.btnBack)
         btnBack.setOnClickListener { finish() }
 
-        // 📌 1. Intent 값 가져오기
+        //  1. Intent 값 가져오기
         receiverUid = intent.getStringExtra("receiverUid") ?: ""
         chatId = intent.getStringExtra("chatId")
             ?: getChatId(FirebaseAuth.getInstance().currentUser!!.uid, receiverUid)
@@ -93,7 +93,7 @@ class ChatRoomActivity : AppCompatActivity() {
         val edtMessage = findViewById<EditText>(R.id.etMessage)
         val btnSend = findViewById<ImageButton>(R.id.btnSend)
 
-        // 📌 2. 이름이나 프로필이 비어있으면 Firestore에서 가져오기
+        // 2. 이름이나 프로필이 비어있으면 Firestore에서 가져오기
         if (receiverName.isEmpty() || receiverProfileImageUrl.isEmpty()) {
             FirebaseFirestore.getInstance()
                 .collection("users")
@@ -119,13 +119,13 @@ class ChatRoomActivity : AppCompatActivity() {
                 .into(imgProfile)
         }
 
-        // 📌 3. 메시지 목록 초기화
+        //  3. 메시지 목록 초기화
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
         adapter = MessageAdapter(mutableListOf(), currentUserId)
         rvMessages.adapter = adapter
         rvMessages.layoutManager = LinearLayoutManager(this)
 
-        // 📌 4. 메시지 불러오기
+        // 4. 메시지 불러오기
         viewModel.loadMessages(chatId)
 
         viewModel.messages.observe(this) { messages ->
@@ -133,7 +133,7 @@ class ChatRoomActivity : AppCompatActivity() {
             rvMessages.scrollToPosition(messages.size - 1)
         }
 
-        // 📌 5. 메시지 보내기
+        //  5. 메시지 보내기
         btnSend.setOnClickListener {
             val text = edtMessage.text.toString()
             if (text.isNotBlank()) {
@@ -187,18 +187,19 @@ class ChatRoomActivity : AppCompatActivity() {
                     start()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Toast.makeText(this@ChatRoomActivity, "녹음 준비 실패", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ChatRoomActivity, "Failed to prepare recording", Toast.LENGTH_SHORT).show()
                     return
+
                 }
             }
 
             isRecording = true
-            tvRecordingStatus.text = "🎙️ 음성 녹음 중..."
+            tvRecordingStatus.text = "🎙️ Recording voice..."
             tvRecordingStatus.visibility = View.VISIBLE
 
         } catch (e: IOException) {
             e.printStackTrace()
-            Toast.makeText(this, "녹음 시작 오류 발생", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "An error occurred while starting the recording", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -266,7 +267,7 @@ class ChatRoomActivity : AppCompatActivity() {
             .document(chatId)
             .update(
                 mapOf(
-                    "lastMessage" to "[음성 메시지]",
+                    "lastMessage" to "[Voice Message]",
                     "updatedAt" to FieldValue.serverTimestamp()
                 )
             )
@@ -279,9 +280,11 @@ class ChatRoomActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 
         if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "녹음 권한 허용됨", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Recording permission granted", Toast.LENGTH_SHORT).show()
+
         } else {
-            Toast.makeText(this, "녹음 권한이 필요합니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Recording permission is required", Toast.LENGTH_SHORT).show()
+
         }
     }
 

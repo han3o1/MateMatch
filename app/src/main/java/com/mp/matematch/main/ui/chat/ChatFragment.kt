@@ -52,7 +52,7 @@ class ChatFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        loadUsersFromFirestore() // ✅ 채팅 탭 올 때마다 새로고침
+        loadUsersFromFirestore() //  채팅 탭 올 때마다 새로고침
     }
 
     private fun loadUsersFromFirestore() {
@@ -64,7 +64,7 @@ class ChatFragment : Fragment() {
             .orderBy("updatedAt", Query.Direction.DESCENDING)
             .get()
             .addOnSuccessListener { documents ->
-                Log.d("ChatFragment", "✅ chats found = ${documents.size()}")
+                Log.d("ChatFragment", "chats found = ${documents.size()}")
 
                 if (documents.isEmpty) {
                     chatList.clear()
@@ -73,7 +73,7 @@ class ChatFragment : Fragment() {
                     return@addOnSuccessListener
                 }
 
-                val tempList = mutableListOf<ChatItem>()   // ⭐ 임시 리스트
+                val tempList = mutableListOf<ChatItem>()   //  임시 리스트
 
                 for (doc in documents) {
 
@@ -107,7 +107,7 @@ class ChatFragment : Fragment() {
 
                             tempList.add(item)
 
-                            // ⭐ 모든 채팅 상대 정보 로딩 완료되었을 때만 RecyclerView 업데이트
+                            //  모든 채팅 상대 정보 로딩 완료되었을 때만 RecyclerView 업데이트
                             if (tempList.size == documents.size()) {
                                 chatList.clear()
                                 chatList.addAll(tempList)
@@ -116,7 +116,7 @@ class ChatFragment : Fragment() {
                             }
                         }
                         .addOnFailureListener { e ->
-                            Log.e("ChatFragment", "🔥 Failed to load user info: $partnerUid", e)
+                            Log.e("ChatFragment", " Failed to load user info: $partnerUid", e)
                         }
                 }
             }

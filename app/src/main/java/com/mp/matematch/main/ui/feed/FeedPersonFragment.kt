@@ -82,14 +82,14 @@ class FeedPersonFragment : Fragment() {
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
         })
 
-        // ❌ 기존 필터 Pair(city,buildingType)는 더 이상 사용 안 함
+        // 기존 필터 Pair(city,buildingType)는 더 이상 사용 안 함
         // viewModel.currentFilters.observe {...} 제거해도 됨
     }
 
     private fun setupListeners() {
         binding.searchBoxPerson.setOnClickListener {
             val dialog = FilterDialog(requireContext()) { filters ->
-                // 🔥 FeedViewModel이 모든 필터를 처리함
+                //  FeedViewModel이 모든 필터를 처리함
                 viewModel.applyFilters(filters)
             }
             dialog.showStep1()

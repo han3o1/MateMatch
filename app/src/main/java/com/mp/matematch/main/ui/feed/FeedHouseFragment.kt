@@ -81,14 +81,14 @@ class FeedHouseFragment : Fragment() {
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
         })
 
-        // ❌ 기존 Pair(city, buildingType)은 더 이상 쓰지 않음
+        //  기존 Pair(city, buildingType)은 더 이상 쓰지 않음
         // viewModel.currentFilters.observe {...} 제거 가능
     }
 
     private fun setupListeners() {
         binding.searchBoxHouse.setOnClickListener {
             val dialog = FilterDialog(requireContext()) { filters ->
-                // 🔥 FeedViewModel에서 모든 필터 관리함
+                // FeedViewModel에서 모든 필터 관리함
                 viewModel.applyFilters(filters)
             }
             dialog.showStep1()

@@ -25,10 +25,10 @@ class HouseAdapter(
 
             with(binding) {
 
-                // ⭐ 궁합 퍼센트
+                //  궁합 퍼센트
                 textMatchRate.text = "★ ${matchScore}% Match"
 
-                // ⭐ 집 사진
+                //  집 사진
                 if (!user.profileImageUrl.isNullOrEmpty()) {
                     Glide.with(root.context)
                         .load(user.profileImageUrl)
@@ -37,28 +37,28 @@ class HouseAdapter(
                     imageHouse.setImageResource(R.drawable.sample_house)
                 }
 
-                // ⭐ 집 종류
+                //  집 종류
                 textTitle.text = user.buildingType ?: "N/A"
 
-                // ⭐ 월세
+                //  월세
                 textPrice.text = "₩${user.monthlyRent ?: 0} / mo"
 
-                // ⭐ 위치
-                textLocation.text = "📍 ${user.city}, ${user.district}"
+                //  위치
+                textLocation.text = " ${user.city}, ${user.district}"
 
-                // ⭐ 관리비
-                textMaintenanceFee.text = "💵 Maintenance Cost: ₩${user.maintenanceFee ?: 0}"
+                //  관리비
+                textMaintenanceFee.text = " Maintenance Cost: ₩${user.maintenanceFee ?: 0}"
 
-                // ⭐ 입주 가능 날짜
-                textMoveIn.text = "📅 Available: ${user.moveInDate ?: "N/A"}"
+                //  입주 가능 날짜
+                textMoveIn.text = " Available: ${user.moveInDate ?: "N/A"}"
 
-                // ⭐ 방 주인 정보
+                //  방 주인 정보
                 textOwnerInfo.text = "${user.name}, ${user.age} | ${user.occupation}"
 
-                // ⭐ 소개
+                //  소개
                 textDescription.text = user.bio ?: ""
 
-                // ⭐ 태그
+                //  태그
                 tagContainer.removeAllViews()
                 user.amenities?.forEach { tag ->
                     val chip = Chip(root.context).apply {

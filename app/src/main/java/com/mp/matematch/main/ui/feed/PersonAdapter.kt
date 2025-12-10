@@ -26,7 +26,7 @@ class PersonAdapter(
 
             with(binding) {
 
-                // ⭐ 프로필 사진 (Glide)
+                //  프로필 사진 (Glide)
                 if (!user.profileImageUrl.isNullOrEmpty()) {
                     Glide.with(root.context)
                         .load(user.profileImageUrl)
@@ -36,30 +36,30 @@ class PersonAdapter(
                     imageProfile.setImageResource(R.drawable.ic_profile_placeholder)
                 }
 
-                // ⭐ 기본 정보
+                // 기본 정보
                 textNameAge.text = "${user.name}, ${user.age}"
                 textJob.text = user.occupation
                 textQuote.text = "\"${user.statusMessage}\""
 
-                // ⭐ 거주 지역
-                textLocation.text = "📍 ${user.city}, ${user.district}"
+                //  거주 지역
+                textLocation.text = " ${user.city}, ${user.district}"
 
-                // ⭐ 월세
+                //  월세
                 val monthlyRent = user.monthlyRent
                 if (monthlyRent != null && monthlyRent > 0) {
-                    textMonthlyRent.text = "💵 Maintenance Cost: ₩$monthlyRent"
+                    textMonthlyRent.text = " Maintenance Cost: ₩$monthlyRent"
                     textMonthlyRent.visibility = View.VISIBLE
                 } else {
                     textMonthlyRent.visibility = View.GONE
                 }
 
-                // ⭐ 입주 가능 날짜
-                textTime.text = "📅 Available: ${user.moveInDate ?: "N/A"}"
+                //  입주 가능 날짜
+                textTime.text = " Available: ${user.moveInDate ?: "N/A"}"
 
-                // ⭐ 자기소개
+                //  자기소개
                 textIntro.text = user.bio ?: ""
 
-                // ⭐ 태그
+                //  태그
                 tagContainer.removeAllViews()
 
                 val lifestyleTags = listOf(

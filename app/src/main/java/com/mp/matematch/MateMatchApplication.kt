@@ -14,29 +14,29 @@ class MateMatchApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // ✅ Firebase 초기화
+        //  Firebase 초기화
         Firebase.initialize(this)
 
-        // ✅ Kakao Map SDK 초기화
+        //  Kakao Map SDK 초기화
         KakaoMapSdk.init(this, "306ea9db2d08a4684b5a8e110f9f0a4e")
 
-        // ✅ FCM 토큰 저장
+        //  FCM 토큰 저장
         registerFcmToken()
     }
 
     private fun registerFcmToken() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("FCM", "❌ FCM 토큰 가져오기 실패", task.exception)
+                Log.w("FCM", "FCM 토큰 가져오기 실패", task.exception)
                 return@addOnCompleteListener
             }
 
             val token = task.result
-            Log.d("FCM", "✅ 새 FCM Token: $token")
+            Log.d("FCM", "새 FCM Token: $token")
 
             val userId = FirebaseAuth.getInstance().currentUser?.uid
             if (userId == null) {
-                Log.w("FCM", "⚠️ 로그인된 사용자가 없어 토큰을 저장하지 않음")
+                Log.w("FCM", " 로그인된 사용자가 없어 토큰을 저장하지 않음")
                 return@addOnCompleteListener
             }
 
@@ -46,10 +46,10 @@ class MateMatchApplication : Application() {
 
             userDoc.update("fcmToken", token)
                 .addOnSuccessListener {
-                    Log.d("FCM", "✅ Firestore에 토큰 저장 완료")
+                    Log.d("FCM", " Firestore에 토큰 저장 완료")
                 }
                 .addOnFailureListener { e ->
-                    Log.e("FCM", "⚠️ Firestore 저장 실패: ${e.message}")
+                    Log.e("FCM", " Firestore 저장 실패: ${e.message}")
                 }
         }
     }

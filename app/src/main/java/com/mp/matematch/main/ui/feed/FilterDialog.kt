@@ -37,7 +37,7 @@ class FilterDialog(
             layoutLocation.addView(cb)
         }
 
-        // 🔹 건물 타입 체크박스
+        //  건물 타입 체크박스
         val checkBoxes = mutableListOf<CheckBox>()
         buildingTypes.forEach { type ->
             val cb = CheckBox(context)
@@ -80,7 +80,7 @@ class FilterDialog(
 
 
     // ============================================
-    // 🔥 Step2: 힌트용 스피너(라벨만 보이고 펼치면 값 나오는 스피너)
+    //  Step2: 힌트용 스피너(라벨만 보이고 펼치면 값 나오는 스피너)
     // ============================================
     private fun showStep2() {
         val bindingStep2 = DialogFilterStep2Binding.inflate(LayoutInflater.from(context))
@@ -99,7 +99,7 @@ class FilterDialog(
         val budgetOptions = listOf("Any", "500k", "700k", "1M", "1.5M+")
 
         // ===================================================
-        // 🔥 공통 힌트 스피너 적용 함수
+        // 공통 힌트 스피너 적용 함수
         // ===================================================
         fun attachHintSpinner(spinner: Spinner, options: List<String>, hint: String) {
             val items = mutableListOf(hint)
@@ -119,7 +119,7 @@ class FilterDialog(
             spinner.setSelection(0) // hint 표시
         }
 
-        // 🔥 여기서 hint 스피너 적용
+        //  여기서 hint 스피너 적용
         attachHintSpinner(bindingStep2.spinnerGender, genderOptions, "Gender")
         attachHintSpinner(bindingStep2.spinnerLifestyle, lifestyleOptions, "Lifestyle")
         attachHintSpinner(bindingStep2.spinnerSmoking, smokingOptions, "Smoking")

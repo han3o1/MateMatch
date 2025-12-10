@@ -19,7 +19,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val body = remoteMessage.notification?.body ?: "You have a new message."
         val chatRoomId = remoteMessage.data["chatRoomId"]
 
-        // ✅ 알림 클릭 시 채팅방으로 이동
+        //  알림 클릭 시 채팅방으로 이동
         val intent = Intent(this, ChatRoomActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             chatRoomId?.let { putExtra("chatRoomId", it) }
@@ -36,7 +36,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val channelName = "채팅 알림"
 
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_logo) // ✅ drawable/ic_chat.xml or png 파일 필요
+            .setSmallIcon(R.drawable.ic_logo) //
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
@@ -46,7 +46,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        // ✅ Android 8.0 이상에서는 NotificationChannel 필수
+        // Android 8.0 이상에서는 NotificationChannel 필요
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
