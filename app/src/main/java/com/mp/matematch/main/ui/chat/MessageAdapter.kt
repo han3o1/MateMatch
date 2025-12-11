@@ -12,10 +12,16 @@ import com.mp.matematch.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import android.widget.ImageView
+import com.bumptech.glide.Glide
 
 class MessageAdapter(
     private val messageList: MutableList<Message>,
-    private val currentUserId: String
+    private val currentUserId: String,
+    var receiverProfileImageUrl: String = "",
+
+    var onLongPress: ((Message) -> Unit)? = null
+
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -57,8 +63,17 @@ class MessageAdapter(
         private val tvMessage = itemView.findViewById<TextView>(R.id.tvMessageLeft)
         private val tvTime = itemView.findViewById<TextView>(R.id.tvTimeLeft)
         private val btnPlayAudio = itemView.findViewById<ImageButton>(R.id.btnPlayAudio)
+        private val imgProfile = itemView.findViewById<ImageView>(R.id.ivProfileLeft)  // ← 추가됨
 
         fun bind(message: Message) {
+
+            // 🔥 상대 프로필 이미지 로드
+            Glide.with(itemView.context)
+                .load(receiverProfileImageUrl)
+                .circleCrop()
+                .placeholder(R.drawable.profile_sample)
+                .into(imgProfile)
+
             tvMessage.text = message.text
             tvTime.text = formatTime(message.timestamp)
 
@@ -68,8 +83,15 @@ class MessageAdapter(
             btnPlayAudio.setOnClickListener {
                 playAudio(message.audioUrl!!, this)
             }
+
+            // 삭제 long press도 그대로 유지
+            itemView.setOnLongClickListener {
+                onLongPress?.invoke(message)
+                true
+            }
         }
     }
+
 
     // ---------------- RIGHT ----------------
     inner class RightMessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -87,6 +109,10 @@ class MessageAdapter(
 
             btnPlayAudio.setOnClickListener {
                 playAudio(message.audioUrl!!, this)
+            }
+            itemView.setOnLongClickListener {
+                onLongPress?.invoke(message)
+                true
             }
         }
     }

@@ -4,5 +4,6 @@ data class Message(
     val senderId: String = "",
     val text: String = "",
     val audioUrl: String? = null,
-    val timestamp: Long = 0L
+    val timestamp: Long = 0L,
+    var messageId: String = ""
 )

@@ -23,7 +23,11 @@ class ChatViewModel : ViewModel() {
             .orderBy("timestamp")
             .addSnapshotListener { snapshot, _ ->
                 if (snapshot != null) {
-                    val list = snapshot.documents.mapNotNull { it.toObject(Message::class.java) }
+                    val list = snapshot.documents.mapNotNull { doc ->
+                        val msg = doc.toObject(Message::class.java)
+                        msg?.messageId = doc.id   // ← 이 한 줄만 추가됨
+                        msg
+                    }
                     _messages.value = list
                 }
             }

@@ -8,6 +8,7 @@
 
     <!-- 프로필 사진 -->
     <ImageView
+        android:id="@+id/ivProfileLeft"
         android:layout_width="32dp"
         android:layout_height="32dp"
         android:src="@drawable/profile_sample"

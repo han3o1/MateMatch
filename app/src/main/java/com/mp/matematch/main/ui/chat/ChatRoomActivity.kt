@@ -13,10 +13,11 @@ import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.NotificationCompat
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -27,14 +28,16 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.storage.FirebaseStorage
 import com.mp.matematch.R
 import java.io.File
-import java.io.IOException
 
 class ChatRoomActivity : AppCompatActivity() {
 
     private val viewModel: ChatViewModel by viewModels()
-    private lateinit var adapter: MessageAdapter
+    private lateinit var adapter: MessageAdapter   // 초기화❌ (나중에 Firestore 로딩 후)
     private lateinit var chatId: String
     private lateinit var receiverUid: String
+
+    private var receiverProfileUrl: String = ""
+    private var receiverName: String = ""
 
     private lateinit var tvRecordingStatus: TextView
     private var isRecording = false
@@ -53,22 +56,13 @@ class ChatRoomActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_room)
 
-        // ----------------------------
-        // 1) 알림 채널 생성 + 권한 요청
-        // ----------------------------
+        // 알림 채널 및 권한 요청
         createNotificationChannel()
         requestNotificationPermission()
 
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        btnBack.setOnClickListener { finish() }
-
-        // Intent 값
         receiverUid = intent.getStringExtra("receiverUid") ?: ""
         chatId = intent.getStringExtra("chatId")
             ?: getChatId(FirebaseAuth.getInstance().currentUser!!.uid, receiverUid)
-
-        var receiverName = intent.getStringExtra("receiverName") ?: ""
-        var receiverProfileImageUrl = intent.getStringExtra("receiverProfileImageUrl") ?: ""
 
         val tvName = findViewById<TextView>(R.id.tvUserName)
         val imgProfile = findViewById<ImageView>(R.id.profileImageView)
@@ -76,76 +70,45 @@ class ChatRoomActivity : AppCompatActivity() {
         val edtMessage = findViewById<EditText>(R.id.etMessage)
         val btnSend = findViewById<ImageButton>(R.id.btnSend)
 
-        // Firestore에서 유저 정보 불러오기 (if 필요)
-        if (receiverName.isEmpty() || receiverProfileImageUrl.isEmpty()) {
-            FirebaseFirestore.getInstance()
-                .collection("chats")
-                .document(chatId)
-                .update("updatedAt", FieldValue.serverTimestamp())
+        // ---------------------------
+        // 1) 상대 유저 정보 Firestore에서 가져오기
+        // ---------------------------
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(receiverUid)
+            .get()
+            .addOnSuccessListener { doc ->
+                receiverName = doc.getString("name") ?: "Unknown"
+                receiverProfileUrl = doc.getString("profileImageUrl") ?: ""
 
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(receiverUid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    receiverName = doc.getString("name") ?: "Unknown"
-                    receiverProfileImageUrl = doc.getString("profileImageUrl") ?: ""
+                // 상단 헤더 업데이트
+                tvName.text = receiverName
+                Glide.with(this)
+                    .load(receiverProfileUrl)
+                    .circleCrop()
+                    .into(imgProfile)
 
-                    tvName.text = receiverName
-                    Glide.with(this)
-                        .load(receiverProfileImageUrl)
-                        .circleCrop()
-                        .into(imgProfile)
+                // ---------------------------
+                // 2) 이제 adapter 초기화 (정답)
+                // ---------------------------
+                val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+                adapter = MessageAdapter(mutableListOf(), currentUserId).apply {
+                    this.receiverProfileImageUrl = receiverProfileUrl
                 }
-        } else {
-            tvName.text = receiverName
-            Glide.with(this)
-                .load(receiverProfileImageUrl)
-                .circleCrop()
-                .into(imgProfile)
-        }
 
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        adapter = MessageAdapter(mutableListOf(), currentUserId)
-        rvMessages.adapter = adapter
-        rvMessages.layoutManager = LinearLayoutManager(this)
+                rvMessages.adapter = adapter
+                rvMessages.layoutManager = LinearLayoutManager(this)
 
-        // ----------------------------
-        // 메시지 실시간 로드
-        // ----------------------------
-        viewModel.loadMessages(chatId)
+                // 3) 메시지 로드 시작
+                observeMessages(rvMessages)
+            }
 
-        viewModel.messages.observe(this) { messages ->
-            adapter.updateMessages(messages)
-            rvMessages.scrollToPosition(messages.size - 1)
-
-            // 알림 트리거
-            val lastMsg = messages.lastOrNull() ?: return@observe
-
-            // 내가 보낸 메시지는 알림 안 띄움
-            if (lastMsg.senderId == currentUserId) return@observe
-
-            // 채팅방 안에 있을 때도 교수님 요구사항 따라 알림 표시 필요
-            showChatNotification(
-                message = lastMsg.text ?: "[Voice Message]",
-                sender = receiverName
-            )
-        }
-
-        // 메시지 보내기
         btnSend.setOnClickListener {
             val text = edtMessage.text.toString()
             if (text.isNotBlank()) {
                 viewModel.sendMessage(chatId, text)
                 edtMessage.text.clear()
             }
-        }
-
-        // 기울기 측정
-        val btnLevel = findViewById<ImageButton>(R.id.btnLevel)
-        btnLevel.setOnClickListener {
-            val intent = Intent(this, LevelMeterActivity::class.java)
-            levelMeterLauncher.launch(intent)
         }
 
         // 음성 녹음 UI
@@ -156,20 +119,38 @@ class ChatRoomActivity : AppCompatActivity() {
         }
 
         if (!checkAudioPermission()) requestAudioPermission()
+        findViewById<View>(R.id.topBar).bringToFront()
+
     }
 
-    // ----------------------------
-    // 알림 채널 생성 (필수)
-    // ----------------------------
+    // ---------------------------
+    // 메시지 옵저버
+    // ---------------------------
+    private fun observeMessages(rvMessages: RecyclerView) {
+        val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+
+        viewModel.loadMessages(chatId)
+        viewModel.messages.observe(this) { messages ->
+            adapter.updateMessages(messages)
+            rvMessages.scrollToPosition(messages.size - 1)
+
+            val lastMsg = messages.lastOrNull() ?: return@observe
+            if (lastMsg.senderId == currentUserId) return@observe
+
+            showChatNotification(
+                message = lastMsg.text ?: "[Voice Message]",
+                sender = receiverName
+            )
+        }
+    }
+
+    // ---------------------------
+    // 알림 생성
+    // ---------------------------
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                "chat_channel",
-                "Chat Messages",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(channel)
+            val channel = NotificationChannel("chat_channel", "Chat Messages", NotificationManager.IMPORTANCE_HIGH)
+            getSystemService(NotificationManager::class.java).createNotificationChannel(channel)
         }
     }
 
@@ -184,44 +165,34 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     private fun showChatNotification(message: String, sender: String) {
-
         val intent = Intent(this, ChatRoomActivity::class.java).apply {
             putExtra("receiverUid", receiverUid)
             putExtra("chatId", chatId)
         }
 
         val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
+            this, 0, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val builder = NotificationCompat.Builder(this, "chat_channel")
-            .setSmallIcon(R.drawable.ic_logo)   // ← 여기 아이콘 문제 해결
-            .setContentTitle("$sender 님의 메시지")             // ← 여기 오류 제거
+            .setSmallIcon(R.drawable.ic_logo)
+            .setContentTitle("$sender 님의 메시지")
             .setContentText(message)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
 
-        val manager = NotificationManagerCompat.from(this)
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+            != PackageManager.PERMISSION_GRANTED
+        ) return
 
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
-        }
-
-        manager.notify(10001, builder.build())
+        NotificationManagerCompat.from(this).notify(10001, builder.build())
     }
 
-
-    // ----------------------------
-    // 아래는 기존 음성 녹음/전송 기능 (수정 X)
-    // ----------------------------
+    // ---------------------------
+    // 음성 메시지 녹음
+    // ---------------------------
     private fun startRecording() {
         try {
             val outputDir = externalCacheDir
@@ -232,18 +203,17 @@ class ChatRoomActivity : AppCompatActivity() {
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
                 setOutputFile(audioFile.absolutePath)
-
                 prepare()
                 start()
             }
 
             isRecording = true
-            tvRecordingStatus.text = "🎙️ Recording voice..."
+            tvRecordingStatus.text = "🎙 Recording..."
             tvRecordingStatus.visibility = View.VISIBLE
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Toast.makeText(this, "Failed to start recording", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Recording failed", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -255,18 +225,13 @@ class ChatRoomActivity : AppCompatActivity() {
         mediaRecorder = null
         isRecording = false
 
-        tvRecordingStatus.text = ""
         tvRecordingStatus.visibility = View.GONE
-
         uploadToStorage(audioFile)
     }
 
-    private fun checkAudioPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this,
-            android.Manifest.permission.RECORD_AUDIO
-        ) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun checkAudioPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO) ==
+                PackageManager.PERMISSION_GRANTED
 
     private fun requestAudioPermission() {
         ActivityCompat.requestPermissions(
@@ -277,16 +242,15 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     private fun uploadToStorage(file: File) {
-        val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
         val timestamp = System.currentTimeMillis()
-
-        val storageRef = FirebaseStorage.getInstance().reference
-        val audioRef = storageRef.child("audio_messages/${chatId}_${currentUid}_${timestamp}.m4a")
+        val audioRef = FirebaseStorage.getInstance().reference
+            .child("audio_messages/${chatId}_${uid}_${timestamp}.m4a")
 
         audioRef.putFile(Uri.fromFile(file))
             .addOnSuccessListener {
                 audioRef.downloadUrl.addOnSuccessListener { uri ->
-                    sendAudioMessage(chatId, uri.toString())
+                    sendAudioMessage(uri.toString())
                 }
             }
             .addOnFailureListener {
@@ -294,24 +258,20 @@ class ChatRoomActivity : AppCompatActivity() {
             }
     }
 
-    private fun sendAudioMessage(chatId: String, audioUrl: String) {
-        val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
-
+    private fun sendAudioMessage(audioUrl: String) {
+        val uid = FirebaseAuth.getInstance().currentUser!!.uid
         val msg = mapOf(
-            "senderId" to currentUid,
+            "senderId" to uid,
             "audioUrl" to audioUrl,
             "timestamp" to System.currentTimeMillis()
         )
 
         FirebaseFirestore.getInstance()
-            .collection("chats")
-            .document(chatId)
-            .collection("messages")
-            .add(msg)
+            .collection("chats").document(chatId)
+            .collection("messages").add(msg)
 
         FirebaseFirestore.getInstance()
-            .collection("chats")
-            .document(chatId)
+            .collection("chats").document(chatId)
             .update(
                 mapOf(
                     "lastMessage" to "[Voice Message]",
@@ -319,8 +279,7 @@ class ChatRoomActivity : AppCompatActivity() {
                 )
             )
     }
-    private fun getChatId(uid1: String, uid2: String): String {
-        return listOf(uid1, uid2).sorted().joinToString("_")
-    }
 
+    private fun getChatId(uid1: String, uid2: String): String =
+        listOf(uid1, uid2).sorted().joinToString("_")
 }
