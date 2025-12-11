@@ -91,15 +91,26 @@ class FeedPersonFragment : Fragment() {
 
     private fun setupListeners() {
         binding.searchBoxPerson.setOnClickListener {
-            val dialog = FilterDialog(requireContext()) { filters ->
-                //  FeedViewModel이 모든 필터를 처리함
-                viewModel.applyFilters(filters)
+
+            lifecycleScope.launch {
+                // 1) Firestore에서 옵션 로드
+                val options = viewModel.loadFilterOptions()
+
+                // 2) FilterDialog에 options 전달
+                val dialog = FilterDialog(
+                    requireContext(),
+                    options
+                ) { filters ->
+                    viewModel.applyFilters(filters)
+                }
+
+                dialog.showStep1()
             }
-            dialog.showStep1()
         }
     }
 
-        override fun onDestroyView() {
+
+    override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }

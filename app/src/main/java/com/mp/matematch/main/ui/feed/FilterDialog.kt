@@ -10,6 +10,7 @@ import com.mp.matematch.databinding.DialogFilterStep2Binding
 
 class FilterDialog(
     private val context: Context,
+    private val options: FilterOptions,
     private val onApplyFilters: (Map<String, Any?>) -> Unit
 ) {
     private var step1Dialog: AlertDialog? = null

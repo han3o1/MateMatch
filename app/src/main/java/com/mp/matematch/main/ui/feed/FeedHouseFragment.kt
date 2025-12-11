@@ -18,6 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.databinding.FragmentFeedHouseBinding
 import com.mp.matematch.main.ui.chat.ChatRoomActivity
 import com.mp.matematch.settings.SettingsRepository
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class FeedHouseFragment : Fragment() {
 
@@ -79,18 +82,25 @@ class FeedHouseFragment : Fragment() {
 
     private fun setupListeners() {
         binding.searchBoxHouse.setOnClickListener {
-            val dialog = FilterDialog(requireContext()) { filters ->
-                // FeedViewModel에서 모든 필터 관리함
-                viewModel.applyFilters(filters)
+
+            lifecycleScope.launch {
+                val options = viewModel.loadFilterOptions()
+
+                val dialog = FilterDialog(
+                    requireContext(),
+                    options
+                ) { filters ->
+                    viewModel.applyFilters(filters)
+                }
+
+                dialog.showStep1()
             }
-            dialog.showStep1()
         }
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
+
+
+
 
     // ===========================================================
     // 🔥 채팅 기능 (정상 위치)
