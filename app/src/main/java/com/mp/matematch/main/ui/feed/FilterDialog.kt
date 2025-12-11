@@ -81,13 +81,18 @@ class FilterDialog(
         // -----------------------------
         // 🔥 Step2 각 필터 옵션 — DB 값 기반
         // -----------------------------
-        attachSpinner(binding.spinnerGender, "Gender", listOf("Male", "Female"))
-        attachSpinner(binding.spinnerLifestyle, "Lifestyle", options.sleepSchedules)
-        attachSpinner(binding.spinnerSmoking, "Smoking", options.smoking)
-        attachSpinner(binding.spinnerPets, "Pets", options.pets)
-        attachSpinner(binding.spinnerCleanliness, "Cleanliness", options.cleanliness)
-        attachSpinner(binding.spinnerOccupation, "Occupation", options.occupations)
+        attachSpinner(binding.spinnerGender, "Any", listOf("Male", "Female"))
+        attachSpinner(binding.spinnerLifestyle, "Any", options.sleepSchedules)
+        attachSpinner(binding.spinnerSmoking, "Any", options.smoking)
+        attachSpinner(binding.spinnerPets, "Any", options.pets)
+        attachSpinner(binding.spinnerCleanliness, "Any", options.cleanliness)
+        attachSpinner(binding.spinnerOccupation, "Any", options.occupations)
 
+        attachSpinner(
+            binding.spinnerMoveInDate,
+            "Any",
+            listOf("Within 1 month", "Within 3 months")
+        )
         // Move-in date는 3개 옵션 유지
         attachSpinner(
             binding.spinnerMoveInDate,
