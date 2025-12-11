@@ -283,27 +283,32 @@ class MapFragment : Fragment() {
     }
 
     private fun startLocationListener() {
-        Log.d("Firestore", " 타 사용자 위치 리스너 등록 완료")
-
-        locationListener = db.collection(LOCATION_COLLECTION_NAME)
-            .whereNotEqualTo("userId", currentUserId)
+        db.collection("users")
             .addSnapshotListener { snapshots, e ->
                 if (e != null) {
-                    Log.e("Firestore", " 위치 리스너 실패: ${e.message}")
+                    Log.e("Firestore", "유저 좌표 읽기 실패: ${e.message}")
                     return@addSnapshotListener
                 }
 
-                if (snapshots != null) {
-                    val otherUsers = snapshots.documents.mapNotNull { document ->
-                        document.toObject(OtherUserLocation::class.java)?.copy(userId = document.id)
-                    }.filter {
-                        it.geoPoint.latitude != 0.0 || it.geoPoint.longitude != 0.0
-                    }
+                val otherUsers = snapshots!!.documents.mapNotNull { doc ->
+                    val lat = doc.getDouble("latitude")
+                    val lng = doc.getDouble("longitude")
+                    val uid = doc.getString("uid") ?: doc.id
 
-                    showOtherUsersLocations(otherUsers)
+                    if (lat != null && lng != null && uid != currentUserId) {
+                        OtherUserLocation(
+                            userId = uid,
+                            geoPoint = GeoPoint(lat, lng)
+                        )
+                    } else null
                 }
+
+                showOtherUsersLocations(otherUsers)
             }
+        Log.d("DEBUG", "currentUserId = $currentUserId")
+
     }
+
 
     private fun setupLabelStyles(labelManager: LabelManager) {
         // 1. 내 위치 스타일 정의
@@ -365,27 +370,18 @@ class MapFragment : Fragment() {
     }
 
     private fun updateMyPositionToFirestore(location: Location) {
-        if (currentUserId == "GUEST_INIT" || currentUserId.startsWith("GUEST_")) {
-            Log.w("Firestore", "️ Firebase Auth UID가 없습니다. 위치 정보 저장하지 않습니다.")
-            return
-        }
 
-        val userLocationData = mapOf(
+        val data = mapOf(
             "userId" to currentUserId,
             "geoPoint" to GeoPoint(location.latitude, location.longitude),
             "timestamp" to System.currentTimeMillis()
         )
 
-        db.collection(LOCATION_COLLECTION_NAME)
+        db.collection("userLocations")
             .document(currentUserId)
-            .set(userLocationData)
-            .addOnSuccessListener {
-                Log.d("Firestore", "내 위치 (${currentUserId}) Firestore 업데이트 성공")
-            }
-            .addOnFailureListener { e ->
-                Log.e("Firestore", " 내 위치 Firestore 업데이트 실패", e)
-            }
+            .set(data)
     }
+
 
     fun showOtherUsersLocations(otherUsers: List<OtherUserLocation>) {
         val layer = otherUserLabelLayer ?: return

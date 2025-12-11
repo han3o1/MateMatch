@@ -12,14 +12,24 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.R
 import com.mp.matematch.databinding.ActivityMainBinding
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+
+
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private var isNavGraphReady = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -54,6 +64,11 @@ class MainActivity : AppCompatActivity() {
             Log.e("KakaoKeyHash", "해시 키를 찾을 수 없습니다.", e)
         }
     }
+    override fun onResume() {
+        super.onResume()
+        updateUserLocation()   // 앱 다시 보일 때마다 위치 갱신
+    }
+
 
     private fun setupNavigationByUserType() {
         val uid = FirebaseAuth.getInstance().uid
@@ -116,4 +131,41 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun updateUserLocation() {
+
+        // 위치 권한 체크
+        if (ContextCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                1002
+            )
+            return
+        }
+
+        // 마지막 위치 가져오기
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                val lat = location.latitude
+                val lng = location.longitude
+
+                val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return@addOnSuccessListener
+
+                FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(uid)
+                    .update(
+                        mapOf(
+                            "latitude" to lat,
+                            "longitude" to lng
+                        )
+                    )
+            }
+        }
+    }
+
 }
