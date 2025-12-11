@@ -96,6 +96,17 @@ class ChatRoomActivity : AppCompatActivity() {
                     this.receiverProfileImageUrl = receiverProfileUrl
                 }
 
+                adapter.onLongPress = { message ->
+                    AlertDialog.Builder(this)
+                        .setTitle("message delete")
+                        .setMessage("message delete?")
+                        .setPositiveButton("deleted") { _, _ ->
+                            deleteMessage(message)   // ←🔥🔥 여기서 호출된다
+                        }
+                        .setNegativeButton("cancel", null)
+                        .show()
+                }
+
                 rvMessages.adapter = adapter
                 rvMessages.layoutManager = LinearLayoutManager(this)
 
@@ -121,6 +132,17 @@ class ChatRoomActivity : AppCompatActivity() {
         if (!checkAudioPermission()) requestAudioPermission()
         findViewById<View>(R.id.topBar).bringToFront()
 
+        val btnLevel = findViewById<ImageButton>(R.id.btnLevel)
+
+        btnLevel.setOnClickListener {
+            val intent = Intent(this, LevelMeterActivity::class.java)
+            levelMeterLauncher.launch(intent)
+        }
+
+
+
+
+
     }
 
     // ---------------------------
@@ -128,6 +150,7 @@ class ChatRoomActivity : AppCompatActivity() {
     // ---------------------------
     private fun observeMessages(rvMessages: RecyclerView) {
         val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
+
 
         viewModel.loadMessages(chatId)
         viewModel.messages.observe(this) { messages ->
@@ -282,4 +305,26 @@ class ChatRoomActivity : AppCompatActivity() {
 
     private fun getChatId(uid1: String, uid2: String): String =
         listOf(uid1, uid2).sorted().joinToString("_")
+
+    private fun deleteMessage(message: Message) {
+        val db = FirebaseFirestore.getInstance()
+
+        if (message.id == null) {
+            Toast.makeText(this, "메시지 ID 없음 – 삭제 불가", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        db.collection("chats")
+            .document(chatId)
+            .collection("messages")
+            .document(message.id!!)
+            .delete()
+            .addOnSuccessListener {
+                Toast.makeText(this, "message deleted", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "delete fail", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 }

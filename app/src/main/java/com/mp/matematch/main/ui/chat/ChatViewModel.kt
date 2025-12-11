@@ -15,25 +15,26 @@ class ChatViewModel : ViewModel() {
     private val _messages = MutableLiveData<List<Message>>()
     val messages: LiveData<List<Message>> = _messages
 
-    // 메시지 불러오기 (실시간)
     fun loadMessages(chatId: String) {
         db.collection("chats")
             .document(chatId)
             .collection("messages")
             .orderBy("timestamp")
-            .addSnapshotListener { snapshot, _ ->
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    return@addSnapshotListener
+                }
                 if (snapshot != null) {
                     val list = snapshot.documents.mapNotNull { doc ->
-                        val msg = doc.toObject(Message::class.java)
-                        msg?.messageId = doc.id   // ← 이 한 줄만 추가됨
-                        msg
+                        doc.toObject(Message::class.java)?.apply {
+                            id = doc.id   // 🔥 여기서 Firestore 문서 ID 넣음
+                        }
                     }
                     _messages.value = list
                 }
             }
     }
 
-    // 메시지 보내기 (현재 사용자 → 상대에게)
     fun sendMessage(chatId: String, text: String) {
         if (text.isBlank()) return
 
@@ -43,13 +44,11 @@ class ChatViewModel : ViewModel() {
             "timestamp" to System.currentTimeMillis()
         )
 
-        // 1. 메시지 저장
         db.collection("chats")
             .document(chatId)
             .collection("messages")
             .add(msg)
 
-        //  2. chats/{chatId}의 lastMessage & updatedAt 업데이트
         db.collection("chats")
             .document(chatId)
             .update(
@@ -60,3 +59,4 @@ class ChatViewModel : ViewModel() {
             )
     }
 }
+
