@@ -8,5 +8,6 @@ data class ChatItem(
     val lastMessage: String = "",
     val timestamp: String = "",
     val profileImageUrl: String = "",
-    val hasNewMessage: Boolean = false
+    val hasNewMessage: Boolean = false,
+    val rawTimestamp: Long
 )

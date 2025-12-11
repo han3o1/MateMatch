@@ -62,21 +62,21 @@ class ChatFragment : Fragment() {
             .collection("chats")
             .whereArrayContains("participants", currentUid)
             .orderBy("updatedAt", Query.Direction.DESCENDING)
-            .get()
-            .addOnSuccessListener { documents ->
+            .addSnapshotListener { documents, error ->
+                if (error != null || documents == null) return@addSnapshotListener
+
                 Log.d("ChatFragment", "chats found = ${documents.size()}")
 
                 if (documents.isEmpty) {
                     chatList.clear()
                     chatAdapter.notifyDataSetChanged()
                     updateEmptyState()
-                    return@addOnSuccessListener
+                    return@addSnapshotListener
                 }
 
-                val tempList = mutableListOf<ChatItem>()   //  임시 리스트
+                val tempList = mutableListOf<ChatItem>()
 
                 for (doc in documents) {
-
                     val chatId = doc.id
                     val participants = doc.get("participants") as? List<String> ?: continue
                     val partnerUid = participants.firstOrNull { it != currentUid } ?: continue
@@ -93,6 +93,7 @@ class ChatFragment : Fragment() {
                             val name = userDoc.getString("name") ?: "Unknown"
                             val job = userDoc.getString("job") ?: ""
                             val profileImageUrl = userDoc.getString("profileImageUrl") ?: ""
+                            val timestampMillis = doc.getTimestamp("updatedAt")?.toDate()?.time ?: 0L
 
                             val item = ChatItem(
                                 chatId = chatId,
@@ -102,28 +103,26 @@ class ChatFragment : Fragment() {
                                 lastMessage = lastMessage,
                                 timestamp = formattedTime,
                                 profileImageUrl = profileImageUrl,
-                                hasNewMessage = false
+                                hasNewMessage = false,
+                                rawTimestamp = timestampMillis
                             )
 
                             tempList.add(item)
 
-                            //  모든 채팅 상대 정보 로딩 완료되었을 때만 RecyclerView 업데이트
                             if (tempList.size == documents.size()) {
+
+                                tempList.sortByDescending { it.rawTimestamp }
+
                                 chatList.clear()
                                 chatList.addAll(tempList)
                                 chatAdapter.notifyDataSetChanged()
                                 updateEmptyState()
                             }
                         }
-                        .addOnFailureListener { e ->
-                            Log.e("ChatFragment", " Failed to load user info: $partnerUid", e)
-                        }
                 }
             }
-            .addOnFailureListener { e ->
-                Log.e("ChatFragment", "Error fetching chats", e)
-            }
     }
+
 
 
 

@@ -96,6 +96,12 @@ class ChatRoomActivity : AppCompatActivity() {
         // 2. 이름이나 프로필이 비어있으면 Firestore에서 가져오기
         if (receiverName.isEmpty() || receiverProfileImageUrl.isEmpty()) {
             FirebaseFirestore.getInstance()
+                .collection("chats")
+                .document(chatId)
+                .update("updatedAt", FieldValue.serverTimestamp())
+
+            // 2) 이제 users에서 이름/프로필 가져오기
+            FirebaseFirestore.getInstance()
                 .collection("users")
                 .document(receiverUid)
                 .get()
