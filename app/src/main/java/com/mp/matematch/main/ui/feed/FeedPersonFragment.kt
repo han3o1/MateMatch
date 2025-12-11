@@ -18,6 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.mp.matematch.databinding.FragmentFeedPersonBinding
 import com.mp.matematch.main.ui.chat.ChatRoomActivity
 import com.mp.matematch.settings.SettingsRepository
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class FeedPersonFragment : Fragment() {
 
@@ -96,7 +99,7 @@ class FeedPersonFragment : Fragment() {
         }
     }
 
-    override fun onDestroyView() {
+        override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }

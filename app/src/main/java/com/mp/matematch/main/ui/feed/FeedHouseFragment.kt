@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -38,11 +38,8 @@ class FeedHouseFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         houseAdapter = HouseAdapter(mutableListOf()) { partnerUid ->
-            if (partnerUid != null) {
-                startChat(partnerUid)
-            } else {
-                Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT).show()
-            }
+            if (partnerUid != null) startChat(partnerUid)
+            else Toast.makeText(requireContext(), "Error: Could not find user", Toast.LENGTH_SHORT).show()
         }
 
         setupRecyclerView()
@@ -53,8 +50,7 @@ class FeedHouseFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        val settingsRepo = SettingsRepository
-        val mode = settingsRepo.getFeedViewMode(requireContext())
+        val mode = SettingsRepository.getFeedViewMode(requireContext())
 
         binding.recyclerViewHouse.apply {
             adapter = houseAdapter
@@ -67,22 +63,18 @@ class FeedHouseFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-
-        viewModel.houseList.observe(viewLifecycleOwner, Observer { feedItems ->
+        viewModel.houseList.observe(viewLifecycleOwner) { feedItems ->
             houseAdapter.updateData(feedItems)
             Log.d("FeedHouse", "피드 업데이트: ${feedItems.size}개")
-        })
+        }
 
-        viewModel.isLoading.observe(viewLifecycleOwner, Observer { loading ->
+        viewModel.isLoading.observe(viewLifecycleOwner) { loading ->
             if (loading) Log.d("FeedHouse", "로딩 중..")
-        })
+        }
 
-        viewModel.error.observe(viewLifecycleOwner, Observer { msg ->
+        viewModel.error.observe(viewLifecycleOwner) { msg ->
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-        })
-
-        //  기존 Pair(city, buildingType)은 더 이상 쓰지 않음
-        // viewModel.currentFilters.observe {...} 제거 가능
+        }
     }
 
     private fun setupListeners() {
@@ -100,6 +92,9 @@ class FeedHouseFragment : Fragment() {
         _binding = null
     }
 
+    // ===========================================================
+    // 🔥 채팅 기능 (정상 위치)
+    // ===========================================================
     private fun startChat(partnerUid: String) {
         val currentUid = FirebaseAuth.getInstance().uid ?: return
         val chatId = listOf(currentUid, partnerUid).sorted().joinToString("_")
@@ -130,5 +125,8 @@ class FeedHouseFragment : Fragment() {
         startActivity(intent)
     }
 
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }
