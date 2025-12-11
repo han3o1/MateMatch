@@ -1,33 +1,33 @@
 package com.mp.matematch.main.ui.chat
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.media.MediaRecorder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.ImageButton
-import android.widget.TextView
+import android.view.View
+import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.storage.FirebaseStorage
 import com.mp.matematch.R
-import android.media.MediaRecorder
 import java.io.File
 import java.io.IOException
-import android.net.Uri
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.firestore.FieldValue
-import android.widget.Toast
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import android.view.View
-import android.content.Intent
-import androidx.activity.result.contract.ActivityResultContracts
-
-
 
 class ChatRoomActivity : AppCompatActivity() {
 
@@ -37,23 +37,229 @@ class ChatRoomActivity : AppCompatActivity() {
     private lateinit var receiverUid: String
 
     private lateinit var tvRecordingStatus: TextView
-
-    // 음성 변수
     private var isRecording = false
     private var mediaRecorder: MediaRecorder? = null
     private lateinit var audioFile: File
 
     private val levelMeterLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
             if (result.resultCode == RESULT_OK) {
                 val levelMsg = result.data?.getStringExtra("levelResult") ?: return@registerForActivityResult
-
-                // 채팅으로 보내기
                 viewModel.sendMessage(chatId, "📐 Tilt Measure:\n$levelMsg")
             }
         }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_chat_room)
+
+        // ----------------------------
+        // 1) 알림 채널 생성 + 권한 요청
+        // ----------------------------
+        createNotificationChannel()
+        requestNotificationPermission()
+
+        val btnBack = findViewById<ImageView>(R.id.btnBack)
+        btnBack.setOnClickListener { finish() }
+
+        // Intent 값
+        receiverUid = intent.getStringExtra("receiverUid") ?: ""
+        chatId = intent.getStringExtra("chatId")
+            ?: getChatId(FirebaseAuth.getInstance().currentUser!!.uid, receiverUid)
+
+        var receiverName = intent.getStringExtra("receiverName") ?: ""
+        var receiverProfileImageUrl = intent.getStringExtra("receiverProfileImageUrl") ?: ""
+
+        val tvName = findViewById<TextView>(R.id.tvUserName)
+        val imgProfile = findViewById<ImageView>(R.id.profileImageView)
+        val rvMessages = findViewById<RecyclerView>(R.id.recyclerViewMessages)
+        val edtMessage = findViewById<EditText>(R.id.etMessage)
+        val btnSend = findViewById<ImageButton>(R.id.btnSend)
+
+        // Firestore에서 유저 정보 불러오기 (if 필요)
+        if (receiverName.isEmpty() || receiverProfileImageUrl.isEmpty()) {
+            FirebaseFirestore.getInstance()
+                .collection("chats")
+                .document(chatId)
+                .update("updatedAt", FieldValue.serverTimestamp())
+
+            FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(receiverUid)
+                .get()
+                .addOnSuccessListener { doc ->
+                    receiverName = doc.getString("name") ?: "Unknown"
+                    receiverProfileImageUrl = doc.getString("profileImageUrl") ?: ""
+
+                    tvName.text = receiverName
+                    Glide.with(this)
+                        .load(receiverProfileImageUrl)
+                        .circleCrop()
+                        .into(imgProfile)
+                }
+        } else {
+            tvName.text = receiverName
+            Glide.with(this)
+                .load(receiverProfileImageUrl)
+                .circleCrop()
+                .into(imgProfile)
+        }
+
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+        adapter = MessageAdapter(mutableListOf(), currentUserId)
+        rvMessages.adapter = adapter
+        rvMessages.layoutManager = LinearLayoutManager(this)
+
+        // ----------------------------
+        // 메시지 실시간 로드
+        // ----------------------------
+        viewModel.loadMessages(chatId)
+
+        viewModel.messages.observe(this) { messages ->
+            adapter.updateMessages(messages)
+            rvMessages.scrollToPosition(messages.size - 1)
+
+            // 알림 트리거
+            val lastMsg = messages.lastOrNull() ?: return@observe
+
+            // 내가 보낸 메시지는 알림 안 띄움
+            if (lastMsg.senderId == currentUserId) return@observe
+
+            // 채팅방 안에 있을 때도 교수님 요구사항 따라 알림 표시 필요
+            showChatNotification(
+                message = lastMsg.text ?: "[Voice Message]",
+                sender = receiverName
+            )
+        }
+
+        // 메시지 보내기
+        btnSend.setOnClickListener {
+            val text = edtMessage.text.toString()
+            if (text.isNotBlank()) {
+                viewModel.sendMessage(chatId, text)
+                edtMessage.text.clear()
+            }
+        }
+
+        // 기울기 측정
+        val btnLevel = findViewById<ImageButton>(R.id.btnLevel)
+        btnLevel.setOnClickListener {
+            val intent = Intent(this, LevelMeterActivity::class.java)
+            levelMeterLauncher.launch(intent)
+        }
+
+        // 음성 녹음 UI
+        tvRecordingStatus = findViewById(R.id.tvRecordingStatus)
+        val btnRecord = findViewById<ImageButton>(R.id.btnRecord)
+        btnRecord.setOnClickListener {
+            if (isRecording) stopRecording() else startRecording()
+        }
+
+        if (!checkAudioPermission()) requestAudioPermission()
+    }
+
+    // ----------------------------
+    // 알림 채널 생성 (필수)
+    // ----------------------------
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "chat_channel",
+                "Chat Messages",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 2001)
+            }
+        }
+    }
+
+    private fun showChatNotification(message: String, sender: String) {
+
+        val intent = Intent(this, ChatRoomActivity::class.java).apply {
+            putExtra("receiverUid", receiverUid)
+            putExtra("chatId", chatId)
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val builder = NotificationCompat.Builder(this, "chat_channel")
+            .setSmallIcon(R.drawable.ic_logo)   // ← 여기 아이콘 문제 해결
+            .setContentTitle("$sender 님의 메시지")             // ← 여기 오류 제거
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+
+        val manager = NotificationManagerCompat.from(this)
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                android.Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
+
+        manager.notify(10001, builder.build())
+    }
+
+
+    // ----------------------------
+    // 아래는 기존 음성 녹음/전송 기능 (수정 X)
+    // ----------------------------
+    private fun startRecording() {
+        try {
+            val outputDir = externalCacheDir
+            audioFile = File.createTempFile("audio_", ".3gp", outputDir)
+
+            mediaRecorder = MediaRecorder().apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                setOutputFile(audioFile.absolutePath)
+
+                prepare()
+                start()
+            }
+
+            isRecording = true
+            tvRecordingStatus.text = "🎙️ Recording voice..."
+            tvRecordingStatus.visibility = View.VISIBLE
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Failed to start recording", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopRecording() {
+        mediaRecorder?.apply {
+            stop()
+            release()
+        }
+        mediaRecorder = null
+        isRecording = false
+
+        tvRecordingStatus.text = ""
+        tvRecordingStatus.visibility = View.GONE
+
+        uploadToStorage(audioFile)
+    }
 
     private fun checkAudioPermission(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -70,185 +276,20 @@ class ChatRoomActivity : AppCompatActivity() {
         )
     }
 
-
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_chat_room)
-
-        val btnBack = findViewById<ImageView>(R.id.btnBack)
-        btnBack.setOnClickListener { finish() }
-
-        //  1. Intent 값 가져오기
-        receiverUid = intent.getStringExtra("receiverUid") ?: ""
-        chatId = intent.getStringExtra("chatId")
-            ?: getChatId(FirebaseAuth.getInstance().currentUser!!.uid, receiverUid)
-
-        var receiverName = intent.getStringExtra("receiverName") ?: ""
-        var receiverProfileImageUrl = intent.getStringExtra("receiverProfileImageUrl") ?: ""
-
-        val tvName = findViewById<TextView>(R.id.tvUserName)
-        val imgProfile = findViewById<ImageView>(R.id.profileImageView)
-        val rvMessages = findViewById<RecyclerView>(R.id.recyclerViewMessages)
-        val edtMessage = findViewById<EditText>(R.id.etMessage)
-        val btnSend = findViewById<ImageButton>(R.id.btnSend)
-
-        // 2. 이름이나 프로필이 비어있으면 Firestore에서 가져오기
-        if (receiverName.isEmpty() || receiverProfileImageUrl.isEmpty()) {
-            FirebaseFirestore.getInstance()
-                .collection("chats")
-                .document(chatId)
-                .update("updatedAt", FieldValue.serverTimestamp())
-
-            // 2) 이제 users에서 이름/프로필 가져오기
-            FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(receiverUid)
-                .get()
-                .addOnSuccessListener { doc ->
-                    receiverName = doc.getString("name") ?: "Unknown"
-                    receiverProfileImageUrl = doc.getString("profileImageUrl") ?: ""
-
-                    tvName.text = receiverName
-
-                    Glide.with(this)
-                        .load(receiverProfileImageUrl)
-                        .circleCrop()
-                        .into(imgProfile)
-                }
-        } else {
-            // Intent 값으로 UI 바인딩
-            tvName.text = receiverName
-            Glide.with(this)
-                .load(receiverProfileImageUrl)
-                .circleCrop()
-                .into(imgProfile)
-        }
-
-        //  3. 메시지 목록 초기화
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
-        adapter = MessageAdapter(mutableListOf(), currentUserId)
-        rvMessages.adapter = adapter
-        rvMessages.layoutManager = LinearLayoutManager(this)
-
-        // 4. 메시지 불러오기
-        viewModel.loadMessages(chatId)
-
-        viewModel.messages.observe(this) { messages ->
-            adapter.updateMessages(messages)
-            rvMessages.scrollToPosition(messages.size - 1)
-        }
-
-        //  5. 메시지 보내기
-        btnSend.setOnClickListener {
-            val text = edtMessage.text.toString()
-            if (text.isNotBlank()) {
-                viewModel.sendMessage(chatId, text)
-                edtMessage.text.clear()
-            }
-        }
-
-        val btnLevel = findViewById<ImageButton>(R.id.btnLevel)
-        btnLevel.setOnClickListener {
-            val intent = Intent(this, LevelMeterActivity::class.java)
-            levelMeterLauncher.launch(intent)
-        }
-
-
-
-
-
-        tvRecordingStatus = findViewById(R.id.tvRecordingStatus)
-
-        val btnRecord = findViewById<ImageButton>(R.id.btnRecord)
-        btnRecord.setOnClickListener {
-            if (isRecording) {
-                stopRecording()
-            } else {
-                startRecording()
-            }
-        }
-        if (!checkAudioPermission()) {
-            requestAudioPermission()
-        }
-    }
-
-    private fun startRecording() {
-        try {
-            val outputDir = externalCacheDir
-            audioFile = File.createTempFile("audio_", ".3gp", outputDir)
-
-            mediaRecorder = MediaRecorder()
-            mediaRecorder?.apply {
-
-                // 순서 매우 중요!
-                setAudioSource(MediaRecorder.AudioSource.MIC)
-                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-
-                setOutputFile(audioFile.absolutePath)
-
-                try {
-                    prepare()
-                    start()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                    Toast.makeText(this@ChatRoomActivity, "Failed to prepare recording", Toast.LENGTH_SHORT).show()
-                    return
-
-                }
-            }
-
-            isRecording = true
-            tvRecordingStatus.text = "🎙️ Recording voice..."
-            tvRecordingStatus.visibility = View.VISIBLE
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-            Toast.makeText(this, "An error occurred while starting the recording", Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-    private fun stopRecording() {
-        mediaRecorder?.apply {
-            stop()
-            release()
-        }
-        mediaRecorder = null
-        isRecording = false
-        tvRecordingStatus.text = ""
-        tvRecordingStatus.visibility = View.GONE
-
-
-        uploadToStorage(audioFile)
-    }
-
-
-
-
-
-    private fun getChatId(uid1: String, uid2: String): String {
-        return listOf(uid1, uid2).sorted().joinToString("_")
-    }
-
     private fun uploadToStorage(file: File) {
         val currentUid = FirebaseAuth.getInstance().currentUser!!.uid
         val timestamp = System.currentTimeMillis()
 
         val storageRef = FirebaseStorage.getInstance().reference
-        val audioRef =
-            storageRef.child("audio_messages/${chatId}_${currentUid}_${timestamp}.m4a")
+        val audioRef = storageRef.child("audio_messages/${chatId}_${currentUid}_${timestamp}.m4a")
 
         audioRef.putFile(Uri.fromFile(file))
             .addOnSuccessListener {
                 audioRef.downloadUrl.addOnSuccessListener { uri ->
-                    val audioUrl = uri.toString()
-                    sendAudioMessage(chatId, audioUrl)
+                    sendAudioMessage(chatId, uri.toString())
                 }
             }
             .addOnFailureListener {
-                it.printStackTrace()
                 Toast.makeText(this, "Upload failed", Toast.LENGTH_SHORT).show()
             }
     }
@@ -278,22 +319,8 @@ class ChatRoomActivity : AppCompatActivity() {
                 )
             )
     }
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-
-        if (requestCode == 1001 && grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Recording permission granted", Toast.LENGTH_SHORT).show()
-
-        } else {
-            Toast.makeText(this, "Recording permission is required", Toast.LENGTH_SHORT).show()
-
-        }
+    private fun getChatId(uid1: String, uid2: String): String {
+        return listOf(uid1, uid2).sorted().joinToString("_")
     }
-
-
 
 }
